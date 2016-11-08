@@ -14,11 +14,17 @@ type card = Suspect of string | Weapon of string | Room of string
 (* The hand is just a card list *)
 type hand = card list
 
+type guess = card * card * card
+
 (* Info represents what we know of a specific card *)
 type info = Mine | ShownBy of string | Unknown | Envelope
 
 (* [sheet] is a map from a [card] to [info] *)
 type sheet
+
+type agent = Human | DumbAI | SmartAI
+
+type move = Roll | Passage
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
@@ -27,7 +33,7 @@ type player = {id: string;
                hand: hand;
                curr_loc: loc;
                sheet: sheet;
-               agent: Agent.t}
+               agent: agent}
 
 type model = {players: player list; curr_player: string; board: loc}
 
@@ -37,7 +43,7 @@ val import_board : string -> model
 
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
-val get_move_options : model -> Agent.move list
+val get_move_options : model -> move list
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
