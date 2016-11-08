@@ -35,7 +35,7 @@ type player = {id: string;
                sheet: sheet;
                agent: agent}
 
-type model = {players: player list; curr_player: string; board: loc}
+type game = {players: player list; curr_player: string; board: loc}
 
 (* [import_board] takes in a filename of a game configuration file and
  * converts the file into a usable game model for stepping through. *)
