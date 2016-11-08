@@ -1,5 +1,8 @@
 open Data
 
+(* Prompts the user for a file so that it can be imported into the Model *)
+val prompt_filename : () -> string
+
 (* Prints a description of who's turn it is. *)
 val print_turn : game -> ()
 
