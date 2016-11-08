@@ -35,4 +35,5 @@ type player = {id: string;
                sheet: sheet;
                agent: agent}
 
-type game = {players: player list; curr_player: string; board: loc}
+type game = {players: player list; curr_player: string; board: loc;
+             envelope: guess}
