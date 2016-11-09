@@ -1,22 +1,25 @@
 open Data
 
 (* Displays the provided error message. *)
-val display_error : string -> ()
+val display_error : string -> unit
 
 (* Displays a description of who's turn it is. *)
-val display_turn : game -> ()
+val display_turn : game -> unit
+
+(* Prompts the user for a file so that it can be imported into the Model *)
+val prompt_filename : unit -> string
 
 (* Prompts the user for whether he rolls dice or not. *)
 val prompt_move : move list -> string
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
-val display_move : move -> ()
+val display_move : move -> unit
 
 (* Prompts the user for his. *)
 val prompt_movement : (string * loc) list -> string
 
 (* Displays the movement the agen took on his turn *)
-val display_movement : (string * loc) -> ()
+val display_movement : (string * loc) -> unit
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
