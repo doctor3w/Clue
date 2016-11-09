@@ -28,7 +28,7 @@ val display_movement : (string * loc) -> unit
 val prompt_guess : loc -> bool -> string
 
 (* Displays a guess (by the user or AI). *)
-val display_guess : guess -> ()
+val display_guess : guess -> unit
 
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.
@@ -38,7 +38,7 @@ val prompt_answer : hand -> guess -> string
 (* Displays the card shown to the human agent and by whom.
  * If None, the user is told just told who showed a card, but not the details
  * of the card. *)
-val display_answer : card option -> string -> ()
+val display_answer : card option -> string -> unit
 
 (* Displays end game victory text. *)
-val display_victory : () -> ()
+val display_victory : unit -> unit
