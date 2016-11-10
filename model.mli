@@ -2,7 +2,7 @@ open Data
 
 (* [import_board] takes in a filename of a game configuration file and
  * converts the file into a usable game model for stepping through. *)
-val import_board : string -> model
+val import_board : string -> game
 
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)

@@ -8,4 +8,4 @@ val step : game -> unit
 
 (* [start] uses view to prompt for a filename which is then passed to the
  * model to build the initial game state. [start] terminates by calling [step]*)
-val start : unit -> unit
+val start : string option -> unit
