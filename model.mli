@@ -9,8 +9,8 @@ val import_board : string -> game
 val get_move_options : game -> move list
 
 (* [get_movement_options] gets the options of the locations that the current
- * player can move to. These options also come with a description in one of
- * the following fashions:
+ * player can move to within the dice roll int. These options also come with
+ * a description in one of the following fashions:
  *        head towars [room name]
  *        go into [room name] *)
-val get_movement_options : game -> (string * loc) list
+val get_movement_options : game -> int -> (string * loc) list
