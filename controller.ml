@@ -27,7 +27,13 @@ let step game =
   let move = Who.answer_move (Model.get_move_options game) in
   let () = Display.display_move move in
   match move with
-  | RollDice -> (Random.int 11) + 2
+  | RollDice -> begin
+    let movement_opt = Model.get_movement_options ((Random.int 11) + 2) in
+    let movement = Who.get_movement movement_opt in
+    let curr_p' = {curr_p with curr_location = movement}
+    match movement with
+    | Room(s, l) when s = "envelope" ->
+    | _ -> (* Get Guess *)
   | Passage ->
 
 
