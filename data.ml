@@ -26,7 +26,7 @@ type sheet
 
 (* [agent] is a type representing what type of agent, specifically which
  * module should be used to call the prompts on *)
-type agent = Human | DumbAI | SmartAI
+type agent = Human_t | DumbAI_t | SmartAI_t
 
 (* [move] is a type of move that you choose to do at the beginning
  * of a turn. *)
