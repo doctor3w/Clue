@@ -226,15 +226,21 @@ in loop game.players
 
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
-<<<<<<< HEAD
-let get_move_options (g: game) : move list =
-  failwith "unimplemented"
-=======
-let get_move_options (g : Data.game) : move list =
+
+let get_move_options (g : game) : move list =
   let cp = get_curr_player g in
+  let add_if_room loc passages =
+    match loc with
+    | Room (s*lst) -> (Passage s)::passages
+    | Space _ -> passages in
+  let loop locs passages =
+    match locs with
+    | [] -> Roll::passages
+    | h::t -> add_if_room h passages
+  in match cp.curr_loc with
+    | Room (s, lst) -> loop lst []
+    | Space _ -> [Roll]
 
-
->>>>>>> 2a3de60... started pathing
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
