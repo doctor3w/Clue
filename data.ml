@@ -30,13 +30,13 @@ type agent = Human_t | DumbAI_t | SmartAI_t
 
 (* [move] is a type of move that you choose to do at the beginning
  * of a turn. *)
-type move = Roll | Passage of string * loc
+type move = Roll | Passage of loc
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
 type player = {suspect: string;
                hand: hand;
-               mutable curr_loc: loc;
+               curr_loc: loc;
                sheet: sheet;
                agent: agent}
 
