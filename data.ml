@@ -32,6 +32,9 @@ type agent = Human_t | DumbAI_t | SmartAI_t
  * of a turn. *)
 type move = Roll | Passage of loc
 
+(* [listens] represents listening data for responsive AI *)
+type listens
+
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
 type player = {suspect: string;
@@ -40,12 +43,22 @@ type player = {suspect: string;
                sheet: sheet;
                agent: agent}
 
+type public = {curr_player: string;
+               board: loc;
+               acc_room: string;
+               listen_data: listens}
+
 (* [game] is the current state of the game. The players represent all agents
  * of the game, curr_player is the current players turn, board is a
  * representation of the game board used for drawing, envelope is the winning
  * guess. *)
 type game = {players: player list;
+             pulic: public;
+             envelope: guess}
+(* type game = {players: player list;
              curr_player: string;
              board: loc;
              envelope: guess;
-             acc_room: string}
+             acc_room: string;
+             listen_data: listens} *)
+

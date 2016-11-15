@@ -4,13 +4,16 @@ open Data
 val display_error : string -> unit
 
 (* Displays a description of who's turn it is. *)
-val display_turn : game -> unit
+val display_turn : public -> unit
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 val prompt_filename : unit -> string
 
 (* Prompts the user for whether he rolls dice or not. *)
 val prompt_move : move list -> string
+
+(* Displays a description of what the agent rolled. *)
+val display_dice_roll : int -> unit
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 val display_move : move -> unit
