@@ -217,15 +217,29 @@ let import_board (file_name: string) : game =
   deal_hands game full_deck
 
 
+
+let get_curr_player game =
+  let rec loop = function
+  | [] -> failwith "can't find current player"
+  | h::t -> if h.suspect = game.curr_player then h
+in loop game.players
+
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
+<<<<<<< HEAD
 let get_move_options (g: game) : move list =
   failwith "unimplemented"
+=======
+let get_move_options (g : Data.game) : move list =
+  let cp = get_curr_player g in
+
+
+>>>>>>> 2a3de60... started pathing
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
  * the following fashions:
- *        head towars [room name]
+ *        head towards [room name]
  *        go into [room name] *)
 
 let get_movement_options (game: game) (steps: int) : (string * loc) list =
