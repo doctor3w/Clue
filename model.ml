@@ -216,17 +216,20 @@ let import_board (file_name: string) : game =
   deal_hands game full_deck
 
 
-let get_curr_player game =
+let get_curr_player (game: game) : player =
   let rec loop = function
   | [] -> failwith "can't find current player"
-  | h::t -> if h.suspect = game.curr_player then h
+  | h::t -> if h.suspect = game.curr_player then h else loop t
 in loop game.players
 
 
-let remove_dups lst acc =
-  match lst with
-  | [] -> acc
-  | h::t -> if List.mem h acc then remove_dups t acc else remove_dups t (h::acc)
+let remove_dups lst =
+  let rec loop lst acc =
+    match lst with
+    | [] -> acc
+    | h::t -> if List.mem h acc then loop t acc
+              else loop t (h::acc)
+  in loop lst []
 
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
@@ -234,13 +237,13 @@ let remove_dups lst acc =
 let get_move_options (g : game) : move list =
   let cp = get_curr_player g in
   let add_if_room loc passages =
-    match loc with
-    | Room (s,lst) -> (Passage s)::passages
+    match (loc: loc) with
+    | Room (s, lst) -> (Passage loc)::passages
     | Space _ -> passages in
-  let loop locs passages =
+  let rec loop locs passages =
     match locs with
     | [] -> Roll::passages
-    | h::t -> add_if_room h passages
+    | h::t -> loop t (add_if_room h passages)
   in match cp.curr_loc with
     | Room (s, lst) -> loop lst []
     | Space _ -> [Roll]
@@ -257,10 +260,10 @@ let get_movement_options (game: game) (steps: int) : (string * loc) list =
   failwith "unimplemented"
 =======
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
-  let f = (fun acc el -> step_loop el (steps-1) acc)
-  in let rec step_loop loc steps loclst =
+  let rec f = (fun acc el -> step_loop el (steps-1) acc)
+  and step_loop loc steps loclst =
     if steps = 0 then loclst else
-    match loc with
+    match (loc: loc) with
     | Room (name, lst) -> loc::loclst
     | Space ((r,c), lst) -> (List.fold_left f loclst lst)
   in let f' = (fun acc el -> match el with | Space _ -> f acc el | _ -> acc)
@@ -270,6 +273,6 @@ let get_movement_options (g: game) (steps: int) : (string * loc) list =
   in let lst_dups = List.fold_left f' [] step1
   in let lst_nodups = remove_dups lst_dups
   in let lst_final = List.filter (fun x -> x != start_loc) lst_nodups
-  in let room_name loc = match loc with Room (n,_) -> n | _ -> failwith "not a room"
+  in let room_name loc = match (loc: loc) with Room (n,_) -> n | _ -> failwith "not a room"
   in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final
 >>>>>>> 6f38f2f... preliminary pathing done
