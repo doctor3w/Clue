@@ -43,5 +43,5 @@ val prompt_answer : hand -> guess -> string
  * of the card. *)
 val display_answer : card option -> string -> unit
 
-(* Displays end game victory text. *)
-val display_victory : unit -> unit
+(* Displays end game victory text, string is who won. *)
+val display_victory : string -> unit
