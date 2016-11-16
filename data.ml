@@ -1,3 +1,5 @@
+(* open Agent *)
+
 (**
  * [loc] respresents a location on the board, holding the name of the room
  * or the coordinates of the space. The list represents all the locations
@@ -9,7 +11,7 @@ type loc = Room of string * loc list | Space of (int * int) * loc list
  * [card] respresents a board game card, which is one of three things.
  * The string is the name on that card.
  *)
-type card = Suspect of string | Weapon of string | Room of string
+type card = Suspect of string | Weapon of string | Room_c of string
 
 (* The hand is just a card list *)
 type hand = card list
@@ -41,7 +43,8 @@ type player = {suspect: string;
                hand: hand;
                curr_loc: loc;
                sheet: sheet;
-               agent: agent}
+               agent: agent;
+               is_out: bool}
 
 type public = {curr_player: string;
                board: loc;
@@ -53,7 +56,7 @@ type public = {curr_player: string;
  * representation of the game board used for drawing, envelope is the winning
  * guess. *)
 type game = {players: player list;
-             pulic: public;
+             public: public;
              envelope: guess}
 (* type game = {players: player list;
              curr_player: string;

@@ -5,7 +5,7 @@ open Agent
 let display_error = failwith ""
 
 (* Displays a description of who's turn it is. *)
-let display_turn = failwith ""
+let display_turn pub = failwith ""
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename = failwith ""
@@ -14,13 +14,15 @@ let prompt_filename = failwith ""
 let prompt_move = failwith ""
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
-let display_move = failwith ""
+let display_move m = failwith ""
+
+let display_dice_roll i = failwith ""
 
 (* Prompts the user for his. *)
 let prompt_movement = failwith ""
 
 (* Displays the movement the agen took on his turn *)
-let display_movement = failwith ""
+let display_movement (s, l) = failwith ""
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -42,4 +44,4 @@ let prompt_answer = failwith ""
 let display_answer = failwith ""
 
 (* Displays end game victory text. *)
-let display_victory = failwith ""
+let display_victory pl_name = failwith ""
