@@ -23,14 +23,14 @@ let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
 let deal_hands game d =
   let p_count = List.length game.players in
   let d_count = List.length deck in
-  let deal_card = (fun p -> c -> {p with hand = c::hand}) in
+  let deal_card = (fun p c -> {p with hand = c::hand}) in
   let d_shuff = List.permute d in
   let rec loop n d players =
     match d with
     | [] -> players
     | h::t -> let f = (fun i a -> if (n mod p_count) = i
                                   then deal_card p h
-                                  else p))
+                                  else p)
               in loop (n+1) t (List.mapi players f)
   in {game with players = (loop 0 d_shuff game.players)}
 
@@ -41,22 +41,26 @@ let extract_pair_from_assoc s asc =
 in loop asc
 
 type player_temp = {
-  id:string; play_ord:int; start:int*int
+  p_id:string; play_ord:int; start:int*int
+}
+
+type room_temp = {
+  r_id:string;
 }
 
 let make_temp_player json =
   let asc = Yojson.Basic.Util.to_assoc json in
-  let p_temp = {id=""; play_ord=-1; start=(=1,-1)} in
+  let p_temp = {p_id = ""; play_ord = -1; start = (-1, -1)} in
   let rec loop lst acc =
   match lst with
   | [] -> p_temp
-  | ("id", s)::t -> let acc = {acc with id = (Yojson.Basic.Util.to_string x)}
+  | ("id", s)::t -> let acc = {acc with p_id = (Yojson.Basic.Util.to_string x)}
                  in loop t acc
   | ("play_order", n)::t -> let acc = {acc with play_ord =
                                       (Yojson.Basic.Util.to_int n)}
                             in loop t acc
-  | ("start_space", j)::t -> let ((s1,n1)::(s2,n2::[]) =
-                                                Yojson.Basic.Util.to_assoc j in
+  | ("start_space", j)::t -> let ((s1,n1)::(s2,n2)::[]) =
+                                                Yojson.Basic.Util.to_assoc j
                           in let r = if s1 = "row"
                                      then Yojson.Basic.Util.to_int n1
                                      else Yojson.Basic.Util.to_int n2
@@ -75,13 +79,19 @@ let make_temp_player json =
 let import_board (file_name: string) : game =
   let json = load_json file_name in
   let main_asc = Yojson.Basic.Util.to_assoc json in
+  let cardify_sus = (fun s -> Suspect s) in
   let cardify_weap = (fun s -> Weapon s) in
+  let cardify_room = (fun s -> Room s) in
   let weap_lst = extract_pair_from_assoc "weapons" asc
-                 |> Yojson.Basic..filter_string
+                 |> Yojson.Util.Basic.filter_string
                  |> (fun x -> List.map x cardify_weap) in
+  let sus_temp_lst = extract_pair_from_assoc "suspects" asc
+                     |> (convert_each make_temp_player) in
+  let sus_id_lst = List.map sus_temp_lst (fun x -> x.p_id) in
+  let sus_lst = List.map sus_id_lst cardify_sus in
   let deck = (sus_lst, weap_lst, room_lst) in
-  let game =
-  let (env * mixed_deck) = pick_env sus_lst weap_lst room_lst in
+  let game = () in
+  let (env, mixed_deck) = pick_env deck in
   let
 
 
