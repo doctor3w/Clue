@@ -1,5 +1,7 @@
 (* open Agent *)
 
+
+
 (**
  * [loc] respresents a location on the board, holding the name of the room
  * or the coordinates of the space. The list represents all the locations
@@ -62,9 +64,10 @@ type player = {suspect: string;
                is_out: bool}
 
 type public = {curr_player: string;
-               board: loc;
+               (*board: loc;*)
                acc_room: string;
-               listen_data: listens}
+               (*listen_data: listens*)
+               }
 
 (* [game] is the current state of the game. The players represent all agents
  * of the game, curr_player is the current players turn, board is a
@@ -80,4 +83,13 @@ type game = {players: player list;
              envelope: guess;
              acc_room: string;
              listen_data: listens} *)
+
+let game_init = {
+  players = [];
+  envelope = (Suspect "", Weapon "", Room_c "");
+  public = {
+    curr_player = "";
+    acc_room = ""
+  }
+}
 

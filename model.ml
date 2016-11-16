@@ -68,7 +68,7 @@ let extract_coord j : int*int =
                            in (r, c)
   | _ -> failwith "invalid coord"
 
-let make_temp_player json =
+let make_temp_player json : player_temp =
   let asc = Yojson.Basic.Util.to_assoc json in
   let p_temp = {p_id = ""; play_ord = -1; start = (-1, -1)} in
   let rec loop lst acc =
@@ -133,23 +133,33 @@ let import_board (file_name: string) : game =
   let cardify_sus = (fun s -> Suspect s) in
   let cardify_weap = (fun s -> Weapon s) in
   let cardify_room = (fun s -> Room_c s) in
+  let acc_id = extract_pair_from_assoc "acc_room" asc
+                 |> YJ.to_string in
   let weap_lst = extract_pair_from_assoc "weapons" asc
                  |> YJ.to_list
                  |> YJ.filter_string
                  |> List.map cardify_weap in
   let sus_temp_lst = extract_pair_from_assoc "suspects" asc
-                     |> YJ.to_list
-                     |> YJ.convert_each make_temp_player in
-  let sus_id_lst = List.map sus_temp_lst (fun x -> x.p_id) in
-  let sus_lst = List.map sus_id_lst cardify_sus in
-  let room_temp_lst = extract_pair_from_assoc "rooms" asc
-                      |> YJ.to_list
+                     |> (YJ.convert_each make_temp_player)
+                     |> List.sort (fun x y -> Pervasives.compare x.play_ord y.play_ord) in
+  let sus_id_lst = List.map (fun x -> x.p_id) sus_temp_lst in
+  let sus_lst = List.map cardify_sus sus_id_lst in
+  let room_temp_lst = (extract_pair_from_assoc "rooms" asc)
                       |> (YJ.convert_each make_temp_room) in
-  let room_id_lst = List.map room_temp_lst (fun x -> x.r_id) in
-  let room_lst = List.map room_id_lst cardify_room in
+  let room_id_lst = (List.map (fun x -> x.r_id) room_temp_lst)
+                    |> List.filter (fun x' -> x' != acc_id) in
+  let room_lst = List.map cardify_room room_id_lst in
   let deck = (sus_lst, weap_lst, room_lst) in
-  let game = () in
   let (env, mixed_deck) = pick_env deck in
+  let game = { game_init with
+    envelope=env;
+    public = {
+      curr_player = (match sus_id_lst with
+                     | h::t -> h
+                     | _ -> failwith "no suspects found");
+      acc_room = acc_id;
+    }
+  } in
   game
 
 
