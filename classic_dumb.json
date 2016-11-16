@@ -1,8 +1,8 @@
 {
   "dim":
   {
-    "rows": 24,
-    "cols": 24
+    "row": 24,
+    "col": 24
   },
   "rooms":
   [

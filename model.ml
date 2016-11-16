@@ -1,6 +1,22 @@
 open Data
 open Yojson.Basic
 
+
+
+(*type player_temp = {
+  p_id:string; play_ord:int; start:int*int
+}
+
+(* rect is x0,x1.y0,y1*)
+type room_temp = {
+  r_id:string;
+  rect:(int*int*int*int);
+  passages: string list;
+  exits: (int*int) list
+}*)
+
+open Board
+
 exception BadConfig
 
 module YJ = Yojson.Basic.Util
@@ -132,7 +148,9 @@ let import_board (file_name: string) : game =
   let asc = Yojson.Basic.Util.to_assoc json in
   let cardify_sus = (fun s -> Suspect s) in
   let cardify_weap = (fun s -> Weapon s) in
-  let cardify_room = (fun s -> Room_c s) in
+  let cardify_room = (fun s -> Room s) in
+  let dim = extract_pair_from_assoc "dim"
+            |> extract_coord in
   let acc_id = extract_pair_from_assoc "acc_room" asc
                  |> YJ.to_string in
   let weap_lst = extract_pair_from_assoc "weapons" asc
@@ -153,13 +171,15 @@ let import_board (file_name: string) : game =
   let (env, mixed_deck) = pick_env deck in
   let game = { game_init with
     envelope=env;
-    public = {
+    public = { game_init.public with
       curr_player = (match sus_id_lst with
                      | h::t -> h
                      | _ -> failwith "no suspects found");
       acc_room = acc_id;
     }
   } in
+  let board' = fill_board dim room_temp_lst in
+  let game = {game with public = {game.public with board = board'}} in
   game
 
 

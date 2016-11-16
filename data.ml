@@ -7,13 +7,13 @@
  * or the coordinates of the space. The list represents all the locations
  * accessible from that location.
  *)
-type loc = Room of string * loc list | Space of (int * int) * loc list
+(*type loc = Room of string * loc list | Space of (int * int) * loc list*)
 
 (**
  * [card] respresents a board game card, which is one of three things.
  * The string is the name on that card.
  *)
-type card = Suspect of string | Weapon of string | Room_c of string
+type card = Suspect of string | Weapon of string | Room of string
 
 module OrderedCard = struct
   type t = card
@@ -49,6 +49,53 @@ type agent = Human_t | DumbAI_t | SmartAI_t
 
 (* [move] is a type of move that you choose to do at the beginning
  * of a turn. *)
+
+type coord = int*int
+
+module Coord = struct
+  type t = coord
+  let compare (r1,c1) (r2,c2) =
+    if r1 < r2 then -1
+    else if r1 > r2 then 1
+    else if c1 < c2 then -1
+    else if c1 > c2 then 1
+    else 0
+end
+
+module CoordMap = Map.Make(Coord)
+module StringMap = Map.Make(String)
+
+type player_temp = {
+  p_id:string; play_ord:int; start:int*int
+}
+
+type rect = int*int*int*int
+(* rect is x0,x1.y0,y1*)
+
+type room_temp = {
+  r_id: string;
+  rect: rect;
+  passages: string list;
+  exits: (int*int) list
+}
+
+(* x0, x1, y0, y1 *)
+
+type coord_info = Space of (int*int) | Room_Rect of string * (int*int*int*int)
+
+type loc =
+{
+  info: coord_info;
+  edges: (int*int) list
+}
+
+type board =
+{
+  dim: int*int;
+  loc_map: loc CoordMap.t;
+  room_coords: coord StringMap.t
+}
+
 type move = Roll | Passage of loc
 
 (* [listens] represents listening data for responsive AI *)
@@ -64,7 +111,7 @@ type player = {suspect: string;
                is_out: bool}
 
 type public = {curr_player: string;
-               (*board: loc;*)
+               board: board;
                acc_room: string;
                (*listen_data: listens*)
                }
@@ -86,10 +133,15 @@ type game = {players: player list;
 
 let game_init = {
   players = [];
-  envelope = (Suspect "", Weapon "", Room_c "");
+  envelope = (Suspect "", Weapon "", Room "");
   public = {
     curr_player = "";
-    acc_room = ""
+    acc_room = "";
+    board = {
+      dim = (-1,-1);
+      loc_map = CoordMap.empty;
+      room_coords = StringMap.empty
+    }
   }
 }
 
