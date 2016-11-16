@@ -87,12 +87,29 @@ let edgify_room board room_temp =
   List.fold_left f' board' room_temp.passages
 
 let add_edge_if_space board c1 c2 =
-  match
+  let (r,c) = board.dim in
+  let (r,c) = (r-1,c-1) in
+  let (x2,y2) = c2 in
+  if x2 < 0 || x2 > c || y2 < 0 || y2 > r then board else
+  match (CoordMap.find board.loc_map c1) with
+  | Space _ -> add_edge board c1 c2 false
+  | Room _ -> board
 
 let edgify_spaces board =
   let (r,c) = board.dim in
   let (r,c) = (r-1,c-1) in
-  let loopx board (x,y)
+  let rec loopx board (x,y) =
+    let rec loopy board (x,y) =
+      if y > r then board
+    else let board' = add_edge_if_space board (x,y) (x-1,y) in
+         let board' = add_edge_if_space board (x,y) (x+1,y) in
+         let board' = add_edge_if_space board (x,y) (x,y-1) in
+         let board' = add_edge_if_space board (x,y) (x,y+1) in
+         loopy board' (x,y+1)
+    in if x > c then board
+    else let board' = loopy board (x,y) in
+    loopx board' (x+1,y) in
+  loopx board (0,0)
 
 let fill_board (r, c) room_temp_lst =
   let empty = build_empty_board r c in
@@ -103,4 +120,5 @@ let fill_board (r, c) room_temp_lst =
   let roomed = List.fold_left f empty room_temp_lst in
   let filled = fill_spaces roomed in
   let room_edged = List.fold_left edgify_room room_temp_lst in
+  edgify_spaces room_edged
 
