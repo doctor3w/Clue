@@ -237,15 +237,15 @@ let remove_dups lst =
 let get_move_options (g : game) : move list =
   let cp = get_curr_player g in
   let add_if_room loc passages =
-    match (loc: loc) with
-    | Room (s, lst) -> (Passage loc)::passages
+    match (loc.info) with
+    | Room (s, _) -> (Passage loc)::passages
     | Space _ -> passages in
   let rec loop locs passages =
     match locs with
     | [] -> Roll::passages
     | h::t -> loop t (add_if_room h passages)
-  in match cp.curr_loc with
-    | Room (s, lst) -> loop lst []
+  in match cp.curr_loc.info with
+    | Room (s, _) -> loop cp.curr_loc.edges []
     | Space _ -> [Roll]
 
 
@@ -254,11 +254,7 @@ let get_move_options (g : game) : move list =
  * the following fashions:
  *        head towards [room name]
  *        go into [room name] *)
-<<<<<<< HEAD
 
-let get_movement_options (game: game) (steps: int) : (string * loc) list =
-  failwith "unimplemented"
-=======
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
   let rec f = (fun acc el -> step_loop el (steps-1) acc)
   and step_loop loc steps loclst =
@@ -275,4 +271,4 @@ let get_movement_options (g: game) (steps: int) : (string * loc) list =
   in let lst_final = List.filter (fun x -> x != start_loc) lst_nodups
   in let room_name loc = match (loc: loc) with Room (n,_) -> n | _ -> failwith "not a room"
   in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final
->>>>>>> 6f38f2f... preliminary pathing done
+
