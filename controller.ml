@@ -20,10 +20,10 @@ let get_cur_next plrs cur =
     | h::[] -> helper ps []
   in if plrs = [] then raise No_players else helper plrs plrs
 
-let string_of_movement l = match l with
-  | Room(s, _) ->
+let string_of_movement l = match (l.info) with
+  | Room_Rect(s, _) ->
     "Entered "^s
-  | Space((x,y), _) ->
+  | Space(x,y) ->
     "Landed on space "^(string_of_int x)^", "^(string_of_int y)
 
 let handle_move game curr_p m =
@@ -35,9 +35,9 @@ let handle_move game curr_p m =
       Agent.get_movement curr_p game.public movement_opt
     | Passage l -> l
 
-let handle_movement game = function
-  | Room(s, _) when s = game.public.acc_room -> `Accusation
-  | Room(_, _) -> `Guess
+let handle_movement game l = match (l.info) with
+  | Room_Rect(s, _) when s = game.public.acc_room -> `Accusation
+  | Room_Rect(_, _) -> `Guess
   | _ -> `End_turn
 
 let replace_player pl lst =
@@ -71,7 +71,7 @@ let rec step game =
     else Display.display_message "Game over."
   else
     let () = Display.display_turn game.public in
-    let move_ops = Model.get_move_options game
+    let move_ops = Model.get_move_options game in
     let move = Agent.answer_move curr_p game.public move_ops in
     let () = Display.display_move move in
     let movement = handle_move game curr_p move in
