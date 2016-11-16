@@ -256,7 +256,8 @@ let get_move_options (g : game) : move list =
  *        go into [room name] *)
 
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
-  let rec f = (fun acc el -> step_loop el (steps-1) acc)
+  failwith "unimplemented"
+  (* let rec f = (fun acc el -> step_loop el (steps-1) acc)
   and step_loop loc steps loclst =
     if steps = 0 then loclst else
     match (loc: loc) with
@@ -270,5 +271,5 @@ let get_movement_options (g: game) (steps: int) : (string * loc) list =
   in let lst_nodups = remove_dups lst_dups
   in let lst_final = List.filter (fun x -> x != start_loc) lst_nodups
   in let room_name loc = match (loc: loc) with Room (n,_) -> n | _ -> failwith "not a room"
-  in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final
+  in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final *)
 
