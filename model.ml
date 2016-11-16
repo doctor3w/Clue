@@ -40,11 +40,15 @@ let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
   | ((h1::t1), (h2::t2), (h3::t3)) -> ((h1, h2, h3), t1@t2@t3)
   | ([],_,_) | (_,[],_) | (_,_,[]) -> raise BadConfig
 
+let deal_card p c =
+  let sd' = {(CardMap.find c p.sheet) with info = Mine []} in
+  {p with hand = c::p.hand;
+          sheet = CardMap.add c sd' p.sheet}
+
+
 (* d is a card list where all card types have been jumbled *)
 let deal_hands game d =
   let p_count = List.length game.players in
-  let d_count = List.length d in
-  let deal_card = (fun p c -> {p with hand = c::p.hand}) in
   let d_shuff = shuffle_lst d in
   let rec loop n d players =
     match d with
@@ -61,18 +65,6 @@ let extract_pair_from_assoc s asc =
   | (h,p)::t -> if h = s then p else loop t
 in loop asc
 
-type player_temp = {
-  p_id:string; play_ord:int; start:int*int
-}
-
-(* rect is x0,x1.y0,y1*)
-type room_temp = {
-  r_id:string;
-  rect:(int*int*int*int);
-  passages: string list;
-  exits: (int*int) list
-}
-
 let extract_coord j : int*int =
   match (Yojson.Basic.Util.to_assoc j) with
   | ((s1,n1)::(s2,n2)::[]) -> let r = if s1 = "row"
@@ -83,6 +75,12 @@ let extract_coord j : int*int =
                                       else Yojson.Basic.Util.to_int n2
                            in (r, c)
   | _ -> failwith "invalid coord"
+
+let extract_dim j : int*int =
+  let asc = YJ.to_assoc j in
+  let r = List.assoc "row_count" asc |> YJ.to_int in
+  let c = List.assoc "col_count" asc |> YJ.to_int in
+  (r,c)
 
 let make_temp_player json : player_temp =
   let asc = Yojson.Basic.Util.to_assoc json in
@@ -139,6 +137,36 @@ let make_temp_room json =
     | (s,_)::t -> failwith ("can't recognize within room: " ^ s)
   in loop asc r_temp
 
+let make_agent_lst j =
+  let lst = YJ.to_list j in
+  let f s = match s with
+  | "Human" -> Human_t
+  | "DumbAI" -> DumbAI_t
+  | "SmartAI" -> SmartAI_t
+  | "ResponsiveAI" -> ResponsiveAI_t
+  | s -> failwith ("unrecongnized agent type: " ^ s) in
+
+  let f' acc el =
+    let el' = YJ.to_assoc el in
+    let sus = List.assoc "suspect" el' |> YJ.to_string in
+    let at = List.assoc "agent_type" el' |> YJ.to_string |> f in
+    (sus, at)::acc in
+  List.fold_left f' [] lst
+
+
+let default_sheet full_deck =
+  let f acc el = CardMap.add el {info=Unknown; note=No_Note} acc
+  in  List.fold_left f CardMap.empty full_deck
+
+let add_player game full_deck player_temp agent_lst =
+  let p = {
+    suspect = player_temp.p_id;
+    hand = [];
+    sheet = default_sheet full_deck;
+    is_out = false;
+    agent = List.assoc player_temp.p_id agent_lst;
+    curr_loc = CoordMap.find player_temp.start game.public.board.loc_map
+  } in {game with players = p::game.players}
 
 (* [import_board] takes in a filename of a game configuration file and
  * converts the file into a usable game model for stepping through. *)
@@ -149,8 +177,8 @@ let import_board (file_name: string) : game =
   let cardify_sus = (fun s -> Suspect s) in
   let cardify_weap = (fun s -> Weapon s) in
   let cardify_room = (fun s -> Room s) in
-  let dim = extract_pair_from_assoc "dim"
-            |> extract_coord in
+  let dim = extract_pair_from_assoc "dim" asc
+            |> extract_dim in
   let acc_id = extract_pair_from_assoc "acc_room" asc
                  |> YJ.to_string in
   let weap_lst = extract_pair_from_assoc "weapons" asc
@@ -168,6 +196,7 @@ let import_board (file_name: string) : game =
                     |> List.filter (fun x' -> x' != acc_id) in
   let room_lst = List.map cardify_room room_id_lst in
   let deck = (sus_lst, weap_lst, room_lst) in
+  let full_deck = sus_lst@(weap_lst@room_lst) in
   let (env, mixed_deck) = pick_env deck in
   let game = { game_init with
     envelope=env;
@@ -176,12 +205,16 @@ let import_board (file_name: string) : game =
                      | h::t -> h
                      | _ -> failwith "no suspects found");
       acc_room = acc_id;
+      deck = deck;
     }
   } in
   let board' = fill_board dim room_temp_lst in
   let game = {game with public = {game.public with board = board'}} in
-  game
-
+  let agent_lst = extract_pair_from_assoc "agent_config" asc
+                  |> make_agent_lst in
+  let f' = (fun acc el -> add_player acc full_deck el agent_lst) in
+  let game = List.fold_left f' game sus_temp_lst in
+  deal_hands game full_deck
 
 
 (* [get_move_options] gets the options of Roll and Passage that the current

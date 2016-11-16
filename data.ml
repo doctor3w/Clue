@@ -19,9 +19,9 @@ module OrderedCard = struct
   type t = card
   let compare c1 c2 =
     match c1, c2 with
-    | Room_c(s1), Room_c(s2) -> Pervasives.compare s1 s2
-    | _, Room_c(_) -> -1
-    | Room_c(_), _ -> 1
+    | Room(s1), Room(s2) -> Pervasives.compare s1 s2
+    | _, Room(_) -> -1
+    | Room(_), _ -> 1
     | Weapon(s1), Weapon(s2) -> Pervasives.compare s1 s2
     | _, Weapon(_) -> -1
     | Weapon(_), _ -> 1
@@ -30,22 +30,33 @@ module OrderedCard = struct
     | Suspect(_), _ -> 1
 end
 
+module CardMap = Map.Make(OrderedCard)
+
 (* The hand is just a card list *)
 type hand = card list
 
 (* A guess is three cards, one of each type.
  * They must be in the order Suspect * Weapon * Room *)
 type guess = card * card * card
+type deck = card list * card list * card list
 
 (* Info represents what we know of a specific card *)
-type info = Mine | ShownBy of string | Unknown | Envelope
+type card_info = Mine of string list | ShownBy of string | Unknown | Envelope
+type note = No_Note
+          | HumanNote of string
+          | NotInHand of string list
+          | MaybeInHand of string list
 
+type sheet_data = {
+  info: card_info;
+  note: note
+}
 (* [sheet] is a map from a [card] to [info] *)
-type sheet
+type sheet = sheet_data CardMap.t
 
 (* [agent] is a type representing what type of agent, specifically which
  * module should be used to call the prompts on *)
-type agent = Human_t | DumbAI_t | SmartAI_t
+type agent = Human_t | DumbAI_t | SmartAI_t | ResponsiveAI_t
 
 (* [move] is a type of move that you choose to do at the beginning
  * of a turn. *)
@@ -113,6 +124,7 @@ type player = {suspect: string;
 type public = {curr_player: string;
                board: board;
                acc_room: string;
+               deck: deck
                (*listen_data: listens*)
                }
 
@@ -141,7 +153,9 @@ let game_init = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty
-    }
-  }
+    };
+    deck = ([],[],[])
+  };
+  ai_only = false
 }
 

@@ -71,7 +71,7 @@ let rec step game =
     else Display.display_message "Game over."
   else
     let () = Display.display_turn game.public in
-    let move_ops = Model.get_move_options game
+    let move_ops = Model.get_move_options game in
     let move = Agent.answer_move curr_p game.public move_ops in
     let () = Display.display_move move in
     let movement = handle_move game curr_p move in
