@@ -4,12 +4,16 @@ open Model
 open Data
 open Agent
 
-exception No_players
-exception Player_not_found
-
 module Display = Cli
 
-(* Gets the current player and the next player records *)
+(* Thrown when there are no players in a player list. *)
+exception No_players
+
+(* Thrown when a player is not found in a player list *)
+exception Player_not_found
+
+(* Gets the current player and the next player in the players list.
+ * If the provided player string is not found it will raise an error. *)
 let get_cur_next plrs cur =
   let rec helper ps t =
     match t with
@@ -20,45 +24,69 @@ let get_cur_next plrs cur =
     | h::[] -> helper ps []
   in if plrs = [] then raise No_players else helper plrs plrs
 
-let string_of_movement l = match (l.info) with
+(* Gets a string describing the movement. *)
+let string_of_movement l = match l with
   | Room_Rect(s, _) ->
     "Entered "^s
   | Space(x,y) ->
     "Landed on space "^(string_of_int x)^", "^(string_of_int y)
 
+(* Handles the agent's option of passage or dice roll. If dice has been rolled,
+ * then the agent is asked where they would like to move. That location is
+ * then displayed. *)
 let handle_move game curr_p m =
-    match m with
-    | Roll ->
-      let dice_roll = (Random.int 11) + 2 in
-      let () = Display.display_dice_roll dice_roll in
-      let movement_opt = Model.get_movement_options game dice_roll in
-      Agent.get_movement curr_p game.public movement_opt
-    | Passage l -> l
+  match m with
+  | Roll ->
+    let dice_roll = (Random.int 11) + 2 in
+    let () = Display.display_dice_roll dice_roll in
+    let movement_opt = Model.get_movement_options game dice_roll in
+    let movement = Agent.get_movement curr_p game.public movement_opt in
+    let () = Display.display_movement (string_of_movement movement.info, movement)
+    in movement
+  | Passage l -> l
 
-let handle_movement game l = match (l.info) with
+(* Handles certain locations and returns the type of action that takes place
+ * after landing in this location. *)
+let handle_movement game = function
   | Room_Rect(s, _) when s = game.public.acc_room -> `Accusation
   | Room_Rect(_, _) -> `Guess
   | _ -> `End_turn
 
+(* Takes in a player and if a player with the same suspect is in the list,
+ * pl replaces that player. Tail recursive. *)
 let replace_player pl lst =
   let rec helper pls t =
     match t with
     | [] -> pls
-    | pl'::t' ->
-      if pl'.suspect = pl.suspect then helper (pl::pls) t'
-      else helper (pl'::pls) t'
+    | pl'::t' when pl'.suspect = pl.suspect -> helper (pl::pls) t'
+    | pl'::t' -> helper (pl'::pls) t'
   in List.rev (helper [] lst)
 
+(* Checks if any [Human_t] players in the list are not out. If a player is
+ * out then [is_out] will be true. *)
 let rec check_for_humans pls =
   match pls with
   | [] -> false
   | pl::t -> if not pl.is_out && pl.agent = Human_t then true
              else check_for_humans t
 
+(* Checks if all players are out. [] = all players are out. Tail recursive. *)
 let rec check_all_out pls =
   match pls with
   | [] -> true
   | pl::t -> if pl.is_out then check_for_humans t else false
+
+(* Reorders the plrs list so pl is at the end. Specifically it splits the
+ * list at pl, puts the tail at the front and the players from hd to pl
+ * (inclusive) at the back. Not tail recursive.
+ * Requires: pl is in plrs *)
+let reorder_pls pl plrs =
+  let rec helper ps t =
+    match t with
+    | [] -> []@(List.rev ps)
+    | h::t' when h.suspect = pl.suspect -> (t')@(List.rev (pl::ps))
+    | h::t' -> helper (h::ps) t'
+  in helper [] plrs
 
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
@@ -75,15 +103,19 @@ let rec step game =
     let move = Agent.answer_move curr_p game.public move_ops in
     let () = Display.display_move move in
     let movement = handle_move game curr_p move in
-    let () = Display.display_movement (string_of_movement movement, movement) in
     let curr_p' = {curr_p with curr_loc = movement} in
-    match handle_movement game movement with
+    match handle_movement game movement.info with
     | `Accusation -> handle_accusation curr_p' next_p game
     | `Guess -> handle_guess curr_p next_p game
     | `End_turn -> handle_end_turn curr_p' next_p game
 
+(* [handle_accusation curr_p next_p game] gets the current player and asks for
+ * their final game accusation. If they are wrong, they are set to out, and
+ * the model is updated and then step is called. If they are correct, the game
+ * ends and they are pronounced the winner. *)
 and handle_accusation curr_p next_p game =
   let guess = Agent.get_accusation curr_p game.public in
+  let () = Display.display_guess guess in
   if guess = game.envelope then
     Display.display_victory curr_p.suspect
   else (* Lose, out *)
@@ -99,14 +131,37 @@ and handle_accusation curr_p next_p game =
     else
       Display.display_message "Game over."
 
+(* [handle_guess curr_p next_p game] takes in the current player, the next
+ * player and the game state and performs actions for getting a guess from
+ * the current player and then any possible shown cards will be gathered and
+ * shown if possible. *)
 and handle_guess curr_p next_p game =
-  failwith ""
+  let (s, w, r) as guess = Agent.get_guess curr_p game.public in
+  let () = Display.display_guess guess in
+  let group = reorder_pls curr_p game.players in
+  let rec get_answers pls =
+    match pls with
+    | [] -> None
+    | pl::t when pl.suspect = curr_p.suspect -> None
+    | pl::t -> extract_answer pl t
+  and extract_answer pl t =
+    match Agent.get_answer pl game.public guess with
+    | None -> get_answers t
+    | Some card -> Some (pl, card)
+  in match get_answers group with
+  | None -> failwith "" (* No card could be shown *)
+  | Some (pl, card) -> failwith "" (* A card was shown by pl *)
 
+(* [handle_end_turn curr_p next_p game] is called when the current player
+ * lands on a space and the turn essentially ends. The game model is updated
+ * and then step is called again. *)
 and handle_end_turn curr_p next_p game =
   let pub = {game.public with curr_player=next_p.suspect} in
   let pls = replace_player curr_p game.players in
   step {game with public=pub; players=pls}
 
+(* Called when starting a game. Loads the provided file if given. Takes a
+ * string option. *)
 let start file_name =
   let load_go fl =
     try step (Model.import_board fl) with

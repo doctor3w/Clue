@@ -31,7 +31,7 @@ let display_movement (s, l) = failwith ""
 let prompt_guess = failwith ""
 
 (* Displays a guess (by the user or AI). *)
-let display_guess = failwith ""
+let display_guess g = failwith ""
 
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.

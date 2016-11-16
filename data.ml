@@ -26,8 +26,6 @@ module OrderedCard = struct
     | _, Weapon(_) -> -1
     | Weapon(_), _ -> 1
     | Suspect(s1), Suspect(s2) -> Pervasives.compare s1 s2
-    | _, Suspect(_) -> -1
-    | Suspect(_), _ -> 1
 end
 
 module CardMap = Map.Make(OrderedCard)
