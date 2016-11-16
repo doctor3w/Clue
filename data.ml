@@ -13,6 +13,21 @@ type loc = Room of string * loc list | Space of (int * int) * loc list
  *)
 type card = Suspect of string | Weapon of string | Room_c of string
 
+module OrderedCard = struct
+  type t = card
+  let compare c1 c2 =
+    match c1, c2 with
+    | Room_c(s1), Room_c(s2) -> Pervasives.compare s1 s2
+    | _, Room_c(_) -> -1
+    | Room_c(_), _ -> 1
+    | Weapon(s1), Weapon(s2) -> Pervasives.compare s1 s2
+    | _, Weapon(_) -> -1
+    | Weapon(_), _ -> 1
+    | Suspect(s1), Suspect(s2) -> Pervasives.compare s1 s2
+    | _, Suspect(_) -> -1
+    | Suspect(_), _ -> 1
+end
+
 (* The hand is just a card list *)
 type hand = card list
 
@@ -57,7 +72,8 @@ type public = {curr_player: string;
  * guess. *)
 type game = {players: player list;
              public: public;
-             envelope: guess}
+             envelope: guess;
+             ai_only: bool}
 (* type game = {players: player list;
              curr_player: string;
              board: loc;

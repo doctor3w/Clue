@@ -45,3 +45,6 @@ val display_answer : card option -> string -> unit
 
 (* Displays end game victory text, string is who won. *)
 val display_victory : string -> unit
+
+(* Displays arbitrary text. *)
+val display_message : string -> unit

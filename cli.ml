@@ -2,13 +2,13 @@ open Data
 open Agent
 
 (* Displays the provided error message. *)
-let display_error = failwith ""
+let display_error e = failwith ""
 
 (* Displays a description of who's turn it is. *)
 let display_turn pub = failwith ""
 
 (* Prompts the user for a file so that it can be imported into the Model *)
-let prompt_filename = failwith ""
+let prompt_filename () = failwith ""
 
 (* Prompts the user for whether he rolls dice or not. *)
 let prompt_move = failwith ""
@@ -45,3 +45,6 @@ let display_answer = failwith ""
 
 (* Displays end game victory text. *)
 let display_victory pl_name = failwith ""
+
+(* Displays end game victory text. *)
+let display_message s = print_endline s
