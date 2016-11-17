@@ -46,10 +46,10 @@ type note = No_Note
           | MaybeInHand of string list
 
 type sheet_data = {
-  info: card_info;
+  card_info: card_info;
   note: note
 }
-(* [sheet] is a map from a [card] to [info] *)
+(* [sheet] is a map from a [card] to [sheet_data] *)
 type sheet = sheet_data CardMap.t
 
 (* [agent] is a type representing what type of agent, specifically which

@@ -41,7 +41,7 @@ let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
   | ([],_,_) | (_,[],_) | (_,_,[]) -> raise BadConfig
 
 let deal_card p c =
-  let sd' = {(CardMap.find c p.sheet) with info = Mine []} in
+  let sd' = {(CardMap.find c p.sheet) with card_info = Mine []} in
   {p with hand = c::p.hand;
           sheet = CardMap.add c sd' p.sheet}
 
@@ -155,7 +155,7 @@ let make_agent_lst j =
 
 
 let default_sheet full_deck =
-  let f acc el = CardMap.add el {info=Unknown; note=No_Note} acc
+  let f acc el = CardMap.add el {card_info=Unknown; note=No_Note} acc
   in  List.fold_left f CardMap.empty full_deck
 
 let add_player game full_deck player_temp agent_lst =
