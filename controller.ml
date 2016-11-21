@@ -139,7 +139,7 @@ and handle_accusation curr_p next_p game =
     let () = Display.display_message message in
     let curr_p' = {curr_p with is_out = true} in
     let pls' = replace_player curr_p' game.players in
-    let guard = (check_for_humans pls' || game.ai_only) in
+    let guard = (game.ai_only || check_for_humans pls') in
     if guard && not (check_all_out pls') then
       let pub = {game.public with curr_player=next_p.suspect} in
       step {game with players = pls'; public = pub}

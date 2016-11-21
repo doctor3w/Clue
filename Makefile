@@ -4,6 +4,9 @@ test:
 play:
 	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main.byte && ./main.byte "test/game.json"
 
+choose:
+	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main.byte && ./main.byte
+
 check:
 	bash checkenv.sh && bash checktypes.sh
 
