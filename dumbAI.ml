@@ -2,7 +2,7 @@ open Data
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
-let answer_move pl pub moves = failwith ""
+let answer_move pl pub moves = Roll
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
