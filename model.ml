@@ -213,13 +213,16 @@ let import_board (file_name: string) : game =
                   |> make_agent_lst in
   let f' = (fun acc el -> add_player acc full_deck el agent_lst) in
   let game = List.fold_left f' game sus_temp_lst in
+  let is_ai = (function | Human_t -> false | _ -> true) in
+  let all_ai = List.fold_left (fun acc (_,el) -> acc&&(is_ai el)) true agent_lst
+in let game = {game with ai_only = all_ai} in
   deal_hands game full_deck
 
 
 let get_curr_player (game: game) : player =
   let rec loop = function
   | [] -> failwith "can't find current player"
-  | h::t -> if h.suspect = game.curr_player then h else loop t
+  | h::t -> if h.suspect = game.public.curr_player then h else loop t
 in loop game.players
 
 
@@ -236,17 +239,15 @@ let remove_dups lst =
 
 let get_move_options (g : game) : move list =
   let cp = get_curr_player g in
-  let add_if_room loc passages =
-    match (loc.info) with
-    | Room (s, _) -> (Passage loc)::passages
-    | Space _ -> passages in
-  let rec loop locs passages =
-    match locs with
-    | [] -> Roll::passages
-    | h::t -> loop t (add_if_room h passages)
-  in match cp.curr_loc.info with
-    | Room (s, _) -> loop cp.curr_loc.edges []
-    | Space _ -> [Roll]
+  let start_loc = cp.curr_loc in
+  let f pass coord =
+    let loc = CoordMap.find coord g.public.board.loc_map in
+    match loc.info with
+    | Space _ -> pass
+    | Room_Rect (s, _) -> Passage(loc)::pass in
+  match start_loc.info with
+  | Space _ -> [Roll]
+  | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
 
 (* [get_movement_options] gets the options of the locations that the current
@@ -256,7 +257,17 @@ let get_move_options (g : game) : move list =
  *        go into [room name] *)
 
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
-  failwith "unimplemented"
+  let b = g.public.board in
+  let start_loc = (get_curr_player g).curr_loc in
+  let rec step_loop steps acc coord =
+    if steps < 0 then acc else
+    let loc = CoordMap.find coord b.loc_map in
+    match (loc.info) with
+    | Room_Rect (s, _) -> ("go into "^s, loc)::acc
+    | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
+  let init = List.fold_left (step_loop (steps-1)) [] start_loc.edges in
+  let no_start = List.filter (fun (s,l) -> l != start_loc) init in
+  remove_dups no_start
   (* let rec f = (fun acc el -> step_loop el (steps-1) acc)
   and step_loop loc steps loclst =
     if steps = 0 then loclst else
