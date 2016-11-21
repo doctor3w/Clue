@@ -8,7 +8,7 @@ val answer_move : player -> public -> move list -> move
  * and returns the agent's choice of movement *)
 val get_movement : player -> public -> (string * loc) list -> loc
 
-(* [get_geuss] takes in a game sheet and the current location and returns
+(* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 val get_guess : player -> public -> guess
 
