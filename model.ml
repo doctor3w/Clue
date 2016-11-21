@@ -170,7 +170,6 @@ let add_player game full_deck player_temp agent_lst =
 
 (* [import_board] takes in a filename of a game configuration file and
  * converts the file into a usable game model for stepping through. *)
-
 let import_board (file_name: string) : game =
   let json = load_json file_name in
   let asc = Yojson.Basic.Util.to_assoc json in
@@ -214,19 +213,74 @@ let import_board (file_name: string) : game =
                   |> make_agent_lst in
   let f' = (fun acc el -> add_player acc full_deck el agent_lst) in
   let game = List.fold_left f' game sus_temp_lst in
+  let is_ai = (function | Human_t -> false | _ -> true) in
+  let all_ai = List.fold_left (fun acc (_,el) -> acc&&(is_ai el)) true agent_lst
+in let game = {game with ai_only = all_ai} in
   deal_hands game full_deck
 
 
+let get_curr_player (game: game) : player =
+  let rec loop = function
+  | [] -> failwith "can't find current player"
+  | h::t -> if h.suspect = game.public.curr_player then h else loop t
+in loop game.players
+
+
+let remove_dups lst =
+  let rec loop lst acc =
+    match lst with
+    | [] -> acc
+    | h::t -> if List.mem h acc then loop t acc
+              else loop t (h::acc)
+  in loop lst []
+
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
-let get_move_options (g: game) : move list =
-  failwith "unimplemented"
+
+let get_move_options (g : game) : move list =
+  let cp = get_curr_player g in
+  let start_loc = cp.curr_loc in
+  let f pass coord =
+    let loc = CoordMap.find coord g.public.board.loc_map in
+    match loc.info with
+    | Space _ -> pass
+    | Room_Rect (s, _) -> Passage(loc)::pass in
+  match start_loc.info with
+  | Space _ -> [Roll]
+  | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
+
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
  * the following fashions:
- *        head towars [room name]
+ *        head towards [room name]
  *        go into [room name] *)
 
-let get_movement_options (game: game) (steps: int) : (string * loc) list =
-  failwith "unimplemented"
+let get_movement_options (g: game) (steps: int) : (string * loc) list =
+  let b = g.public.board in
+  let start_loc = (get_curr_player g).curr_loc in
+  let rec step_loop steps acc coord =
+    if steps < 0 then acc else
+    let loc = CoordMap.find coord b.loc_map in
+    match (loc.info) with
+    | Room_Rect (s, _) -> ("go into "^s, loc)::acc
+    | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
+  let init = List.fold_left (step_loop (steps-1)) [] start_loc.edges in
+  let no_start = List.filter (fun (s,l) -> l != start_loc) init in
+  remove_dups no_start
+  (* let rec f = (fun acc el -> step_loop el (steps-1) acc)
+  and step_loop loc steps loclst =
+    if steps = 0 then loclst else
+    match (loc: loc) with
+    | Room (name, lst) -> loc::loclst
+    | Space ((r,c), lst) -> (List.fold_left f loclst lst)
+  in let f' = (fun acc el -> match el with | Space _ -> f acc el | _ -> acc)
+  in let start_loc = (get_curr_player g).curr_loc
+  in let step1 = match start_loc with
+                 Space(_, lst) | Room (_, lst) -> lst
+  in let lst_dups = List.fold_left f' [] step1
+  in let lst_nodups = remove_dups lst_dups
+  in let lst_final = List.filter (fun x -> x != start_loc) lst_nodups
+  in let room_name loc = match (loc: loc) with Room (n,_) -> n | _ -> failwith "not a room"
+  in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final *)
+
