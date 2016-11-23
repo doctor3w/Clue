@@ -35,8 +35,14 @@ type board =
 } *)
 
 let rec add_edge board coord1 coord2 both =
-  let loc1 = CoordMap.find coord1 board.loc_map
-    (*|> (fun x -> match x with Some y -> y | None -> failwith "no coord") *)in
+  let ((a1, a2), (b1, b2)) = (coord1, coord2) in
+  let loc1 = try (CoordMap.find coord1 board.loc_map)
+    with _ -> failwith ("couldn't find loc ("
+                      ^ (Pervasives.string_of_int a1) ^ ", "
+                      ^ (Pervasives.string_of_int a2) ^ ") for ("
+                      ^ (Pervasives.string_of_int b1) ^ ", "
+                      ^ (Pervasives.string_of_int b2) ^")")
+  (*|> (fun x -> match x with Some y -> y | None -> failwith "no coord") *)in
   let loc1' = {loc1 with edges = coord2::loc1.edges} in
   let board' = {board with loc_map = (CoordMap.add coord1 loc1' board.loc_map)} in
   if both then (add_edge board' coord2 coord1 false) else board'
@@ -50,7 +56,7 @@ let fill_room board room_temp =
   let rec loopx board (x',y') =
     let rec loopy board (x',y') =
       if y' > y1 then board
-      else let board = {board with loc_map = CoordMap.add (y',x') loc' board.loc_map}
+      else let board = {board with loc_map = CoordMap.add (x',y') loc' board.loc_map}
       in loopy board (x', y'+1)
     in if x' > x1 then board
       else let board = loopy board (x', y')
@@ -64,7 +70,7 @@ let fill_spaces board =
     let rec loopy board (x', y') =
       if y' > r then board else
       let f (x,y) acc = if CoordMap.mem (x,y) acc then acc
-                        else CoordMap.add (y,x) {info=Space(y,x); edges=[]} acc in
+                        else CoordMap.add (x,y) {info=Space(y,x); edges=[]} acc in
       let lm' = f (x', y') board.loc_map in
       let board' = {board with loc_map = lm'} in
       loopy board' (x', y'+1)

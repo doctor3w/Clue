@@ -246,9 +246,9 @@
             "col": 15
           }
         ]
-    },
+    }
   ],
-  "acc_id": "Staircase",
+  "acc_room": "Staircase",
   "suspects":
     [
       {
@@ -304,7 +304,7 @@
           "row": 5,
           "col": 23
         }
-      },
+      }
     ],
     "weapons":
     [
@@ -328,7 +328,7 @@
         "agent_type": "DumbAI"
       }, {
         "suspect": "Mr. Green",
-        "agent_type": "Human"
+        "agent_type": "DumbAI"
       }, {
         "suspect": "Madame Peacock",
         "agent_type": "DumbAI"

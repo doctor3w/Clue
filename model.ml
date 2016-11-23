@@ -23,13 +23,18 @@ module YJ = Yojson.Basic.Util
 
 let load_json file_name =
   let len = String.length file_name in
-  if len < 5 then raise BadConfig (* can't end in .json *)
+  if len < 5 then failwith "not a json, ln 26" (* can't end in .json *)
   else if((String.sub file_name (len-5) 5) = ".json")
-  then try (Yojson.Basic.from_file file_name) with _ -> raise BadConfig
-  else raise BadConfig
+  then Yojson.Basic.from_file file_name
+  (*try (Yojson.Basic.from_file file_name) with _ -> failwith "can't make json, ln 28" *)
+  else failwith "not a .json, ln 30"
 
 let shuffle_lst lst =
-  failwith "unimplemented"
+  let len = List.length lst in
+  let weight = List.map (fun x -> (Random.int (len*10), x)) in
+  let sort = List.sort (fun (x1,x2) (y1,y2) -> Pervasives.compare x1 y1) in
+  let unweight = List.map (fun (x1,x2) -> x2) in
+  lst |> weight |> sort |> unweight
 
 (* pre: the lists are non-empty *)
 let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
@@ -38,10 +43,11 @@ let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
   let room_shuff = shuffle_lst room_lst in
   match (sus_shuff, weap_shuff, room_shuff) with
   | ((h1::t1), (h2::t2), (h3::t3)) -> ((h1, h2, h3), t1@t2@t3)
-  | ([],_,_) | (_,[],_) | (_,_,[]) -> raise BadConfig
+  | ([],_,_) | (_,[],_) | (_,_,[]) -> failwith "bad deck, ln 46"
 
 let deal_card p c =
-  let sd' = {(CardMap.find c p.sheet) with card_info = Mine []} in
+  let sd = try (CardMap.find c p.sheet) with _ -> failwith "can't deal card" in
+  let sd' = {sd with card_info = Mine []} in
   {p with hand = c::p.hand;
           sheet = CardMap.add c sd' p.sheet}
 
@@ -159,13 +165,15 @@ let default_sheet full_deck =
   in  List.fold_left f CardMap.empty full_deck
 
 let add_player game full_deck player_temp agent_lst =
+  let loc = try (CoordMap.find player_temp.start game.public.board.loc_map)
+            with _ -> failwith "can't find start coord" in
   let p = {
     suspect = player_temp.p_id;
     hand = [];
     sheet = default_sheet full_deck;
     is_out = false;
     agent = List.assoc player_temp.p_id agent_lst;
-    curr_loc = CoordMap.find player_temp.start game.public.board.loc_map
+    curr_loc = loc;
   } in {game with players = p::game.players}
 
 (* [import_board] takes in a filename of a game configuration file and
@@ -192,7 +200,7 @@ let import_board (file_name: string) : game =
   let room_temp_lst = (extract_pair_from_assoc "rooms" asc)
                       |> (YJ.convert_each make_temp_room) in
   let room_id_lst = (List.map (fun x -> x.r_id) room_temp_lst)
-                    |> List.filter (fun x' -> x' != acc_id) in
+                    |> List.filter (fun x' -> x' <> acc_id) in
   let room_lst = List.map cardify_room room_id_lst in
   let deck = (sus_lst, weap_lst, room_lst) in
   let full_deck = sus_lst@(weap_lst@room_lst) in
@@ -249,6 +257,10 @@ let get_move_options (g : game) : move list =
   | Space _ -> [Roll]
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
+
+
+let get_distance_to board loc1 loc2 =
+  failwith ""
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
