@@ -42,27 +42,33 @@ let unk_to_env card sheet =
     | _ -> data in
   CardMap.add card data' sheet
 
+(* Finds all the unknown cards in the list [cards] *)
 let rec poe_finder cards unks sheet =
   match cards with
   | [] -> unks
-  | h::t -> extract_data h t unks sheet
-
-and extract_data h t unks sheet =
+  | h::t -> extract_card_info h t unks sheet
+(* extracts the card and adds it if it's Unknown. If an envelope card
+ * is found, then there are no unknown's technically. *)
+and extract_card_info h t unks sheet =
   let data = CardMap.find h sheet in
   match data.card_info with
   | ShownBy _ | Mine _ -> poe_finder t unks sheet
   | Unknown -> poe_finder t (h::unks) sheet
   | Envelope -> []
 
+(* Updates the sheet if unks only has one unknown card. *)
 let poe_update unks sheet =
   if List.length unks = 1 then unk_to_env (List.hd unks) sheet
   else sheet
 
+(* Based on the pl_type, the function will go through each type of card
+ * and use the process of elimination to deduce if there's one final card
+ * then it should be made the envelope card in the sheet. *)
 let process_of_elimination sheet pub pl_typ =
   let (ss, ws, rs) = pub.deck in
   match pl_typ with
   | DumbAI_t -> sheet (* He's five and doesn't know POE *)
-  | _ -> (*TODO: process of elimination *)
+  | _ -> (* process of elimination *)
     let s_unks = poe_finder ss [] sheet in
     let w_unks = poe_finder ws [] sheet in
     let r_unks = poe_finder rs [] sheet in
