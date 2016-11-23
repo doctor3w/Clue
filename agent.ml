@@ -33,3 +33,70 @@ let get_answer pl pub guess = match pl.agent with
   | DumbAI_t -> DumbAI.get_answer pl pub guess
   | _ -> DumbAI.get_answer pl pub guess
 
+(* Turns card data from unknown to envelope in sheet. Only if unknown is
+ * the data changed. *)
+let unk_to_env card sheet =
+  let data = CardMap.find card sheet in
+  let data' = match data.card_info with
+    | Unknown -> {data with card_info=Envelope}
+    | _ -> data in
+  CardMap.add card data' sheet
+
+let rec poe_finder cards unks sheet =
+  match cards with
+  | [] -> unks
+  | h::t -> extract_data h t unks sheet
+
+and extract_data h t unks sheet =
+  let data = CardMap.find h sheet in
+  match data.card_info with
+  | ShownBy _ | Mine _ -> poe_finder t unks sheet
+  | Unknown -> poe_finder t (h::unks) sheet
+  | Envelope -> []
+
+let poe_update unks sheet =
+  if List.length unks = 1 then unk_to_env (List.hd unks) sheet
+  else sheet
+
+let process_of_elimination sheet pub pl_typ =
+  let (ss, ws, rs) = pub.deck in
+  match pl_typ with
+  | DumbAI_t -> sheet (* He's five and doesn't know POE *)
+  | _ -> (*TODO: process of elimination *)
+    let s_unks = poe_finder ss [] sheet in
+    let w_unks = poe_finder ws [] sheet in
+    let r_unks = poe_finder rs [] sheet in
+    poe_update s_unks sheet |> poe_update w_unks |> poe_update r_unks
+
+(* [show_card pl pu c g] updates the players sheet based on the new card seen
+ * and the guess. If card is None, then that means no one had cards in the
+ * guess and needs to be updated accordingly. Also needs to use process of
+ * elimination for certain AIs *)
+let show_card pl pub answer (s, w, r) =
+  match answer with
+  | None ->
+    let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
+    {pl with sheet = sheet'}
+  | Some(sus, card) ->
+    let data = CardMap.find card pl.sheet in
+    let data' = {data with card_info= ShownBy(sus)} in
+    let sheet' = CardMap.add card data' pl.sheet in
+    (* In non-DumbAI modules use process elim here to update rest of sheet. *)
+    {pl with sheet = (process_of_elimination sheet' pub pl.agent)}
+
+(* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
+let show_person pl card sus =
+  let data = CardMap.find card pl.sheet in
+  let card_info = match data.card_info with
+    | Mine l -> Mine (sus::l)
+    | x -> x in
+  let data' = {data with card_info=card_info} in
+  let sheet' = CardMap.add card data' pl.sheet in
+  {pl with sheet = sheet'}
+
+(* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
+ * in public. *)
+let take_notes pl pub = match pl.agent with
+  | DumbAI_t -> DumbAI.take_notes pl pub
+  | _ -> DumbAI.take_notes pl pub
+

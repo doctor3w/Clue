@@ -23,3 +23,6 @@ let get_accusation pl pub =(Suspect ("Red"),Weapon("pistol"),Room("Bathroon"))
  * if no card can be shown. *)
 let get_answer pl pub guess = Some (Weapon("pistol"))
 
+(* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
+ * in public. *)
+let take_notes pl pub = pl

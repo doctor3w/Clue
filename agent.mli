@@ -22,3 +22,16 @@ val get_accusation : player -> public -> guess
  * if no card can be shown. *)
 val get_answer : player -> public -> guess -> card option
 
+(* [show_card pl pu c g] updates the players sheet based on the new card seen
+ * and the guess. If card is None, then that means no one had cards in the
+ * guess and needs to be updated accordingly. Also needs to use process of
+ * elimination for certain AIs. The string is who showed's suspect ID. *)
+val show_card : player -> public -> (string * card) option -> guess -> player
+
+(* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
+val show_person : player -> card -> string -> player
+
+(* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
+ * in public. *)
+val take_notes : player -> public -> player
+

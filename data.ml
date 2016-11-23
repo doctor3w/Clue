@@ -153,7 +153,8 @@ let game_init = {
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty
     };
-    deck = ([],[],[])
+    deck = ([],[],[]);
+    player_order = []
   };
   ai_only = false
 }

@@ -88,21 +88,6 @@ let reorder_pls pl plrs =
     | h::t' -> helper (h::ps) t'
   in helper [] plrs
 
-let make_envelope_if data =
-  match data.card_info with
-  | Unknown -> {data with card_info=Envelope}
-  | _ -> data
-
-
-let show_person card pl sheet =
-  let data = CardMap.find card sheet in
-  let card_info = match data.card_info with
-    | Mine l -> Mine (pl.suspect::l)
-    | x -> x in
-  let data' = {data with card_info=card_info} in
-  CardMap.add card data' sheet
-
-
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -165,25 +150,14 @@ and handle_guess curr_p next_p game =
     | Some card -> Some (pl, card)
   in match get_answers group with
   | None -> (* No card could be shown *)
-    let s_data = CardMap.find s curr_p.sheet in
-    let s_data' = make_envelope_if s_data in
-    let w_data = CardMap.find w curr_p.sheet in
-    let w_data' = make_envelope_if w_data in
-    let r_data = CardMap.find r curr_p.sheet in
-    let r_data' = make_envelope_if r_data in
-    let sheet' = CardMap.add s s_data' curr_p.sheet
-      |> CardMap.add w w_data'
-      |> CardMap.add r r_data' in
-    let curr_p' = {curr_p with sheet = sheet'} in
+    let curr_p' = Agent.show_card curr_p game.public None guess in
     let pls' = replace_player curr_p' game.players in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
-    let data = CardMap.find card curr_p.sheet in
-    let data' = {data with card_info= ShownBy(pl.suspect)} in
-    let sheet' = CardMap.add card data' curr_p.sheet in
-    let curr_p' = {curr_p with sheet= sheet'} in
-    let pl' = {pl with sheet= (show_person card curr_p pl.sheet)} in
+    let answer = Some (pl.suspect, card) in
+    let curr_p' = Agent.show_card curr_p game.public answer guess in
+    let pl' = Agent.show_person pl card curr_p'.suspect in
     let pls' = replace_player curr_p' game.players |> replace_player pl' in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}
