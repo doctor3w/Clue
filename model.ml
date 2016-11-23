@@ -258,9 +258,69 @@ let get_move_options (g : game) : move list =
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
 
+module PathMap = struct
+  type backpointer = (int*coord)
+  type t = backpointer CoordMap.t
 
-let get_distance_to board loc1 loc2 =
-  failwith ""
+  let empty = CoordMap.empty
+
+  let make start =
+    CoordMap.add start (0, start) empty
+
+  let put (k:coord) ((s':int), (bp':coord)) (map: t) : t =
+    if CoordMap.mem k map
+    then let (s, bp) = CoordMap.find k map in
+      if (s' < s) then CoordMap.add k (s', bp') map
+      else map
+    else map
+
+  let poll_min (map:t) : (coord * backpointer * t) =
+    let f k (e1, e2) (ak, (a1, a2)) = if e1 < a1 then (k, (e1, e2)) else (ak, (a1, a2)) in
+    let (k, v) = CoordMap.fold f map (CoordMap.choose map) in
+    let map' = CoordMap.remove k map in
+    (k, v, map')
+
+  let mem = CoordMap.mem
+
+  let is_empty = CoordMap.is_empty
+
+  let length_to coord map =
+    let (n, bp) = CoordMap.find coord map in n
+
+  let nth_step_towards coord step map =
+    let rec loop c =
+      let (n, bp) = CoordMap.find c map in
+      if n <= step then c else loop bp
+    in loop coord
+
+end
+
+let make_pathmap board start_loc fast_out =
+  let settled = PathMap.make start_loc in
+  let frontier = PathMap.empty in
+  let loc = CoordMap.find start_loc board.loc_map in
+  let add_next coord steps frnt stld =
+    let loc = CoordMap.find coord board.loc_map in
+    let f (n, bp) acc el = if not (PathMap.mem el stld)
+                           then PathMap.put el (n, bp) acc
+                           else acc in
+    match loc.info with
+    | Space (x,y) -> List.fold_left (f ((steps), (x,y))) frnt loc.edges
+    | _ -> frnt in
+  let is_space c = let l = CoordMap.find c board.loc_map in
+    match l.info with Room_Rect _ -> false | Space _ -> true in
+  let g acc el = PathMap.put el (1, start_loc) acc in
+  let rec loop frnt stld =
+    let (k, (n, bp), frnt') = PathMap.poll_min frnt in
+    let stld' = PathMap.put k (n, bp) stld in
+    let frnt'' = add_next k (n+1) frnt' stld' in
+    if PathMap.is_empty frnt'' || fast_out then stld'
+    else loop frnt'' stld'
+  in match loc.info with
+  | Space _ -> loop (add_next start_loc 0 frontier settled) settled
+  | Room_Rect _ -> let no_pass = List.filter is_space loc.edges in
+                   loop (List.fold_left g frontier no_pass) settled
+
 
 (* [get_movement_options] gets the options of the locations that the current
  * player can move to. These options also come with a description in one of
@@ -271,6 +331,19 @@ let get_distance_to board loc1 loc2 =
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
   let b = g.public.board in
   let start_loc = (get_curr_player g).curr_loc in
+  let coord = match start_loc.info with | Space (x,y) | Room_Rect (_,(x,y,_,_)) -> (x, y) in
+  let full_paths = make_pathmap b coord false in
+  let room_lst = StringMap.bindings b.room_coords in
+  let f (s, (x,y)) = let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
+                     let loc = CoordMap.find coord' b.loc_map in
+                     match loc.info with
+                     | Room_Rect (s', _) when s' = s -> ("go into " ^ s, loc)
+                     | _ -> ("head towards " ^ s, loc) in
+  List.map f room_lst
+
+
+  (*let b = g.public.board in
+  let start_loc = (get_curr_player g).curr_loc in
   let rec step_loop steps acc coord =
     if steps < 0 then acc else
     let loc = CoordMap.find coord b.loc_map in
@@ -279,7 +352,8 @@ let get_movement_options (g: game) (steps: int) : (string * loc) list =
     | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
   let init = List.fold_left (step_loop (steps-1)) [] start_loc.edges in
   let no_start = List.filter (fun (s,l) -> l != start_loc) init in
-  remove_dups no_start
+  remove_dups no_start*)
+
   (* let rec f = (fun acc el -> step_loop el (steps-1) acc)
   and step_loop loc steps loclst =
     if steps = 0 then loclst else
