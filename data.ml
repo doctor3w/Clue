@@ -122,7 +122,8 @@ type player = {suspect: string;
 type public = {curr_player: string;
                board: board;
                acc_room: string;
-               deck: deck
+               deck: deck;
+               player_order: string list;
                (*listen_data: listens*)
                }
 
