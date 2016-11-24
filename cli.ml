@@ -1,20 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @gtr34
-Please read the Github Guide for Cornell Users
- Unwatch 4
-  Star 0
-  Fork 0 asd222/CS3110-MS2 PRIVATE
- Code  Issues 5  Pull requests 0  Wiki  Pulse  Graphs
-Branch: master Find file Copy pathCS3110-MS2/cli.ml
-63e6efc  2 hours ago
-@asd222 asd222 merge
-2 contributors @asd222 @tl547
-RawBlameHistory    195 lines (177 sloc)  6.25 KB
 open Data
 open ANSITerminal
 
@@ -209,5 +192,3 @@ let display_victory pl_name =
 
 (* Displays end game victory text. *)
 let display_message s = print_endline s
-API Training Shop Blog About
-© 2016 GitHub, Inc. Help Support
