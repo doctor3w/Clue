@@ -106,7 +106,7 @@ let rec step game =
     let curr_p' = {curr_p with curr_loc = movement} in
     match handle_movement game movement.info with
     | `Accusation -> handle_accusation curr_p' next_p game
-    | `Guess -> handle_guess curr_p next_p game
+    | `Guess -> handle_guess curr_p' next_p game
     | `End_turn -> handle_end_turn curr_p' next_p game
 
 (* [handle_accusation curr_p next_p game] gets the current player and asks for
