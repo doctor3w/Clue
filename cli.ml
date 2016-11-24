@@ -126,24 +126,25 @@ let rec prompt_answer hand guess =
 	let rec cards_can_be_shown h = 
 		(match h with 
 			| [] -> (print_string [black] "")
-			| h::t -> if prompt_answer_helper h guess 
-					  then match h with
-					 			| Suspect s -> 
-					 						   (print_string [yellow] "Suspect ";
-					 						    print_string [yellow] s;
-					 						    print_string [black] " ";
-					 						    cards_can_be_shown t)
-					 		 	| Weapon s -> 
-					 		 				   (print_string [green] "Weapon ";
-					 						    print_string [green] s;
-					 						    print_string [black] " ";
-					 						    cards_can_be_shown t)
-					 		 	| Room s -> 
-					 		 				   (print_string [blue] "Room ";
-					 						    print_string [blue] s;
-					 						    print_string [black] " ";
-					 						    cards_can_be_shown t)
-					 	else cards_can_be_shown t) in
+			| h::t -> 
+				if prompt_answer_helper h guess 
+				then match h with
+		 			| Suspect s -> 
+		 						   (print_string [yellow] "Suspect ";
+		 						    print_string [yellow] s;
+		 						    print_string [black] " ";
+		 						    cards_can_be_shown t)
+		 		 	| Weapon s -> 
+		 		 				   (print_string [green] "Weapon ";
+		 						    print_string [green] s;
+		 						    print_string [black] " ";
+		 						    cards_can_be_shown t)
+		 		 	| Room s -> 
+		 		 				   (print_string [blue] "Room ";
+		 						    print_string [blue] s;
+		 						    print_string [black] " ";
+		 						    cards_can_be_shown t)
+			 	else cards_can_be_shown t) in
 	cards_can_be_shown hand;
 	print_endline ""
 
