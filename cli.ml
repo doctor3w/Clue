@@ -25,13 +25,13 @@ let rec prompt_move l =
 		(match l with
 		 | [] -> ""
 		 | h::t -> 
-				 (match h with
-				 | Roll -> "Roll a dice; " ^ (moves_can_be_done t)
-				 | Passage loc -> 
-				 				match loc.info with
-				 				| Room_Rect (s, i) -> 
-				 				  		"Take the Passage in " ^ s ^ "; " ^ (moves_can_be_done t)
-				 				| _ -> (moves_can_be_done t))) in
+			 (match h with
+			 | Roll -> "Roll a dice; " ^ (moves_can_be_done t)
+			 | Passage loc -> 
+ 				match loc.info with
+ 				| Room_Rect (s, i) -> 
+				  	"Take the Passage in " ^ s ^ "; "^(moves_can_be_done t)
+ 				| _ -> (moves_can_be_done t))) in
 	let format = intro ^ (moves_can_be_done l) in
 	let len = String.length format in
 	(String.sub format 0 (len-2))^"."
@@ -41,11 +41,11 @@ let display_move (m:move) : unit =
 	match m with
 	| Roll -> print_endline "The agent elected to Roll"
 	| Passage loc -> 
-					(match loc.info with
-					| Room_Rect (s,i) -> 
-							print_endline ("The agent elected to 
-										     take the Passage in " ^ s)					
-					| _ -> failwith "A space is not displayed here")
+		(match loc.info with
+		| Room_Rect (s,i) -> 
+			print_endline ("The agent elected to 
+						    take the Passage in " ^ s)					
+		| _ -> failwith "A space is not displayed here")
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll i = 
@@ -75,11 +75,11 @@ let prompt_movement l =
 let display_movement (str, loc) = 
 	match loc.info with
 	| Room_Rect (s,i) -> 
-			(print_string [black] (str^" the ");
-			 print_string [cyan] (s^"\n"))
+		(print_string [black] (str^" the ");
+		 print_string [cyan] (s^"\n"))
 	| Space (a,b) -> 
-			print_string [black] (str^" the space at ");
-			print_string [cyan] ((string_of_int_tuple (a,b))^"\n")
+		(print_string [black] (str^" the space at ");
+		 print_string [cyan] ((string_of_int_tuple (a,b))^"\n"))
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -90,22 +90,22 @@ let prompt_guess loc b =
 	| Room_Rect (s,i) -> 
 		(match b with
 			| true -> 
-					("Would you like to make an accusation in the " ^ s ^ "?")
+				("Would you like to make an accusation in the " ^ s ^ "?")
 			| false -> 
-			        ("Would you like to make a guess in the " ^ s ^ "?"))
+			    ("Would you like to make a guess in the " ^ s ^ "?"))
 	| _ -> "This is not a room. You can't make a guess here. "
 
 (* Displays a guess (by the user or AI). *)
 let display_guess g = 
 	match g with
 	| (Suspect s1, Weapon s2, Room s3) -> 
-			let () = print_string [black] "The player assumes " in
-			let () = print_string [green] s1 in
-			let () = print_string [black] " is the suspect, " in
-			let () = print_string [yellow] s2 in
-			let () = print_string [black] " is the weapon, and " in
-			let () = print_string [blue] s3 in
-			print_endline "is the room"
+		let () = print_string [black] "The player assumes " in
+		let () = print_string [green] s1 in
+		let () = print_string [black] " is the suspect, " in
+		let () = print_string [yellow] s2 in
+		let () = print_string [black] " is the weapon, and " in
+		let () = print_string [blue] s3 in
+		print_endline "is the room"
 	| (_,_,_) -> failwith "A guess has to follow the order Suspect * Weapon * Room"
 
 (* Prompts the user for a card to show.
@@ -130,20 +130,20 @@ let rec prompt_answer hand guess =
 				if prompt_answer_helper h guess 
 				then match h with
 		 			| Suspect s -> 
-		 						   (print_string [yellow] "Suspect ";
-		 						    print_string [yellow] s;
-		 						    print_string [black] " ";
-		 						    cards_can_be_shown t)
+					   (print_string [yellow] "Suspect ";
+					    print_string [yellow] s;
+					    print_string [black] " ";
+					    cards_can_be_shown t)
 		 		 	| Weapon s -> 
-		 		 				   (print_string [green] "Weapon ";
-		 						    print_string [green] s;
-		 						    print_string [black] " ";
-		 						    cards_can_be_shown t)
+	 				   (print_string [green] "Weapon ";
+					    print_string [green] s;
+					    print_string [black] " ";
+					    cards_can_be_shown t)
 		 		 	| Room s -> 
-		 		 				   (print_string [blue] "Room ";
-		 						    print_string [blue] s;
-		 						    print_string [black] " ";
-		 						    cards_can_be_shown t)
+	 				   (print_string [blue] "Room ";
+					    print_string [blue] s;
+					    print_string [black] " ";
+					    cards_can_be_shown t)
 			 	else cards_can_be_shown t) in
 	cards_can_be_shown hand;
 	print_endline ""
@@ -156,22 +156,22 @@ let display_answer card_opt str b =
 	| true ->
 		(match card_opt with
 		| Some c -> 
-					(match c with
-					| Suspect s -> 
-						(print_string [magenta] str;
-						 print_string [black] " has ";
-						 print_string [yellow] ("Suspect " ^ s);
-						 print_endline " in hand")
-					| Weapon s -> 
-						(print_string [magenta] str;
-						 print_string [black] " has ";
-						 print_string [green] ("Weapon " ^ s);
-						 print_endline " in hand")
-					| Room s -> 
-						(print_string [magenta] str;
-						 print_string [black] " has ";
-						 print_string [blue] ("Room " ^ s);
-						 print_endline " in hand"))
+			(match c with
+				| Suspect s -> 
+					(print_string [magenta] str;
+				 	print_string [black] " has ";
+				 	print_string [yellow] ("Suspect " ^ s);
+				 	print_endline " in hand")
+				| Weapon s -> 
+					(print_string [magenta] str;
+				 	print_string [black] " has ";
+				 	print_string [green] ("Weapon " ^ s);
+				 	print_endline " in hand")
+				| Room s -> 
+					(print_string [magenta] str;
+				 	print_string [black] " has ";
+				 	print_string [blue] ("Room " ^ s);
+				 	print_endline " in hand"))
 		| None -> 
 		    (print_string [magenta] str;
 		    print_endline " has nothing to show you"))
