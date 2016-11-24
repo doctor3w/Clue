@@ -18,7 +18,8 @@ val display_dice_roll : int -> unit
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 val display_move : move -> unit
 
-(* Prompts the user for his. *)
+(* Prompts the user for the room they would like to go to. [string*loc] is
+ * the description alongwith a location to go to. *)
 val prompt_movement : (string * loc) list -> string
 
 (* Displays the movement the agen took on his turn *)
