@@ -35,6 +35,12 @@ type board =
 } *)
 
 let rec add_edge board coord1 coord2 both =
+  (*let ((x1, y1), (x2, y2)) = (coord1, coord2) in
+  Pervasives.print_endline ("adding edge from ("
+  ^ Pervasives.string_of_int x1 ^ ", "
+  ^ Pervasives.string_of_int y1 ^ ") to ("
+  ^ Pervasives.string_of_int x2 ^ ", "
+  ^ Pervasives.string_of_int y2 ^ ")");*)
   let ((a1, a2), (b1, b2)) = (coord1, coord2) in
   let loc1 = try (CoordMap.find coord1 board.loc_map)
     with _ -> failwith ("couldn't find loc ("
@@ -70,7 +76,7 @@ let fill_spaces board =
     let rec loopy board (x', y') =
       if y' > r then board else
       let f (x,y) acc = if CoordMap.mem (x,y) acc then acc
-                        else CoordMap.add (x,y) {info=Space(y,x); edges=[]} acc in
+                        else CoordMap.add (x,y) {info=Space(x,y); edges=[]} acc in
       let lm' = f (x', y') board.loc_map in
       let board' = {board with loc_map = lm'} in
       loopy board' (x', y'+1)
@@ -108,9 +114,9 @@ let edgify_spaces board =
     let rec loopy board (x,y) =
       if y > r then board
     else let board' = add_edge_if_space board (x,y) (x-1,y) in
-         let board' = add_edge_if_space board (x,y) (x+1,y) in
-         let board' = add_edge_if_space board (x,y) (x,y-1) in
-         let board' = add_edge_if_space board (x,y) (x,y+1) in
+         let board' = add_edge_if_space board' (x,y) (x+1,y) in
+         let board' = add_edge_if_space board' (x,y) (x,y-1) in
+         let board' = add_edge_if_space board' (x,y) (x,y+1) in
          loopy board' (x,y+1)
     in if x > c then board
     else let board' = loopy board (x,y) in
@@ -122,7 +128,7 @@ let fill_board (r, c) room_temp_lst =
   let f = (fun acc el ->
               let acc = (fill_room acc el) in
               let (x0,x1,y0,y1) = el.rect in
-              let rc' = StringMap.add (el.r_id) (y0, x0) (acc.room_coords) in
+              let rc' = StringMap.add (el.r_id) (x0, y0) (acc.room_coords) in
               {acc with room_coords = rc'}) in
   let roomed = List.fold_left f empty room_temp_lst in
   let filled = fill_spaces roomed in
