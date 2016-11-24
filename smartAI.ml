@@ -45,17 +45,58 @@ let get_answer (me:player) public guess : card option =
   | [(c, lst)] -> Some c
   | lst -> Some (pick_to_show cp)
 
+let env_nm card me =
+  let f c = let sd = CardMap.find c me.sheet in
+    match sd.card_info with
+    | Unknown -> let sht' = CardMap.add c {sd with card_info = Envelope} me.sheet in
+                 {me with sheet = sht'}
+    | _ -> me
+
+let deduce_env me:player =
+  let bindings = CardMap.bindings me.sheet in
+  let fs = (fun (c,i) -> match c with | Suspect _ -> true | _ -> false ) in
+  let fw = (fun (c,i) -> match c with | Weapon _ -> true | _ -> false ) in
+  let fr = (fun (c,i) -> match c with | Room _ -> true | _ -> false ) in
+  let suss = List.filter fs bindings in
+  let weaps = List.filter fw bindings in
+  let rooms = List.filter fr bindings in
+  let count_unkn = (fun acc (c, i) -> match i.card_info with
+                                      | Unknown -> acc+1
+                                      | _ -> acc) in
+  let env_un acc (c, i) =
+    match i.card_info with
+    | Unknown -> CardMap.add c {i with card_info = Envelope} acc
+    | _ -> acc in
+  let f lst acc = if List.fold_left count_unkn 0 lst = 1
+                  then List.fold_left env_un acc lst
+                  else acc in
+  let sht' = me.sheet |> f suss |> f weaps |> f rooms in
+  {me with sheet = sht'}
+
+
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
  * guess and needs to be updated accordingly. Also needs to use process of
  * elimination for certain AIs. The string is who showed's suspect ID. *)
 let show_card (me:player) public (shown:(string * card) option) guess : player =
-  let me' = me (* adjust sheet *)
-in failwith "unimplemented SmartAI.show_card"
+  let sht = (fun c -> CardMap.find c me.sheet) in
+  let (s, w, r) = guess in
+  let me' = match shown with
+  | None -> me |> env_nm s |> env_nm w |> env_nm r
+  | Some (sus, c) -> let old_sd = sht c in
+                     let sht'  = CardMap.add
+                     {old_c_info with card_info = (ShownBy sus)} me.sheet in
+                     {me with sheet = sht'} in
+  me' |> deduce_env
 
 (* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
 let show_person (me:player) card  (who:string) : player =
-  failwith "unimplemented SmartAI.show_person"
+  let sd = CardMap.find card me.sheet in
+  let shown = match sd.info with
+              | Mine s -> s
+              | _ -> failwith "showed card not in hand!" in
+  let shown' = if List.mem who shown then shown else who::shown in
+  {me with sheet=(CardMap.add card {sd with card_info = Mine shown'})}
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
