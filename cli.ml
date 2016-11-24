@@ -1,5 +1,4 @@
 open Data
-open Agent
 
 (* Displays the provided error message. *)
 let display_error e = failwith ""

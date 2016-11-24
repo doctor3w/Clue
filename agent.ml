@@ -83,9 +83,11 @@ let process_of_elimination sheet pub pl_typ =
 let show_card pl pub answer (s, w, r) =
   match answer with
   | None ->
+    let () = Display.display_answer None "" (pl.agent = Human_t) in
     let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
     {pl with sheet = sheet'}
   | Some(sus, card) ->
+    let () = Display.display_answer (Some card) sus (pl.agent = Human_t) in
     let data = CardMap.find card pl.sheet in
     let data' = {data with card_info= ShownBy(sus)} in
     let sheet' = CardMap.add card data' pl.sheet in
