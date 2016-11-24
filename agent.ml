@@ -1,6 +1,8 @@
 open Data
 open DumbAI
 
+module Display = Cli
+
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move pl pub moves = match pl.agent with

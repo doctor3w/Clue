@@ -41,7 +41,7 @@ val prompt_answer : hand -> guess -> string
 (* Displays the card shown to the human agent and by whom.
  * If None, the user is told just told who showed a card, but not the details
  * of the card. *)
-val display_answer : card option -> string -> unit
+val display_answer : card option -> string -> bool -> unit
 
 (* Displays end game victory text, string is who won. *)
 val display_victory : string -> unit
