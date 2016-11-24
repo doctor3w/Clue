@@ -73,13 +73,13 @@ in loop asc
 
 let extract_coord j : int*int =
   match (Yojson.Basic.Util.to_assoc j) with
-  | ((s1,n1)::(s2,n2)::[]) -> let r = if s1 = "row"
+  | ((s1,n1)::(s2,n2)::[]) -> let y = if s1 = "row"
                                       then Yojson.Basic.Util.to_int n1
                                       else Yojson.Basic.Util.to_int n2
-                           in let c = if s1 = "col"
+                           in let x = if s1 = "col"
                                       then Yojson.Basic.Util.to_int n1
                                       else Yojson.Basic.Util.to_int n2
-                           in (r, c)
+                           in (x, y)
   | _ -> failwith "invalid coord"
 
 let extract_dim j : int*int =
@@ -279,7 +279,7 @@ module PathMap = struct
     then let (s, bp) = try (CoordMap.find k map) with _ -> failwith "line 277" in
       if (s' < s) then CoordMap.add k (s', bp') map
       else map
-    else map
+    else CoordMap.add k (s', bp') map
 
   let poll_min (map:t) : (coord * backpointer * t) =
     if is_empty map then failwith "can't poll empty PathMap" else
@@ -347,7 +347,7 @@ let make_pathmap board start_loc fast_out =
 let get_movement_options (g: game) (steps: int) : (string * loc) list =
   let b = g.public.board in
   let start_loc = (get_curr_player g).curr_loc in
-  let coord = match start_loc.info with | Space (x,y) | Room_Rect (_,(x,y,_,_)) -> (x, y) in
+  let coord = match start_loc.info with | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
   let full_paths = make_pathmap b coord false in
   let room_lst = StringMap.bindings b.room_coords in
   let f (s, (x,y)) = let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
