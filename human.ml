@@ -47,6 +47,18 @@ let rec get_movement pl pub move_ops =
     Display.display_error "Please enter a valid location to move to.";
     get_movement pl pub move_ops
 
+let card_norm card =
+  match card with
+  | Room s -> Room (normalize s)
+  | Weapon s -> Weapon (normalize s)
+  | Suspect s -> Suspect (normalize s)
+
+let parse_guess s (ss, ws, rs) =
+  let norm = normalize s in
+  let c_norm =
+  let ss_norm = List.map card_norm
+
+
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess pl pub = (Suspect ("Red"),Weapon("pistol"),Room("Bathroon"))
