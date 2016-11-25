@@ -8,33 +8,40 @@ let display_error (e:string): unit = print_string [red] (e ^ "\n")
    The format of print statment is "This is [player]'s turn",
    where the information about the [player] is stored in [pub] *)
 let display_turn (pub:public): unit =
-	let () = print_string [black] "This is " in
+	let () = print_string [] "This is " in
 	let () = print_string [cyan] pub.curr_player in
 	print_endline "'s turn"
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
-	"Please enter the name of the game file you want to load. "
+	print_string [red]
+		"Please enter the name of the game file you want to load.\n\n";
+	print_string [red] "> ";
+	read_line ()
 
 (* Prompts the user for whether he rolls dice or not.
 	[prompt_move] takes [l], which is a move list and prints out all the
 	possible moves the player could take. All of the option are in color magenta *)
 let rec prompt_move l =
-	let intro = "Moves you could make: " in
+	let intro =
+		"Would you like to roll the dice or take a passage? Choose from:\n" in
 	let rec moves_can_be_done l =
 		(match l with
 		 | [] -> ""
 		 | h::t ->
 			 (match h with
-			 | Roll -> "Roll a dice; " ^ (moves_can_be_done t)
+			 | Roll -> "Roll dice; \n" ^ (moves_can_be_done t)
 			 | Passage loc ->
  				match loc.info with
  				| Room_Rect (s, i) ->
-				  	"Take the Passage in " ^ s ^ "; "^(moves_can_be_done t)
+				  	"Take the Passage into " ^ s ^ "; \n"^(moves_can_be_done t)
  				| _ -> (moves_can_be_done t))) in
-	let format = intro ^ (moves_can_be_done l) in
-	let len = String.length format in
-	(String.sub format 0 (len-2))^"."
+	let print_st = (moves_can_be_done l) in
+	print_string [] intro;
+	print_string [magenta] print_st;
+	print_string [green] "\n>>> ";
+	read_line ()
+
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move (m:move) : unit =
@@ -58,7 +65,7 @@ let string_of_int_tuple (a,b) =
 	"(" ^ (string_of_int a) ^ "," ^ (string_of_int b) ^")"
 
 let prompt_movement l =
-	let intro = "All the possible movements you could make: " in
+	let intro = "After rolling, these are the possble options for moving. All the possible movements you could make: " in
 	let helper (str,loc) =
 		(match loc.info with
 		| Room_Rect (s,i) ->
