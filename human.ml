@@ -34,7 +34,8 @@ let parse_move str moves =
   let mappings = List.map fmap passages in
   if contains_xs norm ["roll";"dice"] then Roll
   else if contains_xs norm (List.map (fun (k,v) -> k) mappings) then
-    try List.assoc norm mappings with _ -> raise Bad_input
+    let selected = Str.matched_string norm in
+    try List.assoc selected mappings with _ -> raise Bad_input
   else raise Bad_input
 
 (* [answer_move] gets the type of movement the agent wants to perform,
@@ -49,21 +50,17 @@ let rec answer_move pl pub moves =
  * if it is one in the movement options. *)
 let parse_movement str move_ops =
   let norm = normalize str in
-  let f (s, l) =
-    let ss = Str.split (Str.regexp "[ \t]+") (normalize s) in
-    let ss_rev = List.rev ss in
-    try List.hd ss_rev with _ -> failwith "Loc description was blank" in
-  let rooms = List.map f move_ops in
+  let rooms = List.map (fun (_, (s, _)) -> s) move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
     let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
-    try List.assoc norm norm_moves with Not_found -> raise Bad_input
+    try List.assoc selected norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops =
-  try parse_movement (Display.prompt_movement move_ops) with
+  try parse_movement (Display.prompt_movement move_ops) move_ops with
   | Bad_input ->
     Display.display_error "Please enter a valid location to move to.";
     get_movement pl pub move_ops
@@ -129,14 +126,16 @@ let rec get_accusation pl pub =
 let parse_answer str hand (s, w, r) =
   let norm = normalize str in
   let hand_norm = List.map card_norm_map hand in
-  let card = match_card str hand_norm in
+  let card = match_card norm hand_norm in
   if card = s || card = w || card = r then card else raise Bad_input
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
 let rec get_answer pl pub guess =
-  try parse_answer (Display.prompt_answer pl.hand guess) with
+  try
+    Some (parse_answer (Display.prompt_answer pl.hand guess) pl.hand guess)
+  with
   | Bad_input ->
     Display.display_error
       "Please enter a valid card from your hand that's in the guess.";

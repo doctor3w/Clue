@@ -19,15 +19,22 @@ let rec answer_move pl pub moves : move =
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops : loc =
-  match move_ops with
-  | []-> pl.curr_loc
-  | (loc, (str, b))::t ->
-    match loc.info with
-    | Room_Rect (name,_)->
-      let r_info = (CardMap.find (Room(name)) pl.sheet).card_info in
-        if r_info = Unknown then loc
-        else get_movement pl pub t
-    | Space (_,_) -> get_movement pl pub t
+  let pick_random lst =
+    let len = List.length lst in
+    if len = 0 then None
+    else Some (List.nth lst (Random.int len)) in
+  if List.length move_ops = 0 then pl.curr_loc
+  else
+    let filtered = List.filter (fun (l, (s, b)) -> b) move_ops in
+    if List.length filtered = 0 then
+      (* No rooms accessible, pick one to head towards. *)
+      match pick_random move_ops with
+      | Some (l, _) -> l
+      | None -> failwith "No place to go!"
+    else
+      match pick_random filtered with
+      | Some (l, _) -> l
+      | None -> failwith "No place to go!"
 
 (* [guess_acc_handler] returns a list of tuples that flips the bindngs of
  * card to sheet data to sheet_data to card  *)
@@ -95,8 +102,7 @@ let get_guess pl pub: guess =
 (* [get_answer_hand] takes in a hand from the player,the current guess and
  * returns Some card. if a card from the hand and also in the list can be shown.
  * Returns None if no card can be shown. *)
-let rec get_answer_hand hand pub guess : card option=
-  let (s,w,r)= guess in
+let rec get_answer_hand hand pub ((s,w,r) as guess) : card option=
   match hand with
   | []->None
   | h::t-> if s = h || w = h || r = h then Some h
