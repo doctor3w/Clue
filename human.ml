@@ -5,10 +5,13 @@ module Display = Cli
 exception Bad_input
 exception Wrong_room
 
+(* Normalizes a string *)
 let normalize s = String.lowercase_ascii (String.trim s)
 
+(* Checks if two normalized strings are equal *)
 let eq_str s1 s2 = (normalize s1) = (normalize s2)
 
+(* [contains_xs s xs] checks if any xs appear in the string s *)
 let contains_xs s xs =
   let cat = if List.length xs = 1 then List.hd xs
             else List.fold_left (fun acc el -> match acc with
@@ -17,6 +20,8 @@ let contains_xs s xs =
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
+(* [parse_move str] parses the movement input str and returns one of two
+ * options. Will raise Bad_input on nothing. *)
 let parse_move str =
   let norm = normalize str in
   if contains_xs norm ["roll";"dice"] then Roll
@@ -31,6 +36,8 @@ let rec answer_move pl pub moves =
     Display.display_error "Please enter roll or passage";
     answer_move pl pub moves
 
+(* [parse_movement str move_ops] parses the movement input str and sees
+ * if it is one in the movement options. *)
 let parse_movement str move_ops =
   let norm = normalize str in
   let f (s, l) =
@@ -108,6 +115,8 @@ let rec get_accusation pl pub =
       "Please enter a valid accusation (must be real cards).";
     get_accusation pl pub
 
+(* [parse_answer str hand guess] parses the answer input str and returns the
+ * associated card from the hand. Also checks if it's part of the guess. *)
 let parse_answer str hand (s, w, r) =
   let norm = normalize str in
   let hand_norm = List.map card_norm_map hand in
@@ -120,7 +129,8 @@ let parse_answer str hand (s, w, r) =
 let rec get_answer pl pub guess =
   try parse_answer (Display.prompt_answer pl.hand guess) with
   | Bad_input ->
-    Display.display_error "Please enter a valid card from your hand.";
+    Display.display_error
+      "Please enter a valid card from your hand that's in the guess.";
     get_answer pl pub guess
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
