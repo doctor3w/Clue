@@ -45,7 +45,7 @@ let get_answer (me:player) public guess : card option =
   | [(c, lst)] -> Some c
   | lst -> Some (pick_to_show cp)
 
-let env_nm card me =
+(* let env_nm card me =
   let f c = let sd = CardMap.find c me.sheet in
     match sd.card_info with
     | Unknown -> let sht' = CardMap.add c {sd with card_info = Envelope} me.sheet in
@@ -72,7 +72,7 @@ let deduce_env me:player =
                   else acc in
   let sht' = me.sheet |> f suss |> f weaps |> f rooms in
   {me with sheet = sht'}
-
+ *)
 
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
