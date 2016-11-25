@@ -22,16 +22,25 @@ let contains_xs s xs =
 
 (* [parse_move str] parses the movement input str and returns one of two
  * options. Will raise Bad_input on nothing. *)
-let parse_move str =
+let parse_move str moves =
   let norm = normalize str in
+  let passages = List.filter (fun m -> not (m = Roll)) moves in
+  let extr_loc l = match l.info with
+    | Room_Rect (s, i) -> (normalize s, Passage l)
+    | _ -> raise Bad_input in
+  let fmap m = match m with
+    | Passage l -> extr_loc l
+    | _ -> raise Bad_input in
+  let mappings = List.map fmap passages in
   if contains_xs norm ["roll";"dice"] then Roll
-  else if contains_xs norm ["passage"] then Passage
+  else if contains_xs norm (List.map (fun (k,v) -> k) mappings) then
+    try List.assoc norm mappings with _ -> raise Bad_input
   else raise Bad_input
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let rec answer_move pl pub moves =
-  try parse_move (Display.prompt_move moves) with
+  try parse_move (Display.prompt_move moves) moves with
   | Bad_input ->
     Display.display_error "Please enter roll or passage";
     answer_move pl pub moves
@@ -41,7 +50,7 @@ let rec answer_move pl pub moves =
 let parse_movement str move_ops =
   let norm = normalize str in
   let f (s, l) =
-    let ss = split (regexp "[ \t]+") (normalize s) in
+    let ss = Str.split (Str.regexp "[ \t]+") (normalize s) in
     let ss_rev = List.rev ss in
     try List.hd ss_rev with _ -> failwith "Loc description was blank" in
   let rooms = List.map f move_ops in
