@@ -31,6 +31,9 @@ let string_of_movement l = match l with
   | Space(x,y) ->
     "Landed on space "^(string_of_int x)^", "^(string_of_int y)
 
+let get_movement_dir l ops =
+  try List.assoc l ops with Not_found -> ("nothing", false)
+
 (* Handles the agent's option of passage or dice roll. If dice has been rolled,
  * then the agent is asked where they would like to move. That location is
  * then displayed. *)
@@ -41,8 +44,9 @@ let handle_move game curr_p m =
     let () = Display.display_dice_roll dice_roll in
     let movement_opt = Model.get_movement_options game dice_roll in
     let movement = Agent.get_movement curr_p game.public movement_opt in
-    let () = Display.display_movement (string_of_movement movement.info, movement)
-    in movement
+    let movement_dir = get_movement_dir movement movement_opt in
+    let () = Display.display_movement movement_dir in
+    movement
   | Passage l -> l
 
 (* Handles certain locations and returns the type of action that takes place
@@ -87,6 +91,10 @@ let reorder_pls pl plrs =
     | h::t' when h.suspect = pl.suspect -> (t')@(List.rev (pl::ps))
     | h::t' -> helper (h::ps) t'
   in helper [] plrs
+
+let can_show hand (s, w, r) =
+  let p c = (s = c || w = c || r = c) in
+  List.exists p hand
 
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
@@ -145,9 +153,11 @@ and handle_guess curr_p next_p game =
     | pl::t when pl.suspect = curr_p.suspect -> None
     | pl::t -> extract_answer pl t
   and extract_answer pl t =
-    match Agent.get_answer pl game.public guess with
-    | None -> get_answers t
-    | Some card -> Some (pl, card)
+    if can_show pl.hand guess then
+      match Agent.get_answer pl game.public guess with
+      | None -> get_answers t
+      | Some card -> Some (pl, card)
+    else get_answers t
   in match get_answers group with
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in

@@ -4,8 +4,8 @@ open Data
  * so either roll the dice or take a secret passage if possible  *)
 let rec answer_move pl pub moves : move =
   match moves with
-  |[]-> Roll
-  |h::t->
+  | []-> Roll
+  | h::t->
     match h with
     | Roll -> answer_move pl pub t
     | Passage (loc) ->
@@ -18,10 +18,10 @@ let rec answer_move pl pub moves : move =
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let rec get_movement pl pub move_ops :loc =
+let rec get_movement pl pub move_ops : loc =
   match move_ops with
   | []-> pl.curr_loc
-  | (_,loc) :: t->
+  | (loc, (str, b))::t ->
     match loc.info with
     | Room_Rect (name,_)->
       let r_info = (CardMap.find (Room(name)) pl.sheet).card_info in

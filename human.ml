@@ -47,7 +47,7 @@ let parse_movement str move_ops =
   let rooms = List.map f move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
-    let norm_moves = List.map (fun (s,l) -> (normalize s, l)) move_ops in
+    let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
     try List.assoc norm norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
 

@@ -8,9 +8,9 @@ let display_error (e:string): unit = print_string [red] (e ^ "\n")
    The format of print statment is "This is [player]'s turn",
    where the information about the [player] is stored in [pub] *)
 let display_turn (pub:public): unit =
-	let () = print_string [] "This is " in
+	let () = print_string [] "\n-----------------------------------\n\nThis is " in
 	let () = print_string [cyan] pub.curr_player in
-	print_endline "'s turn"
+	print_endline "'s turn."
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
@@ -21,23 +21,20 @@ let prompt_filename () : string =
 
 (* Prompts the user for whether he rolls dice or not.
 	[prompt_move] takes [l], which is a move list and prints out all the
-	possible moves the player could take. All of the option are in color magenta *)
-let rec prompt_move l =
+	possible moves the player could take. All of the option are in color green *)
+let prompt_move moves =
 	let intro =
 		"Would you like to roll the dice or take a passage? Choose from:\n" in
-	let rec moves_can_be_done l =
-		(match l with
-		 | [] -> ""
-		 | h::t ->
-			 (match h with
-			 | Roll -> "Roll dice; \n" ^ (moves_can_be_done t)
-			 | Passage loc ->
- 				match loc.info with
- 				| Room_Rect (s, i) ->
-				  	"Take the Passage into " ^ s ^ "; \n"^(moves_can_be_done t)
- 				| _ -> (moves_can_be_done t))) in
-	let print_st = (moves_can_be_done l) in
-	print_string [] intro;
+	let disp_loc l =
+		match l.info with
+		| Room_Rect (s, i) -> "Take the Passage into " ^ s ^ "; \n"
+		| _ -> "" in
+	let fold acc move =
+		match move with
+		| Roll -> "Roll dice; \n"
+		| Passage loc -> disp_loc loc in
+	let print_st = List.fold_left fold "" moves in
+	print_string [Bold] intro;
 	print_string [magenta] print_st;
 	print_string [green] "\n>>> ";
 	read_line ()
@@ -45,48 +42,40 @@ let rec prompt_move l =
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move (m:move) : unit =
-	match m with
-	| Roll -> print_endline "The agent elected to Roll"
-	| Passage loc ->
-		(match loc.info with
+	let disp_loc l =
+		match l.info with
 		| Room_Rect (s,i) ->
-			print_endline ("The agent elected to
-						    take the Passage in " ^ s)
-		| _ -> failwith "A space is not displayed here")
+			print_endline ("The player elected to take the Passage to " ^ s)
+		| _ -> failwith "A space is not displayed here"
+	in match m with
+	| Roll -> print_string [] "The player elected to Roll "
+	| Passage loc -> disp_loc loc
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll i =
-	let print_info =
-		"A dice was just rolled and it turned to be " ^ (string_of_int i) in
-	print_endline print_info
+	print_endline ("and "^(string_of_int i)^" was rolled.")
 
 (* Prompts the user for his. *)
 let string_of_int_tuple (a,b) =
 	"(" ^ (string_of_int a) ^ "," ^ (string_of_int b) ^")"
 
-let prompt_movement l =
-	let intro = "After rolling, these are the possble options for moving. All the possible movements you could make: " in
-	let helper (str,loc) =
-		(match loc.info with
-		| Room_Rect (s,i) ->
-			(str^" the "^ s^"; ")
-		| Space (a,b) ->
-			str^" the space at "^(string_of_int_tuple (a,b))^"; ") in
-	let str_list = List.map helper l in
-	let len = String.length (intro ^ (List.fold_right (^) str_list "")) in
-	let format =
-		String.sub (intro ^ (List.fold_right (^) str_list "")) 0 (len-2) in
-	format^"."
+let prompt_movement move_ops =
+	let intro = "After rolling, these are the possble options for moving:\n" in
+	let helper acc (_, (str, b)) =
+		acc^(if b then "Enter "^str^";\n" else "Head towards "^str^";\n") in
+	let str_list = List.fold_left helper "" move_ops in
+	print_string [Bold] intro;
+	print_string [blue] str_list;
+	print_string [green] "\n>>> ";
+	read_line ()
 
 (* Displays the movement the agen took on his turn *)
-let display_movement (str, loc) =
-	match loc.info with
-	| Room_Rect (s,i) ->
-		(print_string [black] (str^" the ");
-		 print_string [cyan] (s^"\n"))
-	| Space (a,b) ->
-		(print_string [black] (str^" the space at ");
-		 print_string [cyan] ((string_of_int_tuple (a,b))^"\n"))
+let display_movement (str, b) =
+	let intro = "The player " in
+	let str =
+		if b then "entered the "^str^".\n"
+		else "headed towards the "^str^".\n" in
+	print_string [] (intro^str)
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -95,107 +84,78 @@ let display_movement (str, loc) =
 let prompt_guess loc b =
 	match loc.info with
 	| Room_Rect (s,i) ->
-		(match b with
-			| true ->
-				("Would you like to make an accusation in the " ^ s ^ "?")
-			| false ->
-			    ("Would you like to make a guess in the " ^ s ^ "?"))
-	| _ -> "This is not a room. You can't make a guess here. "
+		(if b then
+			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
+		else
+			print_string [Bold]
+				"You are in the accusation room. What is your final accusation?\n");
+		print_string [green] "\n>>> ";
+		read_line ()
+	| _ ->
+		print_string [red] "This is not a room. You can't make a guess here. ";
+		""
 
 (* Displays a guess (by the user or AI). *)
 let display_guess g =
 	match g with
 	| (Suspect s1, Weapon s2, Room s3) ->
-		let () = print_string [black] "The player assumes " in
+		let () = print_string [] "\nThe player thinks: \n    " in
 		let () = print_string [green] s1 in
-		let () = print_string [black] " is the suspect, " in
+		let () = print_string [] " is the suspect, \n    " in
 		let () = print_string [yellow] s2 in
-		let () = print_string [black] " is the weapon, and " in
+		let () = print_string [] " is the weapon, and \n    " in
 		let () = print_string [blue] s3 in
-		print_endline "is the room"
+		print_string [] " is the room.\n"
 	| (_,_,_) -> failwith "A guess has to follow the order Suspect * Weapon * Room"
 
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.
- * Can be none if there is no card to show. *)
-let triple_fst (a,b,c) = a
-let triple_snd (a,b,c) = b
-let triple_thd (a,b,c) = c
-
-let prompt_answer_helper c g =
-	if c = triple_fst g then true
-	else if c = triple_snd g then true
-	else if c = triple_thd g then true
-	else false
+ * Cannot be none, only call when a card they have a card in the guess. *)
+let showable hand (s, w, r) =
+  let p c = (s = c || w = c || r = c) in
+  List.filter p hand
 
 let rec prompt_answer hand guess =
-	print_string [black] "Cards you could show: ";
-	let rec cards_can_be_shown h =
-		(match h with
-			| [] -> (print_string [black] "")
-			| h::t ->
-				if prompt_answer_helper h guess
-				then match h with
-		 			| Suspect s ->
-					   (print_string [yellow] "Suspect ";
-					    print_string [yellow] s;
-					    print_string [black] " ";
-					    cards_can_be_shown t)
-		 		 	| Weapon s ->
-	 				   (print_string [green] "Weapon ";
-					    print_string [green] s;
-					    print_string [black] " ";
-					    cards_can_be_shown t)
-		 		 	| Room s ->
-	 				   (print_string [blue] "Room ";
-					    print_string [blue] s;
-					    print_string [black] " ";
-					    cards_can_be_shown t)
-			 	else cards_can_be_shown t) in
-	cards_can_be_shown hand;
-	print_endline ""
+	let cards_showable = showable hand guess in
+	let intro = "\nYou can show a card, which one will you show? " in
+	let f acc c =
+		match c with
+		| Suspect s -> acc^s^"; \n"
+		| Weapon s -> acc^s^"; \n"
+		| Room s -> acc^s^"; \n" in
+	let str = List.fold_left f "" cards_showable in
+	print_string [] intro;
+	print_string [blue] str;
+	print_string [green] "\n>>> ";
+	read_line ()
 
 (* Displays the card shown to the human agent and by whom.
- * If None, the user is told just told who showed a card, but not the details
- * of the card. *)
+ * If None, no card could be shown. If false, the user is not shown the
+ * details of the card. *)
 let display_answer card_opt str b =
-	match b with
-	| true ->
-		(match card_opt with
+	let () = print_string [] "\n" in
+	let print_card s =
+		print_string [magenta] str;
+		print_string [] " shows you ";
+		print_string [yellow] s;
+		print_string [] " from their hand.\n" in
+	if b then
+		match card_opt with
+		| Some (Suspect s) -> print_card s;
+		| Some (Weapon s) -> print_card s;
+		| Some (Room s) -> print_card s;
+		| None -> print_string [] "No one has a card to show. "
+	else
+		match card_opt with
 		| Some c ->
-			(match c with
-				| Suspect s ->
-					(print_string [magenta] str;
-				 	print_string [black] " has ";
-				 	print_string [yellow] ("Suspect " ^ s);
-				 	print_endline " in hand")
-				| Weapon s ->
-					(print_string [magenta] str;
-				 	print_string [black] " has ";
-				 	print_string [green] ("Weapon " ^ s);
-				 	print_endline " in hand")
-				| Room s ->
-					(print_string [magenta] str;
-				 	print_string [black] " has ";
-				 	print_string [blue] ("Room " ^ s);
-				 	print_endline " in hand"))
-		| None ->
-		    (print_string [magenta] str;
-		    print_endline " has nothing to show you"))
-	| _ ->
-		(match card_opt with
-		| Some c ->
-			(print_string [magenta] str;
-			 print_endline " showed a card")
-		| None ->
-			(print_string [magenta] str;
-		    print_endline " has nothing to show you"))
+			print_string [magenta] str;
+			print_string [] " showed a card from their hand.\n";
+		| None -> print_string [] "No one has a card to show. "
 
 (* Displays end game victory text. *)
 let display_victory pl_name =
-	print_endline "Congratulations!!!";
+	print_string [yellow] "\nCongratulations!!!\n";
 	print_string [magenta] pl_name;
-	print_endline " just won the game! The game is over."
+	print_string [] " just won the game! The game is over."
 
-(* Displays end game victory text. *)
 let display_message s = print_endline s

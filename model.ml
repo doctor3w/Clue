@@ -344,17 +344,20 @@ let make_pathmap board start_loc fast_out =
  *        head towards [room name]
  *        go into [room name] *)
 
-let get_movement_options (g: game) (steps: int) : (string * loc) list =
+let get_movement_options (g: game) (steps: int) =
   let b = g.public.board in
   let start_loc = (get_curr_player g).curr_loc in
-  let coord = match start_loc.info with | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
+  let coord =
+    match start_loc.info with
+    | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
   let full_paths = make_pathmap b coord false in
   let room_lst = StringMap.bindings b.room_coords in
-  let f (s, (x,y)) = let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
-                     let loc = CoordMap.find coord' b.loc_map in
-                     match loc.info with
-                     | Room_Rect (s', _) when s' = s -> ("go into " ^ s, loc)
-                     | _ -> ("head towards " ^ s, loc) in
+  let f (s, (x,y)) =
+    let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
+    let loc = CoordMap.find coord' b.loc_map in
+    match loc.info with
+    | Room_Rect (s', _) when s' = s -> (loc, (s, true))
+    | _ -> (loc, (s, false)) in
   List.map f room_lst
 
 
