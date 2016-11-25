@@ -128,7 +128,7 @@ and handle_accusation curr_p next_p game =
     Display.display_victory curr_p.suspect
   else (* Lose, out *)
     let message =
-      (curr_p.suspect^" guessed incorrectly, and is out of the game.") in
+      ("\n"^curr_p.suspect^" guessed incorrectly, and is out of the game.") in
     let () = Display.display_message message in
     let curr_p' = {curr_p with is_out = true} in
     let pls' = replace_player curr_p' game.players in
@@ -137,7 +137,7 @@ and handle_accusation curr_p next_p game =
       let pub = {game.public with curr_player=next_p.suspect} in
       step {game with players = pls'; public = pub}
     else
-      Display.display_message "Game over."
+      Display.display_message "\n\nGame over."
 
 (* [handle_guess curr_p next_p game] takes in the current player, the next
  * player and the game state and performs actions for getting a guess from

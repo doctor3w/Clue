@@ -36,77 +36,105 @@ let rec get_movement pl pub move_ops : loc =
       | Some (l, _) -> l
       | None -> failwith "No place to go!"
 
-(* [guess_acc_handler] returns a list of tuples that flips the bindngs of
- * card to sheet data to sheet_data to card  *)
-let guess_acc_handler pl pub =
-  let info_list = CardMap.bindings pl.sheet in
-  let flipped_binding = List.map (fun (a,b) -> (b,a)) info_list in
-    List.fold_left (fun acc (a,c) -> (a.card_info,c)::acc) [] flipped_binding
+let print_card c = match c with
+  | Suspect s -> print_string ("Suspect "^s^": ")
+  | Weapon s -> print_string ("Weapon "^s^": ")
+  | Room s -> print_string ("Room "^s^": ")
 
-(* [get_c_lst] returns a list with the needed card_info*)
-let rec get_c_lst lst c_inf=
-  match lst with
-  | []->[]
-  | (inf,card)::t-> if inf = c_inf then card::get_c_lst t c_inf
-                    else get_c_lst t c_inf
+let print_data d = match d.card_info with
+  | Mine _ -> print_endline ("Mine")
+  | ShownBy s -> print_endline ("Shown by "^s)
+  | Unknown -> print_endline ("Unknown")
+  | Envelope -> print_endline ("Envelope")
 
-let get_acc lst :guess =
-  let suspect_list =
-    List.filter (fun ele -> match ele with
-                            | Suspect s -> true
-                            | _ -> false) lst in
-  let weapon_list =
-    List.filter (fun ele -> match ele with
-                            | Weapon s -> true
-                            | _ -> false) lst in
-  let room_list =
-    List.filter (fun ele -> match ele with
-                            | Room s -> true
-                            | _ -> false) lst in
-  (List.nth suspect_list 0, List.nth weapon_list 0, List.nth room_list 0)
-
+let get_cards_with_info info sheet =
+  let l =
+    CardMap.filter (fun _ data -> (data.card_info = info)) sheet in
+  List.map (fun (c,_) -> c) (CardMap.bindings l)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
  * inside the envelope. *)
-let get_accusation pl pub : guess=
-  let card_info_list = guess_acc_handler pl pub in
-    get_acc (get_c_lst card_info_list Envelope)
+let get_accusation pl pub : guess =
+  let unks = get_cards_with_info Unknown pl.sheet in
+  let envs = get_cards_with_info Envelope pl.sheet in
+  let s_only c = match c with Suspect s -> true | _ -> false in
+  let w_only c = match c with Weapon s -> true | _ -> false in
+  let r_only c = match c with Room s -> true | _ -> false in
+  let env_s = List.filter s_only envs in
+  let env_w = List.filter w_only envs in
+  let env_r = List.filter r_only envs in
+  let unks_s = List.filter s_only unks in
+  let unks_w = List.filter w_only unks in
+  let unks_r = List.filter r_only unks in
+  let s = if List.length env_s = 0 then
+            if List.length unks_s = 0 then
+              (* print_sheet *)
+              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
+              failwith "No card"
+            else
+              List.nth unks_s (Random.int (List.length unks_s))
+          else List.hd env_s in
+  let w = if List.length env_w = 0 then
+            if List.length unks_w = 0 then
+              (* print_sheet *)
+              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
+              failwith "No card"
+            else
+              List.nth unks_w (Random.int (List.length unks_w))
+          else List.hd env_w in
+  let r = if List.length env_r = 0 then
+            if List.length unks_r = 0 then
+              (* print_sheet *)
+              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
+              failwith "No card"
+            else
+              List.nth unks_r (Random.int (List.length unks_r))
+          else List.hd env_r in
+  (s, w, r)
 
-let get_g guess_list pl pub=
-  let r_lst = List.fold_left (fun acc e -> match e with
-                                | Room(_)->e::acc
-                                | _ -> acc) [] guess_list in
-  let s_lst = List.fold_left (fun acc e -> match e with
-                                | Suspect(_)->e::acc
-                                | _ -> acc) [] guess_list in
-  let w_lst = List.fold_left (fun acc e -> match e with
-                                | Weapon(_)->e::acc
-                                | _ -> acc) [] guess_list in
-    let r = Random.int (List.length r_lst) in
-    let s = Random.int (List.length s_lst) in
-    let w = Random.int (List.length w_lst) in
-      (List.nth s_lst s,List.nth w_lst w, List.nth r_lst r)
+let get_card_for_loc l = match l.info with
+  | Room_Rect (s, i) -> Room s
+  | _ -> failwith "Not a room"
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess pl pub: guess =
-  let card_info_list = guess_acc_handler pl pub in
-  let guess_list  = (get_c_lst card_info_list Unknown
-                    @ get_c_lst card_info_list Envelope) in
-    if List.length guess_list = 0 then get_accusation pl pub
-    else get_g guess_list pl pub
-
-(* (Suspect ("Red"),Weapon("pistol"),Room("Bathroon")) *)
+  let r = get_card_for_loc pl.curr_loc in
+  let unks = get_cards_with_info Unknown pl.sheet in
+  let envs = get_cards_with_info Envelope pl.sheet in
+  let s_only c = match c with Suspect s -> true | _ -> false in
+  let w_only c = match c with Weapon s -> true | _ -> false in
+  let env_s = List.filter s_only envs in
+  let env_w = List.filter w_only envs in
+  let unks_s = List.filter s_only unks in
+  let unks_w = List.filter w_only unks in
+  let s = if List.length env_s = 0 then
+            if List.length unks_s = 0 then
+              (* print_sheet *)
+              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
+              failwith "No card"
+            else
+              List.nth unks_s (Random.int (List.length unks_s))
+          else List.hd env_s in
+  let w = if List.length env_w = 0 then
+            if List.length unks_w = 0 then
+              (* print_sheet *)
+              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
+              failwith "No card"
+            else
+              List.nth unks_w (Random.int (List.length unks_w))
+          else List.hd env_w in
+  (s, w, r)
 
 (* [get_answer_hand] takes in a hand from the player,the current guess and
  * returns Some card. if a card from the hand and also in the list can be shown.
  * Returns None if no card can be shown. *)
 let rec get_answer_hand hand pub ((s,w,r) as guess) : card option=
   match hand with
-  | []->None
+  | [] -> None
   | h::t-> if s = h || w = h || r = h then Some h
-          else get_answer_hand t pub guess
+           else get_answer_hand t pub guess
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
