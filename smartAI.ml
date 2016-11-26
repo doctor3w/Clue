@@ -124,7 +124,7 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
       | (l, (s, false)) when is_my_card me (Room s) -> l::acc
       | _ -> acc in
       let p acc el = match el with
-      | (l, (s, false)) when is_my_card me (Room s) -> l::acc
+      | (l, (s, false)) when is_env_card me (Room s) -> l::acc
       | _ -> acc in
       let fs = List.fold_left f [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
@@ -132,7 +132,9 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
       if List.length gs > 0 then rand_from_lst gs
       else let hs = List.fold_left h [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
-      else rand_from_lst (List.fold_left p [] movelst')
+      else let ps = List.fold_left p [] movelst' in
+      if List.length ps > 0 then rand_from_lst ps
+      else failwith ("impossible " ^ Pervasives.__LOC__)
     else
       let f' acc el = match el with
       | (l, (s, true)) when is_unknown_card me (Room s) -> l::acc
@@ -142,7 +144,9 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
       | _ -> acc in
       let fs = List.fold_left f' [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
-      else rand_from_lst (List.fold_left h' [] movelst')
+      else let hs = List.fold_left h' [] movelst' in
+      if List.length hs > 0 then rand_from_lst hs
+      else failwith ("impossible " ^ Pervasives.__LOC__)
 
 
 (* [get_guess] takes in a game sheet and the current location and returns
@@ -154,30 +158,36 @@ let get_guess (me:player) public : guess =
   let sus_env = knows_room me in
   let weap_env = knows_weap me in
   let l = CardMap.bindings me.sheet in
-  let s_u lst = List.filter (fun (c, i) -> match c, i.card_info with
+  let s_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Suspect _, Unknown -> true
-                                       | _ -> false) lst
-                  |> rand_from_lst |> fst in
-  let w_u lst = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | _ -> false) lst in
+                  if List.length u > 0 then rand_from_lst u |> fst
+                  else failwith "don't know sus, but no sus unknown" in
+  let w_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Weapon _, Unknown -> true
-                                       | _ -> false) lst
-                  |> rand_from_lst |> fst in
+                                       | _ -> false) lst in
+                  if List.length u > 0 then rand_from_lst u |> fst
+                  else failwith "don't know weap, but no weaps unknown" in
   let s_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Suspect _, Mine _ -> true
                                        | _ -> false) lst in
                   if List.length m > 0 then rand_from_lst m |> fst
-                else List.filter (fun (c, i) -> match c, i.card_info with
+                else
+                  let n = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Suspect _, Envelope -> true
-                                       | _ -> false) lst
-                  |> rand_from_lst |> fst in
+                                       | _ -> false) lst in
+                    if List.length n > 0 then rand_from_lst n |> fst
+                    else failwith "no sus_mine/env for guess" in
   let w_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Weapon _, Mine _ -> true
                                        | _ -> false) lst in
                   if List.length m > 0 then rand_from_lst m |> fst
-                else List.filter (fun (c, i) -> match c, i.card_info with
+                  else
+                    let n = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Weapon _, Envelope -> true
-                                       | _ -> false) lst
-                  |> rand_from_lst |> fst in
+                                       | _ -> false) lst in
+                      if List.length n > 0 then rand_from_lst n |> fst
+                      else failwith "no weap_mine/env for guess" in
   match sus_env, weap_env with
   | true, true    -> (s_m l, w_m l, room)
   | true, false   -> (s_m l, w_u l, room)
@@ -200,9 +210,9 @@ let get_accusation (me:player) public : guess =
 let pick_to_show lst cp =
   let pre_shown = List.filter (fun (c, shn) -> List.mem cp shn) lst in
   match pre_shown with
-  | [] -> fst (List.nth lst (Random.int (List.length lst)))
+  | [] -> fst (rand_from_lst lst)
   | [(c, shn)] -> c
-  | lst' -> fst (List.nth lst' (Random.int (List.length lst')))
+  | lst' -> fst (rand_from_lst lst')
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None

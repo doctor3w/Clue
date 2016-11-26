@@ -352,6 +352,9 @@ let get_movement_options (g: game) (steps: int) =
     | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
   let full_paths = make_pathmap b coord false in
   let room_lst = StringMap.bindings b.room_coords in
+  let room_lst = match start_loc.info with
+    | Room_Rect (s, _) -> List.filter (fun (s', bi) -> s <> s') room_lst
+    | _ -> room_lst in
   let f (s, (x,y)) =
     let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
     let loc = CoordMap.find coord' b.loc_map in
