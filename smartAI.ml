@@ -1,5 +1,6 @@
 open Data
 open Model
+open Cli
 
 let rand_from_lst lst =
   let len = List.length lst in
@@ -93,10 +94,8 @@ let answer_move  (me:player) public (passages: move list) : move =
     let unknowns = List.fold_left h [] passages in
     if List.length unknowns > 0 then rand_from_lst unknowns else Roll
 
-let is_acc_room public el =
-  match el with
-  | (l, (s, b)) when s = public.acc_room -> true
-  | _ -> false
+let is_acc_room public (_, (s, _)) = s = public.acc_room
+
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc =
@@ -106,7 +105,7 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
   let acc_id = public.acc_room in
   if sus_env && weap_env && room_env
   then
-    match List.filter (fun x -> is_acc_room public x) movelst with
+    match List.filter (is_acc_room public) movelst with
     | [(l, _)] -> l
     | _ -> failwith "can't find accusation room"
   else
@@ -155,7 +154,7 @@ let get_guess (me:player) public : guess =
   let room = match me.curr_loc.info with
              | Room_Rect (s, _) -> (Room s)
              | _ -> failwith "trying to guess from not room" in
-  let sus_env = knows_room me in
+  let sus_env = knows_sus me in
   let weap_env = knows_weap me in
   let l = CardMap.bindings me.sheet in
   let s_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
