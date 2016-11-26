@@ -319,22 +319,22 @@
     [
       {
         "suspect": "Miss Scarlet",
-        "agent_type": "DumbAI"
+        "agent_type": "SmartAI"
       }, {
         "suspect": "Colonel Mustard",
-        "agent_type": "DumbAI"
+        "agent_type": "SmartAI"
       }, {
         "suspect": "Mrs. White",
-        "agent_type": "DumbAI"
+        "agent_type": "SmartAI"
       }, {
         "suspect": "Mr. Green",
-        "agent_type": "Human"
+        "agent_type": "SmartAI"
       }, {
         "suspect": "Madame Peacock",
-        "agent_type": "DumbAI"
+        "agent_type": "SmartAI"
       }, {
         "suspect": "Professor Plum",
-        "agent_type": "DumbAI"
+        "agent_type": "SmartAI"
       }
     ]
 }

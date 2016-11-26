@@ -369,7 +369,11 @@ let get_movement_options (g: game) (steps: int) =
     match (loc.info) with
     | Room_Rect (s, _) -> ("go into "^s, loc)::acc
     | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
-  let init = List.fold_left (step_loop (steps-1)) [] start_loc.edges in
+  let init = List.fold_left (step_loop (steps-1)) [] st
+
+
+
+  art_loc.edges in
   let no_start = List.filter (fun (s,l) -> l != start_loc) init in
   remove_dups no_start*)
 
