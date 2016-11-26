@@ -59,10 +59,14 @@ let display_dice_roll i =
 let string_of_int_tuple (a,b) =
 	"(" ^ (string_of_int a) ^ "," ^ (string_of_int b) ^")"
 
-let prompt_movement move_ops =
+let prompt_movement move_ops acc_room =
 	let intro = "After rolling, these are the possble options for moving:\n" in
 	let helper acc (_, (str, b)) =
-		acc^(if b then "Enter "^str^";\n" else "Head towards "^str^";\n") in
+		let comb =
+			let is_acc = if str = acc_room then " (Accusation Room)" else "" in
+			if b then "Enter "^str^is_acc^";\n"
+			else "Head towards "^str^is_acc^";\n" in
+		acc^comb in
 	let str_list = List.fold_left helper "" move_ops in
 	print_string [Bold] intro;
 	print_string [blue] str_list;
