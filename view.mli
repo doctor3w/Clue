@@ -50,3 +50,7 @@ val display_victory : string -> unit
 
 (* Displays arbitrary text. *)
 val display_message : string -> unit
+
+val show_sheet : sheet -> unit
+
+val show_hand : hand -> unit

@@ -163,3 +163,30 @@ let display_victory pl_name =
 	print_string [] " just won the game!\n\n"
 
 let display_message s = print_endline s
+
+let print_card c = match c with
+  | Suspect s -> print_string [green] (s)
+  | Weapon s -> print_string [yellow] (s)
+  | Room s -> print_string [blue] (s)
+
+let print_data d = match d.card_info with
+  | Mine _ -> print_endline (": Mine")
+  | ShownBy s -> print_endline (": Shown by "^s)
+  | Unknown -> print_endline (": Unknown")
+  | Envelope -> print_endline (": Envelope")
+
+let show_sheet sheet =
+	let print (c,d) =
+		print_card c;
+		print_data d; in
+	print_string [] "\n";
+	ignore (List.map print (CardMap.bindings sheet));
+	print_string [] "\n"
+
+let show_hand hand =
+	let print i c =
+		if i mod 3 = 0 then print_string [] "\n" else ();
+		print_card c;
+		print_string [] ", " in
+	ignore (List.mapi print hand);
+	print_string [] "\n\n"

@@ -70,8 +70,7 @@ let print_data d = match d.card_info with
   | Envelope -> print_endline ("Envelope")
 
 let get_cards_with_info info sheet =
-  let l =
-    CardMap.filter (fun _ data -> (data.card_info = info)) sheet in
+  let l = CardMap.filter (fun _ data -> (data.card_info = info)) sheet in
   List.map (fun (c,_) -> c) (CardMap.bindings l)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
