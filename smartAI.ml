@@ -1,13 +1,14 @@
 open Data
 open Model
-open Cli
 
+(* returns a random element from the list [lst] *)
 let rand_from_lst lst =
   let len = List.length lst in
   if len = 0 then failwith "no lst"
   else let n = Random.int len in
     List.nth lst n
 
+(* true if the player [me] knows the suspect *)
 let knows_sus me =
   let pairs = CardMap.bindings me.sheet in
   let f acc (c, i) = match (c, i.card_info) with
@@ -15,6 +16,7 @@ let knows_sus me =
                  | _ -> acc in
   List.fold_left f false pairs
 
+(* true if the player [me] knows the weapon *)
 let knows_weap me =
   let pairs = CardMap.bindings me.sheet in
   let f acc (c, i) = match (c, i.card_info) with
@@ -22,6 +24,7 @@ let knows_weap me =
                  | _ -> acc in
   List.fold_left f false pairs
 
+(* true if the player [me] knows the room *)
 let knows_room me =
   let pairs = CardMap.bindings me.sheet in
   let f acc (c, i) = match (c, i.card_info) with
@@ -29,6 +32,8 @@ let knows_room me =
                  | _ -> acc in
   List.fold_left f false pairs
 
+(* returns true if the location corresponds with a card marked as
+ * Mine in [me].sheet *)
 let is_my_room me loc =
   let f c = match (CardMap.find c me.sheet).card_info with
             | Mine _ -> true
@@ -37,6 +42,8 @@ let is_my_room me loc =
   | Room_Rect (s, _) -> f (Room s)
   | _ -> false
 
+(* returns true if the location corresponds with a card marked as
+ * Envelope in [me].sheet *)
 let is_env_room me loc =
   let f c = match (CardMap.find c me.sheet).card_info with
             | Envelope -> true
@@ -45,6 +52,8 @@ let is_env_room me loc =
   | Room_Rect (s, _) -> f (Room s)
   | _ -> false
 
+(* returns true if the location corresponds with a card marked as
+ * Unknown in [me].sheet *)
 let is_unknown_room me loc =
   let f c = match (CardMap.find c me.sheet).card_info with
             | Unknown -> true
@@ -53,16 +62,19 @@ let is_unknown_room me loc =
   | Room_Rect (s, _) -> f (Room s)
   | _ -> false
 
+(* true if card [c] is marked as Mine in [me].sheet *)
 let is_my_card me c =
   match (CardMap.find c me.sheet).card_info with
   | Mine _ -> true
   | _ -> false
 
+(* true if card [c] is marked as Unknown in [me].sheet *)
 let is_unknown_card me c =
   match (CardMap.find c me.sheet).card_info with
   | Unknown -> true
   | _ -> false
 
+(* true if card [c] is marked as Envelope in [me].sheet *)
 let is_env_card me c =
   match (CardMap.find c me.sheet).card_info with
   | Envelope -> true
@@ -94,6 +106,7 @@ let answer_move  (me:player) public (passages: move list) : move =
     let unknowns = List.fold_left h [] passages in
     if List.length unknowns > 0 then rand_from_lst unknowns else Roll
 
+(* true if s is the acc_room, takes in an element from [movelst] below *)
 let is_acc_room public (_, (s, _)) = s = public.acc_room
 
 (* [get_movement] passes in a list of locations that could be moved to,
@@ -206,6 +219,7 @@ let get_accusation (me:player) public : guess =
     | _ -> (s, w, r) in
   List.fold_left f (Suspect "", Weapon "", Room "") bindings
 
+(* picks which card to show based on having shown a card before *)
 let pick_to_show lst cp =
   let pre_shown = List.filter (fun (c, shn) -> List.mem cp shn) lst in
   match pre_shown with
