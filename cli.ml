@@ -133,10 +133,15 @@ let prompt_answer hand guess =
 	print_string [green] "\n>>> ";
 	read_line ()
 
+let display_no_answer name =
+	print_string [] "\n";
+	print_string [magenta] name;
+	print_string [] " could not show a card from their hand."
+
 (* Displays the card shown to the human agent and by whom.
  * If None, no card could be shown. If false, the user is not shown the
  * details of the card. *)
-let display_answer card_opt str b =
+let display_answer (card_opt:card option) str b : unit =
 	let () = print_string [] "\n" in
 	let print_card s =
 		print_string [magenta] str;
@@ -153,8 +158,13 @@ let display_answer card_opt str b =
 		match card_opt with
 		| Some _ ->
 			print_string [magenta] str;
-			print_string [] " showed a card from their hand.\n";
+			print_string [] " showed a card from their hand.\n"
 		| None -> print_string [] "No one has a card to show. "
+
+(* let display_no_answer name =
+	print_string [] "\n";
+	print_string [magenta] name;
+	print_string [] " could not show a card from their hand." *)
 
 (* Displays end game victory text. *)
 let display_victory pl_name =

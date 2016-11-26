@@ -150,7 +150,9 @@ and handle_guess curr_p next_p game =
       match Agent.get_answer pl game.public guess with
       | None -> get_answers t
       | Some card -> Some (pl, card)
-    else get_answers t
+    else
+      let () = Display.display_no_answer pl.suspect in
+      get_answers t
   in match get_answers group with
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in

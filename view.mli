@@ -45,6 +45,10 @@ val prompt_answer : hand -> guess -> string
  * details of the card. *)
 val display_answer : card option -> string -> bool -> unit
 
+(* Displays that the player [string] could not answer with a card.
+ * This is different from no one being able to show a card. *)
+val display_no_answer : string -> unit
+
 (* Displays end game victory text, string is who won. *)
 val display_victory : string -> unit
 
