@@ -27,12 +27,12 @@ let prompt_move moves =
 		"Would you like to roll the dice or take a passage? Choose from:\n" in
 	let disp_loc l =
 		match l.info with
-		| Room_Rect (s, i) -> "Take the Passage into " ^ s ^ "; \n"
+		| Room_Rect (s, _) -> "Take the Passage into " ^ s ^ "; \n"
 		| _ -> "" in
 	let fold acc move =
 		match move with
-		| Roll -> "Roll dice; \n"
-		| Passage loc -> disp_loc loc in
+		| Roll -> acc^"Roll dice; \n"
+		| Passage loc -> acc^(disp_loc loc) in
 	let print_st = List.fold_left fold "" moves in
 	print_string [Bold] intro;
 	print_string [magenta] print_st;
@@ -44,7 +44,7 @@ let prompt_move moves =
 let display_move (m:move) : unit =
 	let disp_loc l =
 		match l.info with
-		| Room_Rect (s,i) ->
+		| Room_Rect (s,_) ->
 			print_endline ("The player elected to take the Passage to " ^ s)
 		| _ -> failwith "A space is not displayed here"
 	in match m with
@@ -87,7 +87,7 @@ let display_movement (str, b) =
  * returns a string of the user's response. *)
 let prompt_guess loc b =
 	match loc.info with
-	| Room_Rect (s,i) ->
+	| Room_Rect (s,_) ->
 		(if not b then
 			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
 		else
@@ -119,7 +119,7 @@ let showable hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.filter p hand
 
-let rec prompt_answer hand guess =
+let prompt_answer hand guess =
 	let cards_showable = showable hand guess in
 	let intro = "\nYou can show a card, which one will you show? " in
 	let f acc c =
@@ -151,7 +151,7 @@ let display_answer card_opt str b =
 		| None -> print_string [] "No one has a card to show. "
 	else
 		match card_opt with
-		| Some c ->
+		| Some _ ->
 			print_string [magenta] str;
 			print_string [] " showed a card from their hand.\n";
 		| None -> print_string [] "No one has a card to show. "
