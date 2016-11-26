@@ -88,7 +88,7 @@ let display_movement (str, b) =
 let prompt_guess loc b =
 	match loc.info with
 	| Room_Rect (s,i) ->
-		(if b then
+		(if not b then
 			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
 		else
 			print_string [Bold]
