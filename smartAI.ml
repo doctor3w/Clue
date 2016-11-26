@@ -162,12 +162,20 @@ let get_guess (me:player) public : guess =
                                        | Weapon _, Unknown -> true
                                        | _ -> false) lst
                   |> rand_from_lst |> fst in
-  let s_m lst = List.filter (fun (c, i) -> match c, i.card_info with
+  let s_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Suspect _, Mine _ -> true
+                                       | _ -> false) lst in
+                  if List.length m > 0 then rand_from_lst m |> fst
+                else List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Suspect _, Envelope -> true
                                        | _ -> false) lst
                   |> rand_from_lst |> fst in
-  let w_m lst = List.filter (fun (c, i) -> match c, i.card_info with
+  let w_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
                                        | Weapon _, Mine _ -> true
+                                       | _ -> false) lst in
+                  if List.length m > 0 then rand_from_lst m |> fst
+                else List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Weapon _, Envelope -> true
                                        | _ -> false) lst
                   |> rand_from_lst |> fst in
   match sus_env, weap_env with
