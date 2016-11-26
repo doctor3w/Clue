@@ -60,7 +60,9 @@ let parse_movement str move_ops =
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops =
-  try parse_movement (Display.prompt_movement move_ops) move_ops with
+  try
+    parse_movement (Display.prompt_movement move_ops pub.acc_room) move_ops
+  with
   | Bad_input ->
     Display.display_error "Please enter a valid location to move to.";
     get_movement pl pub move_ops

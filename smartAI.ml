@@ -1,10 +1,58 @@
 open Data
 open Model
 
+let rand_from_lst lst =
+  let len = List.length lst in
+  if len = 0 then failwith "no lst"
+  else let n = Random.int len in
+    List.nth lst n
+
+let knows_sus me =
+  let pairs = CardMap.bindings me.sheet in
+  let f acc (c, i) = match (c, i.info) with
+                 | (Suspect _, Envelope) -> acc || true
+                 | _ -> acc in
+  List.fold_left f false pairs
+
+let knows_weap me =
+  let pairs = CardMap.bindings me.sheet in
+  let f acc (c, i) = match (c, i) with
+                 | (Weapon _, Envelope) -> acc || true
+                 | _ -> acc in
+  List.fold_left f false pairs
+
+let knows_room me =
+  let pairs = CardMap.bindings me.sheet in
+  let f acc (c, i) = match (c, i) with
+                 | (Room _, Envelope) -> acc || true
+                 | _ -> acc in
+  List.fold_left f false pairs
+
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move  (me:player) public passages:(move list) : move =
-failwith "unimplemented SmartAI.answer_move"
+  let knows_room = knows_room me in
+  if knows_room then
+    let f acc pass =
+      match pass with
+      | Passage r when (CardMap,find r me.sheet).card_info = Mine _ -> (Passage r)::acc
+      | _ -> acc in
+    let g acc pass =
+      match acc pass with
+      | Passage r when (CardMap,find r me.sheet).card_info = Envelope -> (Passage r)::acc
+      | _ -> acc in
+    let my_rooms = List.fold_left f [] passages in
+    if List.length my_room > 0 then rand_from_lst my_rooms
+    else let env_room = List.fold_left [] passages in
+      if List.length env_room > 0 then rand_from_lst env_room else
+      Roll
+  else
+    let f acc pass =
+      match pass with
+      | Passage r when (CardMap,find r me.sheet).card_info = Unknown -> (Passage r)::acc
+      | _ -> acc in
+    let unknowns = List.fold_left f [] passages in
+    if List.length unknowns > 0 then rand_from_lst unknowns else Roll
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)

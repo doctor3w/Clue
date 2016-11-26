@@ -26,8 +26,6 @@ let rec remove_op op checked tl =
   | [] -> checked
   | h::t -> if h = op then checked@t else remove_op op (h::checked) t
 
-
-
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops : loc =
