@@ -36,7 +36,8 @@ let rec get_movement pl pub move_ops : loc =
       if r_info = Unknown then l
       else go (remove_op (l, (s, b)) [] mops)
     | None -> failwith "No place to go!" in
-  let no_acc = List.filter (fun (_, (s, _)) -> s = pub.acc_room) move_ops in
+  let no_acc =
+    List.filter (fun (_, (s, _)) -> not (s = pub.acc_room)) move_ops in
   if List.length no_acc = 0 then pl.curr_loc
   else
     let filtered = List.filter (fun (l, (s, b)) -> b) no_acc in
