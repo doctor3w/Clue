@@ -160,6 +160,6 @@ let display_answer card_opt str b =
 let display_victory pl_name =
 	print_string [yellow] "\nCongratulations!!!\n";
 	print_string [magenta] pl_name;
-	print_string [] " just won the game! The game is over."
+	print_string [] " just won the game!\n\n"
 
 let display_message s = print_endline s
