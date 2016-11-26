@@ -95,7 +95,7 @@ let edgify_room board room_temp =
   let r_coord = (StringMap.find s board.room_coords) in
   let f acc el = add_edge acc r_coord el true in
   let board' = List.fold_left f board room_temp.exits in
-  let f' acc el = add_edge board' r_coord (StringMap.find s board.room_coords) false in
+  let f' acc el = add_edge board' r_coord (StringMap.find el board.room_coords) false in
   List.fold_left f' board' room_temp.passages
 
 let add_edge_if_space board c1 c2 =
