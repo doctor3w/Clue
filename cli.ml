@@ -59,10 +59,14 @@ let display_dice_roll i =
 let string_of_int_tuple (a,b) =
 	"(" ^ (string_of_int a) ^ "," ^ (string_of_int b) ^")"
 
-let prompt_movement move_ops =
+let prompt_movement move_ops acc_room =
 	let intro = "After rolling, these are the possble options for moving:\n" in
 	let helper acc (_, (str, b)) =
-		acc^(if b then "Enter "^str^";\n" else "Head towards "^str^";\n") in
+		let comb =
+			let is_acc = if str = acc_room then " (Accusation Room)" else "" in
+			if b then "Enter "^str^is_acc^";\n"
+			else "Head towards "^str^is_acc^";\n" in
+		acc^comb in
 	let str_list = List.fold_left helper "" move_ops in
 	print_string [Bold] intro;
 	print_string [blue] str_list;
@@ -84,7 +88,7 @@ let display_movement (str, b) =
 let prompt_guess loc b =
 	match loc.info with
 	| Room_Rect (s,i) ->
-		(if b then
+		(if not b then
 			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
 		else
 			print_string [Bold]
@@ -156,6 +160,6 @@ let display_answer card_opt str b =
 let display_victory pl_name =
 	print_string [yellow] "\nCongratulations!!!\n";
 	print_string [magenta] pl_name;
-	print_string [] " just won the game! The game is over."
+	print_string [] " just won the game!\n\n"
 
 let display_message s = print_endline s

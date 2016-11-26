@@ -26,7 +26,7 @@ let rec remove_op op checked tl =
   | [] -> checked
   | h::t -> if h = op then checked@t else remove_op op (h::checked) t
 
-
+exception No_place_to_go
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
@@ -37,13 +37,26 @@ let rec get_movement pl pub move_ops : loc =
       let r_info = (CardMap.find (Room(s)) pl.sheet).card_info in
       if r_info = Unknown then l
       else go (remove_op (l, (s, b)) [] mops)
-    | None -> failwith "No place to go!" in
-  let no_acc = List.filter (fun (_, (s, _)) -> s = pub.acc_room) move_ops in
+    | None -> raise No_place_to_go in
+  let go_acc () =
+    let accl =
+        List.filter (fun (_, (s, _)) -> (s = pub.acc_room)) move_ops in
+      let (l, (s, b)) =
+        if List.length accl = 0 then failwith "No acc room exists"
+        else List.hd accl in
+      l in
+  let no_acc =
+    List.filter (fun (_, (s, _)) -> not (s = pub.acc_room)) move_ops in
   if List.length no_acc = 0 then pl.curr_loc
   else
     let filtered = List.filter (fun (l, (s, b)) -> b) no_acc in
-    if List.length filtered = 0 then go no_acc
-    else go filtered
+    if List.length filtered = 0 then
+      try go no_acc with No_place_to_go -> go_acc ()
+    else
+      try go filtered with No_place_to_go ->
+      try go no_acc with No_place_to_go -> go_acc ()
+
+
 
 let print_card c = match c with
   | Suspect s -> print_string ("Suspect "^s^": ")

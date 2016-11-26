@@ -224,7 +224,7 @@ let import_board (file_name: string) : game =
   let is_ai = (function | Human_t -> false | _ -> true) in
   let all_ai = List.fold_left (fun acc (_,el) -> acc&&(is_ai el)) true agent_lst
 in let game = {game with ai_only = all_ai} in
-  deal_hands game full_deck
+  deal_hands game (shuffle_lst mixed_deck)
 
 
 let get_curr_player (game: game) : player =

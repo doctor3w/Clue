@@ -43,16 +43,17 @@ let parse_move str moves =
 let rec answer_move pl pub moves =
   try parse_move (Display.prompt_move moves) moves with
   | Bad_input ->
-    Display.display_error "Please enter roll or passage";
+    Display.display_error "Please enter roll or one of the passages";
     answer_move pl pub moves
 
 (* [parse_movement str move_ops] parses the movement input str and sees
  * if it is one in the movement options. *)
 let parse_movement str move_ops =
   let norm = normalize str in
-  let rooms = List.map (fun (_, (s, _)) -> s) move_ops in
+  let rooms = List.map (fun (_, (s, _)) -> normalize s) move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
+    let () = print_endline selected in
     let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
     try List.assoc selected norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
@@ -60,7 +61,9 @@ let parse_movement str move_ops =
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops =
-  try parse_movement (Display.prompt_movement move_ops) move_ops with
+  try
+    parse_movement (Display.prompt_movement move_ops pub.acc_room) move_ops
+  with
   | Bad_input ->
     Display.display_error "Please enter a valid location to move to.";
     get_movement pl pub move_ops
