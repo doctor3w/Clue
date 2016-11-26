@@ -16,25 +16,34 @@ let rec answer_move pl pub moves : move =
             if r_info = Unknown then h
             else answer_move pl pub t
 
+let pick_random lst =
+  let len = List.length lst in
+  if len = 0 then None
+  else Some (List.nth lst (Random.int len))
+
+let rec remove_op op checked tl =
+  match tl with
+  | [] -> checked
+  | h::t -> if h = op then checked@t else remove_op op (h::checked) t
+
+
+
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops : loc =
-  let pick_random lst =
-    let len = List.length lst in
-    if len = 0 then None
-    else Some (List.nth lst (Random.int len)) in
-  if List.length move_ops = 0 then pl.curr_loc
+  let rec go mops =
+    match pick_random mops with
+    | Some (l, (s, b)) ->
+      let r_info = (CardMap.find (Room(s)) pl.sheet).card_info in
+      if r_info = Unknown then l
+      else go (remove_op (l, (s, b)) [] mops)
+    | None -> failwith "No place to go!" in
+  let no_acc = List.filter (fun (_, (s, _)) -> s = pub.acc_room) move_ops in
+  if List.length no_acc = 0 then pl.curr_loc
   else
-    let filtered = List.filter (fun (l, (s, b)) -> b) move_ops in
-    if List.length filtered = 0 then
-      (* No rooms accessible, pick one to head towards. *)
-      match pick_random move_ops with
-      | Some (l, _) -> l
-      | None -> failwith "No place to go!"
-    else
-      match pick_random filtered with
-      | Some (l, _) -> l
-      | None -> failwith "No place to go!"
+    let filtered = List.filter (fun (l, (s, b)) -> b) no_acc in
+    if List.length filtered = 0 then go no_acc
+    else go filtered
 
 let print_card c = match c with
   | Suspect s -> print_string ("Suspect "^s^": ")
