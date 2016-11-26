@@ -31,6 +31,9 @@ let string_of_movement l = match l with
   | Space(x,y) ->
     "Landed on space "^(string_of_int x)^", "^(string_of_int y)
 
+let get_movement_dir l ops =
+  try List.assoc l ops with Not_found -> ("nothing", false)
+
 (* Handles the agent's option of passage or dice roll. If dice has been rolled,
  * then the agent is asked where they would like to move. That location is
  * then displayed. *)
@@ -41,8 +44,9 @@ let handle_move game curr_p m =
     let () = Display.display_dice_roll dice_roll in
     let movement_opt = Model.get_movement_options game dice_roll in
     let movement = Agent.get_movement curr_p game.public movement_opt in
-    let () = Display.display_movement (string_of_movement movement.info, movement)
-    in movement
+    let movement_dir = get_movement_dir movement movement_opt in
+    let () = Display.display_movement movement_dir in
+    movement
   | Passage l -> l
 
 (* Handles certain locations and returns the type of action that takes place
@@ -88,20 +92,9 @@ let reorder_pls pl plrs =
     | h::t' -> helper (h::ps) t'
   in helper [] plrs
 
-let make_envelope_if data =
-  match data.card_info with
-  | Unknown -> {data with card_info=Envelope}
-  | _ -> data
-
-
-let show_person card pl sheet =
-  let data = CardMap.find card sheet in
-  let card_info = match data.card_info with
-    | Mine l -> Mine (pl.suspect::l)
-    | x -> x in
-  let data' = {data with card_info=card_info} in
-  CardMap.add card data' sheet
-
+let can_show hand (s, w, r) =
+  let p c = (s = c || w = c || r = c) in
+  List.exists p hand
 
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
@@ -121,7 +114,7 @@ let rec step game =
     let curr_p' = {curr_p with curr_loc = movement} in
     match handle_movement game movement.info with
     | `Accusation -> handle_accusation curr_p' next_p game
-    | `Guess -> handle_guess curr_p next_p game
+    | `Guess -> handle_guess curr_p' next_p game
     | `End_turn -> handle_end_turn curr_p' next_p game
 
 (* [handle_accusation curr_p next_p game] gets the current player and asks for
@@ -135,16 +128,16 @@ and handle_accusation curr_p next_p game =
     Display.display_victory curr_p.suspect
   else (* Lose, out *)
     let message =
-      (curr_p.suspect^" guessed incorrectly, and is out of the game.") in
+      ("\n"^curr_p.suspect^" guessed incorrectly, and is out of the game.") in
     let () = Display.display_message message in
     let curr_p' = {curr_p with is_out = true} in
     let pls' = replace_player curr_p' game.players in
-    let guard = (check_for_humans pls' || game.ai_only) in
+    let guard = (game.ai_only || check_for_humans pls') in
     if guard && not (check_all_out pls') then
       let pub = {game.public with curr_player=next_p.suspect} in
       step {game with players = pls'; public = pub}
     else
-      Display.display_message "Game over."
+      Display.display_message "\n\nGame over."
 
 (* [handle_guess curr_p next_p game] takes in the current player, the next
  * player and the game state and performs actions for getting a guess from
@@ -160,30 +153,21 @@ and handle_guess curr_p next_p game =
     | pl::t when pl.suspect = curr_p.suspect -> None
     | pl::t -> extract_answer pl t
   and extract_answer pl t =
-    match Agent.get_answer pl game.public guess with
-    | None -> get_answers t
-    | Some card -> Some (pl, card)
+    if can_show pl.hand guess then
+      match Agent.get_answer pl game.public guess with
+      | None -> get_answers t
+      | Some card -> Some (pl, card)
+    else get_answers t
   in match get_answers group with
   | None -> (* No card could be shown *)
-    let s_data = CardMap.find s curr_p.sheet in
-    let s_data' = make_envelope_if s_data in
-    let w_data = CardMap.find w curr_p.sheet in
-    let w_data' = make_envelope_if w_data in
-    let r_data = CardMap.find r curr_p.sheet in
-    let r_data' = make_envelope_if r_data in
-    let sheet' = CardMap.add s s_data' curr_p.sheet
-      |> CardMap.add w w_data'
-      |> CardMap.add r r_data' in
-    let curr_p' = {curr_p with sheet = sheet'} in
+    let curr_p' = Agent.show_card curr_p game.public None guess in
     let pls' = replace_player curr_p' game.players in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
-    let data = CardMap.find card curr_p.sheet in
-    let data' = {data with card_info= ShownBy(pl.suspect)} in
-    let sheet' = CardMap.add card data' curr_p.sheet in
-    let curr_p' = {curr_p with sheet= sheet'} in
-    let pl' = {pl with sheet= (show_person card curr_p pl.sheet)} in
+    let answer = Some (pl.suspect, card) in
+    let curr_p' = Agent.show_card curr_p game.public answer guess in
+    let pl' = Agent.show_person pl card curr_p'.suspect in
     let pls' = replace_player curr_p' game.players |> replace_player pl' in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}

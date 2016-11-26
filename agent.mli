@@ -6,7 +6,7 @@ val answer_move : player -> public -> move list -> move
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-val get_movement : player -> public -> (string * loc) list -> loc
+val get_movement : player -> public -> (loc * (string * bool)) list -> loc
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
@@ -21,4 +21,17 @@ val get_accusation : player -> public -> guess
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
 val get_answer : player -> public -> guess -> card option
+
+(* [show_card pl pu c g] updates the players sheet based on the new card seen
+ * and the guess. If card is None, then that means no one had cards in the
+ * guess and needs to be updated accordingly. Also needs to use process of
+ * elimination for certain AIs. The string is who showed's suspect ID. *)
+val show_card : player -> public -> (string * card) option -> guess -> player
+
+(* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
+val show_person : player -> card -> string -> player
+
+(* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
+ * in public. *)
+val take_notes : player -> public -> player
 

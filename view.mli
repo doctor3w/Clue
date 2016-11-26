@@ -18,11 +18,12 @@ val display_dice_roll : int -> unit
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 val display_move : move -> unit
 
-(* Prompts the user for his. *)
-val prompt_movement : (string * loc) list -> string
+(* Prompts the user for the room they would like to go to. [string*loc] is
+ * the description alongwith a location to go to. *)
+val prompt_movement : (loc * (string * bool)) list -> string
 
 (* Displays the movement the agen took on his turn *)
-val display_movement : (string * loc) -> unit
+val display_movement : (string * bool) -> unit
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -39,9 +40,9 @@ val display_guess : guess -> unit
 val prompt_answer : hand -> guess -> string
 
 (* Displays the card shown to the human agent and by whom.
- * If None, the user is told just told who showed a card, but not the details
- * of the card. *)
-val display_answer : card option -> string -> unit
+ * If None, no card could be shown. If false, the user is not shown the
+ * details of the card. *)
+val display_answer : card option -> string -> bool -> unit
 
 (* Displays end game victory text, string is who won. *)
 val display_victory : string -> unit

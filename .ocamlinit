@@ -1,0 +1,10 @@
+#require "str";;
+#require "yojson";;
+#directory "_build";;
+#load "data.cmo";;
+#load "board.cmo";;
+#load "model.cmo";;
+#use "data.ml";;
+#use "model.ml";;
+
+let game1 = Model.import_board "classic_dumb.json";;

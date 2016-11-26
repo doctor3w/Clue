@@ -2,7 +2,10 @@ test:
 	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main_test.byte && ./main_test.byte
 
 play:
-	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main.byte && ./main.byte "test/game.json"
+	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main.byte && ./main.byte "tests/game.json"
+
+choose:
+	ocamlbuild -pkgs oUnit,yojson,str,ANSITerminal main.byte && ./main.byte
 
 check:
 	bash checkenv.sh && bash checktypes.sh
