@@ -27,12 +27,12 @@ let prompt_move moves =
 		"Would you like to roll the dice or take a passage? Choose from:\n" in
 	let disp_loc l =
 		match l.info with
-		| Room_Rect (s, i) -> "Take the Passage into " ^ s ^ "; \n"
+		| Room_Rect (s, _) -> "Take the Passage into " ^ s ^ "; \n"
 		| _ -> "" in
 	let fold acc move =
 		match move with
-		| Roll -> "Roll dice; \n"
-		| Passage loc -> disp_loc loc in
+		| Roll -> acc^"Roll dice; \n"
+		| Passage loc -> acc^(disp_loc loc) in
 	let print_st = List.fold_left fold "" moves in
 	print_string [Bold] intro;
 	print_string [magenta] print_st;
@@ -44,7 +44,7 @@ let prompt_move moves =
 let display_move (m:move) : unit =
 	let disp_loc l =
 		match l.info with
-		| Room_Rect (s,i) ->
+		| Room_Rect (s,_) ->
 			print_endline ("The player elected to take the Passage to " ^ s)
 		| _ -> failwith "A space is not displayed here"
 	in match m with
@@ -73,12 +73,21 @@ let prompt_movement move_ops acc_room =
 	print_string [green] "\n>>> ";
 	read_line ()
 
-(* Displays the movement the agen took on his turn *)
+(* Displays the movement the agent took on its turn *)
 let display_movement (str, b) =
 	let intro = "The player " in
 	let str =
 		if b then "entered the "^str^".\n"
 		else "headed towards the "^str^".\n" in
+	print_string [] (intro^str)
+
+(* Displays the relocation of suspect [string] to the Room loc *)
+let display_relocate who loc =
+	let intro = "The player " in
+	let room_name = match loc.info with
+									| Room_Rect (s, _) -> s
+									| _ -> failwith ("must be a room: " ^ Pervasives.__LOC__) in
+	let str = who ^ " was relocated to the " ^ room_name ^ ".\n" in
 	print_string [] (intro^str)
 
 (* Prompts the user for a guess.
@@ -87,7 +96,7 @@ let display_movement (str, b) =
  * returns a string of the user's response. *)
 let prompt_guess loc b =
 	match loc.info with
-	| Room_Rect (s,i) ->
+	| Room_Rect (s,_) ->
 		(if not b then
 			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
 		else
@@ -119,7 +128,7 @@ let showable hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.filter p hand
 
-let rec prompt_answer hand guess =
+let prompt_answer hand guess =
 	let cards_showable = showable hand guess in
 	let intro = "\nYou can show a card, which one will you show? " in
 	let f acc c =
@@ -133,10 +142,15 @@ let rec prompt_answer hand guess =
 	print_string [green] "\n>>> ";
 	read_line ()
 
+let display_no_answer name =
+	print_string [] "\n";
+	print_string [magenta] name;
+	print_string [] " could not show a card from their hand."
+
 (* Displays the card shown to the human agent and by whom.
  * If None, no card could be shown. If false, the user is not shown the
  * details of the card. *)
-let display_answer card_opt str b =
+let display_answer (card_opt:card option) str b : unit =
 	let () = print_string [] "\n" in
 	let print_card s =
 		print_string [magenta] str;
@@ -151,10 +165,15 @@ let display_answer card_opt str b =
 		| None -> print_string [] "No one has a card to show. "
 	else
 		match card_opt with
-		| Some c ->
+		| Some _ ->
 			print_string [magenta] str;
-			print_string [] " showed a card from their hand.\n";
+			print_string [] " showed a card from their hand.\n"
 		| None -> print_string [] "No one has a card to show. "
+
+(* let display_no_answer name =
+	print_string [] "\n";
+	print_string [magenta] name;
+	print_string [] " could not show a card from their hand." *)
 
 (* Displays end game victory text. *)
 let display_victory pl_name =
@@ -163,3 +182,30 @@ let display_victory pl_name =
 	print_string [] " just won the game!\n\n"
 
 let display_message s = print_endline s
+
+let print_card c = match c with
+  | Suspect s -> print_string [green] (s)
+  | Weapon s -> print_string [yellow] (s)
+  | Room s -> print_string [blue] (s)
+
+let print_data d = match d.card_info with
+  | Mine _ -> print_endline (": Mine")
+  | ShownBy s -> print_endline (": Shown by "^s)
+  | Unknown -> print_endline (": Unknown")
+  | Envelope -> print_endline (": Envelope")
+
+let show_sheet sheet =
+	let print (c,d) =
+		print_card c;
+		print_data d; in
+	print_string [] "\n";
+	ignore (List.map print (CardMap.bindings sheet));
+	print_string [] "\n"
+
+let show_hand hand =
+	let print i c =
+		if i mod 3 = 0 then print_string [] "\n" else ();
+		print_card c;
+		print_string [] ", " in
+	ignore (List.mapi print hand);
+	print_string [] "\n\n"

@@ -12,6 +12,7 @@ let get_movement player public move_option_list: loc= failiwith "responsiveai ge
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess player public :guess= failiwith "responsiveai get_guess"
 
+<<<<<<< HEAD
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
  * guess and needs to be updated accordingly. Also needs to use process of
@@ -43,10 +44,17 @@ let pick_to_show lst cp =
   | [] -> List.nth lst (Random.int (List.length lst))
   | [(c, shn)] -> c
   | lst' -> List.nth lst' (Random.int (List.length lst'))
+=======
+(* [get_accusation] takes in a game sheet and the current location and returns
+ * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
+ * inside the envelope. *)
+let get_accusation player public :guess= failiwith "responsiveai get_accusation"
+>>>>>>> master
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
+<<<<<<< HEAD
 let get_answer (me:player) public guess : card option =
   let (sus, weap, room) = guess in
   let cp = public.curr_player in
@@ -62,7 +70,14 @@ let get_answer (me:player) public guess : card option =
   		| [] -> None
   		| [(c, lst)] -> Some c
   		| lst -> Some (pick_to_show cp)
+=======
+let get_answer player public guess : card option = failwith "responsiveai get_answer"
+>>>>>>> master
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
 let take_notes player public :player = failwith "responsiveai take_notes"
+<<<<<<< HEAD
+=======
+
+>>>>>>> master

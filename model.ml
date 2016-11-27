@@ -263,6 +263,8 @@ let get_move_options (g : game) : move list =
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
 
+
+
 module PathMap = struct
   type backpointer = (int*coord)
   type t = backpointer CoordMap.t
@@ -352,6 +354,9 @@ let get_movement_options (g: game) (steps: int) =
     | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
   let full_paths = make_pathmap b coord false in
   let room_lst = StringMap.bindings b.room_coords in
+  let room_lst = match start_loc.info with
+    | Room_Rect (s, _) -> List.filter (fun (s', bi) -> s <> s') room_lst
+    | _ -> room_lst in
   let f (s, (x,y)) =
     let coord' = PathMap.nth_step_towards (x,y) steps full_paths in
     let loc = CoordMap.find coord' b.loc_map in
@@ -369,7 +374,11 @@ let get_movement_options (g: game) (steps: int) =
     match (loc.info) with
     | Room_Rect (s, _) -> ("go into "^s, loc)::acc
     | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
-  let init = List.fold_left (step_loop (steps-1)) [] start_loc.edges in
+  let init = List.fold_left (step_loop (steps-1)) [] st
+
+
+
+  art_loc.edges in
   let no_start = List.filter (fun (s,l) -> l != start_loc) init in
   remove_dups no_start*)
 

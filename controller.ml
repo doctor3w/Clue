@@ -1,10 +1,12 @@
 open View
 open Cli
+open Gui
 open Model
 open Data
 open Agent
 
 module Display = Cli
+module Display2 = Gui
 
 (* Thrown when there are no players in a player list. *)
 exception No_players
@@ -21,15 +23,8 @@ let get_cur_next plrs cur =
     | c::n::t' ->
       if c.suspect = cur then (c, n) else helper ps (n::t')
     | h::[] when h.suspect = cur -> (h, List.hd ps)
-    | h::[] -> helper ps []
+    | _::[] -> raise Player_not_found
   in if plrs = [] then raise No_players else helper plrs plrs
-
-(* Gets a string describing the movement. *)
-let string_of_movement l = match l with
-  | Room_Rect(s, _) ->
-    "Entered "^s
-  | Space(x,y) ->
-    "Landed on space "^(string_of_int x)^", "^(string_of_int y)
 
 let get_movement_dir l ops =
   try List.assoc l ops with Not_found -> ("nothing", false)
@@ -78,7 +73,7 @@ let rec check_for_humans pls =
 let rec check_all_out pls =
   match pls with
   | [] -> true
-  | pl::t -> if pl.is_out then check_for_humans t else false
+  | pl::t -> if pl.is_out then check_all_out t else false
 
 (* Reorders the plrs list so pl is at the end. Specifically it splits the
  * list at pl, puts the tail at the front and the players from hd to pl
@@ -144,20 +139,22 @@ and handle_accusation curr_p next_p game =
  * the current player and then any possible shown cards will be gathered and
  * shown if possible. *)
 and handle_guess curr_p next_p game =
-  let (s, w, r) as guess = Agent.get_guess curr_p game.public in
+  let guess = Agent.get_guess curr_p game.public in
   let () = Display.display_guess guess in
   let group = reorder_pls curr_p game.players in
   let rec get_answers pls =
     match pls with
     | [] -> None
-    | pl::t when pl.suspect = curr_p.suspect -> None
+    | pl::_ when pl.suspect = curr_p.suspect -> None
     | pl::t -> extract_answer pl t
   and extract_answer pl t =
     if can_show pl.hand guess then
       match Agent.get_answer pl game.public guess with
       | None -> get_answers t
       | Some card -> Some (pl, card)
-    else get_answers t
+    else
+      let () = Display.display_no_answer pl.suspect in
+      get_answers t
   in match get_answers group with
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in

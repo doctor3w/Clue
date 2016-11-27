@@ -23,8 +23,11 @@ val display_move : move -> unit
  * accessible. The second string parameter is the acc_room name. *)
 val prompt_movement : (loc * (string * bool)) list -> string -> string
 
-(* Displays the movement the agen took on his turn *)
+(* Displays the movement the agent took on its turn *)
 val display_movement : (string * bool) -> unit
+
+(* Displays the relocation of suspect [string] to the Room loc *)
+val display_relocate : string -> loc -> unit
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -45,8 +48,16 @@ val prompt_answer : hand -> guess -> string
  * details of the card. *)
 val display_answer : card option -> string -> bool -> unit
 
+(* Displays that the player [string] could not answer with a card.
+ * This is different from no one being able to show a card. *)
+val display_no_answer : string -> unit
+
 (* Displays end game victory text, string is who won. *)
 val display_victory : string -> unit
 
 (* Displays arbitrary text. *)
 val display_message : string -> unit
+
+val show_sheet : sheet -> unit
+
+val show_hand : hand -> unit

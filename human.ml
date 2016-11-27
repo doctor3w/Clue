@@ -20,6 +20,13 @@ let contains_xs s xs =
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
+let check_sheet_or_hand text pl =
+  if contains_xs (normalize text) ["sheet"] then
+    (Display.show_sheet pl.sheet; true)
+  else if contains_xs (normalize text) ["hand"] then
+    (Display.show_hand pl.hand; true)
+  else false
+
 (* [parse_move str] parses the movement input str and returns one of two
  * options. Will raise Bad_input on nothing. *)
 let parse_move str moves =
@@ -41,9 +48,11 @@ let parse_move str moves =
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let rec answer_move pl pub moves =
-  try parse_move (Display.prompt_move moves) moves with
+  let text = Display.prompt_move moves in
+  try parse_move text moves with
   | Bad_input ->
-    Display.display_error "Please enter roll or one of the passages";
+    if check_sheet_or_hand text pl then ()
+    else Display.display_error "Please enter roll or one of the passages";
     answer_move pl pub moves
 
 (* [parse_movement str move_ops] parses the movement input str and sees
@@ -53,7 +62,6 @@ let parse_movement str move_ops =
   let rooms = List.map (fun (_, (s, _)) -> normalize s) move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
-    let () = print_endline selected in
     let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
     try List.assoc selected norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
@@ -61,11 +69,11 @@ let parse_movement str move_ops =
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let rec get_movement pl pub move_ops =
-  try
-    parse_movement (Display.prompt_movement move_ops pub.acc_room) move_ops
-  with
+  let text = Display.prompt_movement move_ops pub.acc_room in
+  try parse_movement text move_ops with
   | Bad_input ->
-    Display.display_error "Please enter a valid location to move to.";
+    if check_sheet_or_hand text pl then ()
+    else Display.display_error "Please enter a valid location to move to.";
     get_movement pl pub move_ops
 
 (* [card_norm_map card] takes a list of cards and normalizes the card names
@@ -96,9 +104,8 @@ let parse_guess str (ss, ws, rs) =
 
 (* [handle_guess pl pub] parses the guess and then makes sure the room guess
  * is the room the player is currently in. *)
-let handle_guess pl pub =
-  let prompt = Display.prompt_guess pl.curr_loc false in
-  let (s, w, r) = parse_guess prompt pub.deck in
+let handle_guess text pl pub =
+  let (s, w, r) = parse_guess text pub.deck in
   match r, pl.curr_loc.info with
   | Room r1, Room_Rect (r2, _) when eq_str r1 r2 -> (s, w, r)
   | _, _ -> raise Wrong_room
@@ -106,22 +113,29 @@ let handle_guess pl pub =
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let rec get_guess pl pub =
-  try handle_guess pl pub with
+  let text = Display.prompt_guess pl.curr_loc false in
+  try handle_guess text pl pub with
   | Bad_input ->
-    Display.display_error "Please enter a valid guess (must be real cards).";
+    if check_sheet_or_hand text pl then ()
+    else
+      Display.display_error "Please enter a valid guess (must be real cards).";
     get_guess pl pub
   | Wrong_room ->
-    Display.display_error "The room must match the room you are in.";
+    if check_sheet_or_hand text pl then ()
+    else Display.display_error "The room must match the room you are in.";
     get_guess pl pub
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
  * inside the envelope. *)
 let rec get_accusation pl pub =
-  try parse_guess (Display.prompt_guess pl.curr_loc true) pub.deck with
+  let text = Display.prompt_guess pl.curr_loc true in
+  try parse_guess text pub.deck with
   | Bad_input ->
-    Display.display_error
-      "Please enter a valid accusation (must be real cards).";
+    if check_sheet_or_hand text pl then ()
+    else
+      Display.display_error
+        "Please enter a valid accusation (must be real cards).";
     get_accusation pl pub
 
 (* [parse_answer str hand guess] parses the answer input str and returns the
@@ -136,12 +150,15 @@ let parse_answer str hand (s, w, r) =
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
 let rec get_answer pl pub guess =
+  let text = Display.prompt_answer pl.hand guess in
   try
-    Some (parse_answer (Display.prompt_answer pl.hand guess) pl.hand guess)
+    Some (parse_answer text pl.hand guess)
   with
   | Bad_input ->
-    Display.display_error
-      "Please enter a valid card from your hand that's in the guess.";
+    if check_sheet_or_hand text pl then ()
+    else
+      Display.display_error
+        "Please enter a valid card from your hand that's in the guess.";
     get_answer pl pub guess
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
