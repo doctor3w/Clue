@@ -124,6 +124,12 @@ let translate_to_coord pt =
   let (x', y') = pt in
   (x'/x_mult, y'/y_mult)
 
+let adjust_coord_if_room coord =
+  let loc = CoordMap.find coord window.board.loc_map in
+  match loc.info with
+  | Room_Rect (_, (x, _, y, _)) | Space (x, y) -> (x, y)
+
+
 let draw_exits transform loc =
   Graphics.set_line_width 3;
   Graphics.set_color door_color;
@@ -222,7 +228,7 @@ let redraw () =
   ()
 
 let highlight_coord transform coord =
-  match (Coordmap.find coord board.loc_map).info with
+  match (CoordMap.find coord window.board.loc_map).info with
   | Space (x, y) -> let (gx, gy, gw, gh) = transform (x, y, 1, 1) in
                     let grect' = (gx+1, gy+1, gw-2, gh-2) in
                     Graphics.set_color highlight_color;
@@ -263,20 +269,22 @@ let prompt_movement (movelst : (loc * (string * bool)) list) (acc_room:string) :
   failwith "Unimplemented gui.prompt_movement"
 
 let prompt_movement_with_pm pathmap acc_room roll : loc =
-  let pm = Pathmap.filter (fun ((x, y), (n, x', y')) -> n <= roll) pathmap in
-  let highlight_coords = Pathmap.keys pm in
+  let pm = PathMap.filter (fun (x, y) (n, (x', y')) -> n <= roll) pathmap in
+  let highlight_coords = PathMap.keys pm in
   let (xb, yb, wb, hb) = window.b_window in
   let (x_mult, y_mult) = get_mults () in
   let transform x = x |> scale_grect (x_mult, y_mult)
                       |> shift_grect (xb, yb) in
   List.iter (highlight_coord transform) highlight_coords;
   draw_players ();
-  let rec loop =
-    click_coord = translate_to_coord (get_next_click_in_rect b_window) in
+  let rec loop () =
+    let f = grect_curry get_next_click_in_rect window.b_window in
+    let click_coord = translate_to_coord (f ())
+                      |> adjust_coord_if_room in
     if List.mem click_coord highlight_coords
     then CoordMap.find click_coord window.board.loc_map
-    else loop in
-  loop
+    else loop () in
+  loop ()
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (end_move :(string * bool)) : unit =
