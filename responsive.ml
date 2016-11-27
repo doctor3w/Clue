@@ -12,43 +12,30 @@ let get_movement player public move_option_list: loc= failiwith "responsiveai ge
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess player public :guess= failiwith "responsiveai get_guess"
 
+(* [show_card pl pu c g] updates the players sheet based on the new card seen
+ * and the guess. If card is None, then that means no one had cards in the
+ * guess and needs to be updated accordingly. Also needs to use process of
+ * elimination for certain AIs. The string is who showed's suspect ID. *)
+let show_card player public answer (s,w,r) :player = failwith "responsiveai show_card"
+
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
  * inside the envelope. *)
-let get_accusation player public :guess= failiwith "responsiveai get_accusation"
-
-(* [rand_from_lst] returns a random element in the list, 
-    where [lst] is the input list *)
-let rand_from_lst lst =
-  let len = List.length lst in
-  if len = 0 then failwith "no lst"
-  else let n = Random.int len in
-    List.nth lst n
-
-let pick_to_show lst cp =
-  let pre_shown = List.filter (fun (c, shn) -> List.mem cp shn) lst in
-  match pre_shown with
-  | [] -> fst (rand_from_lst lst)
-  | [(c, shn)] -> c
-  | lst' -> fst (rand_from_lst lst')
+let get_accusation player public :guess=
+  let bindings = CardMap.bindings me.sheet in
+    let f (s, w, r) (c, i) =
+      match c, i.card_info with
+      | Suspect _, Envelope -> (c, w, r)
+      | Weapon _, Envelope -> (s, c, r)
+      | Room _, Envelope -> (s, w, c)
+      | _ -> (s, w, r) in
+    List.fold_left f (Suspect "", Weapon "", Room "") bindings
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
-let get_answer (me:player) public guess : card option =
-	let get_answer (me:player) public guess : card option =
-  	let (sus, weap, room) = guess in
-  	let cp = public.curr_player in
-  	let f acc el = match (CardMap.find el me.sheet).card_info with
-        | Mine lst -> (el, lst)::acc
-        | _ -> acc in
-  	let mine_info = List.fold_left f [] (sus::weap::[room]) in
-  		match mine_info with
-  			| [] -> None
-  			| [(c, lst)] -> Some c
-  			| lst -> Some (pick_to_show lst cp)
+let get_answer player public guess : card option = failwith "responsiveai get_answer"
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
 let take_notes player public :player = failwith "responsiveai take_notes"
-
