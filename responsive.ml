@@ -17,10 +17,36 @@ let get_guess player public :guess= failiwith "responsiveai get_guess"
  * inside the envelope. *)
 let get_accusation player public :guess= failiwith "responsiveai get_accusation"
 
+(* [rand_from_lst] returns a random element in the list, 
+    where [lst] is the input list *)
+let rand_from_lst lst =
+  let len = List.length lst in
+  if len = 0 then failwith "no lst"
+  else let n = Random.int len in
+    List.nth lst n
+
+let pick_to_show lst cp =
+  let pre_shown = List.filter (fun (c, shn) -> List.mem cp shn) lst in
+  match pre_shown with
+  | [] -> fst (rand_from_lst lst)
+  | [(c, shn)] -> c
+  | lst' -> fst (rand_from_lst lst')
+
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
-let get_answer player public guess : card option = failwith "responsiveai get_answer"
+let get_answer (me:player) public guess : card option =
+	let get_answer (me:player) public guess : card option =
+  	let (sus, weap, room) = guess in
+  	let cp = public.curr_player in
+  	let f acc el = match (CardMap.find el me.sheet).card_info with
+        | Mine lst -> (el, lst)::acc
+        | _ -> acc in
+  	let mine_info = List.fold_left f [] (sus::weap::[room]) in
+  		match mine_info with
+  			| [] -> None
+  			| [(c, lst)] -> Some c
+  			| lst -> Some (pick_to_show lst cp)
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
