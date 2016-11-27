@@ -263,6 +263,8 @@ let get_move_options (g : game) : move list =
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
 
+
+
 module PathMap = struct
   type backpointer = (int*coord)
   type t = backpointer CoordMap.t

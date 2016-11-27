@@ -1,10 +1,12 @@
 open View
 open Cli
+open Gui
 open Model
 open Data
 open Agent
 
 module Display = Cli
+module Display2 = Gui
 
 (* Thrown when there are no players in a player list. *)
 exception No_players
