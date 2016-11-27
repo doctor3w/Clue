@@ -10,6 +10,8 @@ type graphic_board = {
   mutable sheet_disp: string;
   mutable win_bounds: int*int;
   mutable b_window: rect;
+  mutable player_locs: loc StringMap.t;
+  mutable player_colors: Graphics.color StringMap.t;
 }
 
 let window = {
@@ -21,8 +23,11 @@ let window = {
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty
     };
+    player_locs = StringMap.empty;
+    player_colors = StringMap.empty;
   }
 
+let player_border = Graphics.black
 let room_color = Graphics.rgb 191 191 191
 let space_color = Graphics.rgb 255 255 255
 let door_color = Graphics.rgb 119 61 20
@@ -173,6 +178,31 @@ let draw_board () =
   List.iter g coord_binds;
   List.iter f room_bind
 
+let draw_players_in_rooms transform rect_binds =
+  ()
+
+let draw_players () =
+  let sus_binds = StringMap.bindings window.player_locs in
+  let (xb, yb, wb, hb) = window.b_window in
+  let (x_mult, y_mult) = get_mults () in
+  let rlst = ref [] in
+  let transform x = x |> scale_grect (x_mult, y_mult)
+                      |> shift_grect (xb, yb) in
+  let f (sus, loc) =
+    match loc.info with
+    | Space (x, y) -> let grect = transform (x, y, 1, 1) in
+                      let fl = StringMap.find sus window.player_colors in
+                      (grect_curry draw_ell_in_rect grect) player_border fl
+    | Room_Rect (s, rect) -> rlst := (sus, rect)::(!rlst) in
+  List.iter f sus_binds;
+  draw_players_in_rooms transform !rlst
+
+
+let redraw () =
+  draw_board ();
+  draw_players ();
+  ()
+
 (* Displays the provided error message. *)
 let display_error (e_msg: string) : unit =
   failwith "Unimplemented gui.display_error"
@@ -203,9 +233,14 @@ let display_move move : unit =
 let prompt_movement (movelst : (loc * (string * bool)) list) (acc_room:string) : string =
   failwith "Unimplemented gui.prompt_movement"
 
-(* Displays the movement the agen took on his turn *)
+(* Displays the movement the agent took on its turn *)
 let display_movement (end_move :(string * bool)) : unit =
   failwith "Unimplemented gui.display_movement"
+
+(* Displays the relocation of suspect [string] to the Room loc *)
+let display_relocate (who:string) loc : unit =
+  window.player_locs <- StringMap.add who loc window.player_locs;
+  redraw ()
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
