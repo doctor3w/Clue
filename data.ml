@@ -115,6 +115,7 @@ type listens
 type player = {suspect: string;
                hand: hand;
                curr_loc: loc;
+               (* cards_weight: (card * float) array; *)
                sheet: sheet;
                agent: agent;
                is_out: bool}
