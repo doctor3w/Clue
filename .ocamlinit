@@ -11,4 +11,4 @@
 #use "model.ml";;
 
 let game1 = Model.import_board "classic_dumb.json";;
-window.board <- game1.public.board;;
+let game2 = Model.import_board "small_mixed.json";;
