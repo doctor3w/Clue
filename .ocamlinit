@@ -1,10 +1,14 @@
 #require "str";;
 #require "yojson";;
+#require "graphics";;
 #directory "_build";;
 #load "data.cmo";;
 #load "board.cmo";;
 #load "model.cmo";;
+#load "gui.cmo";;
+#use "gui.ml";;
 #use "data.ml";;
 #use "model.ml";;
 
 let game1 = Model.import_board "classic_dumb.json";;
+window.board <- game1.public.board;;
