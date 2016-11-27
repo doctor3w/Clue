@@ -179,7 +179,24 @@ let draw_board () =
   List.iter f room_bind
 
 let draw_players_in_rooms transform rect_binds =
-  ()
+  let rec count_rect rect count lst =
+    match lst with
+    | [] -> count
+    | (sus, rect')::t -> if rect = rect' then count_rect rect (count+1) t
+                         else count_rect rect count t in
+  let rec place_player placed queue =
+    match queue with
+    | [] -> ()
+    | (sus, (x0, x1, y0, y1))::t ->
+          let pcount = count_rect (x0, x1, y0, y1) 0 placed in
+          let w = x1-x0 in
+          let r = pcount/w in
+          let c = pcount mod w in
+          let grect = transform (x0+c, y0+r, 1, 1) in
+          let col = StringMap.find sus window.player_colors in
+          (grect_curry draw_ell_in_rect grect) player_border col;
+          place_player ((sus, (x0, x1, y0, y1))::placed) t in
+  place_player [] rect_binds
 
 let draw_players () =
   let sus_binds = StringMap.bindings window.player_locs in
@@ -277,6 +294,15 @@ let display_victory (who: string) : unit =
 (* Displays arbitrary text. *)
 let display_message (text: string) : unit =
   failwith "Unimplemented gui.display_error"
+
+let init game =
+  window.board <- game.public.board;
+  let f me =
+    let sus = me.suspect in
+    let color = Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
+    in window.player_locs <- StringMap.add sus me.curr_loc window.player_locs;
+    window.player_colors <- StringMap.add sus color window.player_colors
+  in List.iter f game.players
 
 let show_sheet sheet : unit =
   ()
