@@ -31,10 +31,37 @@ let get_accusation player public :guess=
       | _ -> (s, w, r) in
     List.fold_left f (Suspect "", Weapon "", Room "") bindings
 
+let rand_from_lst lst =
+  let len = List.length lst in
+  if len = 0 then failwith "no lst"
+  else let n = Random.int len in
+    List.nth lst n
+
+let pick_to_show lst cp =
+  let pre_shown = List.filter (fun (c, shn) -> List.mem cp shn) lst in
+  match pre_shown with
+  | [] -> List.nth lst (Random.int (List.length lst))
+  | [(c, shn)] -> c
+  | lst' -> List.nth lst' (Random.int (List.length lst'))
+
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
-let get_answer player public guess : card option = failwith "responsiveai get_answer"
+let get_answer (me:player) public guess : card option =
+  let (sus, weap, room) = guess in
+  let cp = public.curr_player in
+  let sus_sht = (CardMap.find sus m.sheet).card_info in
+  let weap_sht = (CardMap.find weap m.sheet).card_info in
+  let room_sht = (CardMap.find room m.sheet).card_info in
+  let f acc el = 
+  	match c with 
+  		| Mine lst -> (c, lst)::acc 
+  		| _ -> acc in
+  let mine_info = List.fold_left f [] (sus::weap::room) in
+  	match mine_info with
+  		| [] -> None
+  		| [(c, lst)] -> Some c
+  		| lst -> Some (pick_to_show cp)
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
