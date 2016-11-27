@@ -123,6 +123,17 @@ let edgify_spaces board =
     loopx board' (x+1,y) in
   loopx board (0,0)
 
+let finish_rooms board =
+  let f coord loc board =
+    match loc.info with
+    | Room_Rect (s, rect) -> let coord' = StringMap.find s board.room_coords in
+                             let loc' = CoordMap.find coord' board.loc_map in
+                             {board with loc_map =
+                              (CoordMap.add coord loc' board.loc_map)
+                             }
+    | Space _ -> board in
+  CoordMap.fold f board.loc_map board
+
 let fill_board (r, c) room_temp_lst =
   let empty = build_empty_board r c in
   let f = (fun acc el ->
@@ -133,5 +144,6 @@ let fill_board (r, c) room_temp_lst =
   let roomed = List.fold_left f empty room_temp_lst in
   let filled = fill_spaces roomed in
   let room_edged = List.fold_left edgify_room filled room_temp_lst in
-  edgify_spaces room_edged
+  let full_edged = edgify_spaces room_edged in
+  finish_rooms full_edged
 

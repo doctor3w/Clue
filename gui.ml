@@ -31,6 +31,7 @@ let player_border = Graphics.black
 let room_color = Graphics.rgb 191 191 191
 let space_color = Graphics.rgb 255 255 255
 let door_color = Graphics.rgb 119 61 20
+let highlight_color = Graphics.rgb 126 249 32
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -122,6 +123,12 @@ let translate_to_coord pt =
   let (x_mult, y_mult) = get_mults () in
   let (x', y') = pt in
   (x'/x_mult, y'/y_mult)
+
+let adjust_coord_if_room coord =
+  let loc = CoordMap.find coord window.board.loc_map in
+  match loc.info with
+  | Room_Rect (_, (x, _, y, _)) | Space (x, y) -> (x, y)
+
 
 let draw_exits transform loc =
   Graphics.set_line_width 3;
@@ -220,6 +227,17 @@ let redraw () =
   draw_players ();
   ()
 
+let highlight_coord transform coord =
+  match (CoordMap.find coord window.board.loc_map).info with
+  | Space (x, y) -> let (gx, gy, gw, gh) = transform (x, y, 1, 1) in
+                    let grect' = (gx+1, gy+1, gw-2, gh-2) in
+                    Graphics.set_color highlight_color;
+                    (grect_curry Graphics.draw_rect grect')
+  | Room_Rect (s, rect) -> let (gx, gy, gw, gh) = transform (rect_to_grect rect) in
+                    let grect' = (gx+1, gy+1, gw-2, gh-2) in
+                    Graphics.set_color highlight_color;
+                    (grect_curry Graphics.draw_rect grect')
+
 (* Displays the provided error message. *)
 let display_error (e_msg: string) : unit =
   failwith "Unimplemented gui.display_error"
@@ -249,6 +267,24 @@ let display_move move : unit =
  * accessible. The second string parameter is the acc_room name. *)
 let prompt_movement (movelst : (loc * (string * bool)) list) (acc_room:string) : string =
   failwith "Unimplemented gui.prompt_movement"
+
+let prompt_movement_with_pm pathmap acc_room roll : loc =
+  let pm = PathMap.filter (fun (x, y) (n, (x', y')) -> n <= roll) pathmap in
+  let highlight_coords = PathMap.keys pm in
+  let (xb, yb, wb, hb) = window.b_window in
+  let (x_mult, y_mult) = get_mults () in
+  let transform x = x |> scale_grect (x_mult, y_mult)
+                      |> shift_grect (xb, yb) in
+  List.iter (highlight_coord transform) highlight_coords;
+  draw_players ();
+  let rec loop () =
+    let f = grect_curry get_next_click_in_rect window.b_window in
+    let click_coord = translate_to_coord (f ())
+                      |> adjust_coord_if_room in
+    if List.mem click_coord highlight_coords
+    then CoordMap.find click_coord window.board.loc_map
+    else loop () in
+  loop ()
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (end_move :(string * bool)) : unit =
