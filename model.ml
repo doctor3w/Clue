@@ -172,6 +172,7 @@ let add_player game full_deck player_temp agent_lst =
     hand = [];
     sheet = default_sheet full_deck;
     is_out = false;
+    cards_weight = [||];
     agent = List.assoc player_temp.p_id agent_lst;
     curr_loc = loc;
   } in {game with players = p::game.players}
