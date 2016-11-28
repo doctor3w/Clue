@@ -108,10 +108,10 @@ type board =
 type move = Roll | Passage of loc
 
 (* [listens] represents listening data for responsive AI *)
-type listens = {cards_weight: (card * float) array;
-                 mutable susp_known: bool;
-                 mutable weap_known: bool;
-                 mutable room_known: bool;}
+type listens = {cards_weight: (card * bool * float) array array;
+                (*  mutable susp_in_env: bool;
+                 mutable weap_in_env: bool;
+                 mutable room_in_env: bool; *)} 
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
@@ -121,14 +121,15 @@ type player = {suspect: string;
                sheet: sheet;
                agent: agent;
                is_out: bool;
-               listen: listen}
+               listen: listen}      (* need to update model *)
 
 type public = {curr_player: string;
                board: board;
                acc_room: string;
                deck: deck;
                player_order: string list;
-               mutable current_guess: guess;
+               mutable current_guess: card option * card option * card option;  
+               (* needs to be added in public initiation*)
                (*listen_data: listens*)
                }
 
@@ -157,6 +158,7 @@ let game_init = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty
+    current_guess = (None, None, None)  (* every time we have a new guess, we need to update game.current_guess *)
     };
     deck = ([],[],[]);
     player_order = []
