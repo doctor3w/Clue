@@ -117,10 +117,6 @@ type listens = (listen_choice * float) array array
 type player = {suspect: string;
                hand: hand;
                curr_loc: loc;
-<<<<<<< HEAD
-               cards_weight: (card * float) array;
-=======
->>>>>>> responsive
                sheet: sheet;
                agent: agent;
                is_out: bool;
