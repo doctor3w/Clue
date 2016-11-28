@@ -130,6 +130,7 @@ type public = {curr_player: string;
 
                fixed_players: string list;
                mutable current_guess: card option * card option * card option;
+               mutable current_response: card option
                (* needs to be added in public initiation*)
                (*listen_data: listens*)
                }
