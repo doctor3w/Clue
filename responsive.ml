@@ -99,24 +99,23 @@ let helper a =
        default:= (!default) && case ) done;
   !default
 
+(* Given a string [sus], a string [curr_player] and a string list [players], 
+   return true if [sus] is adjacent to [curr_player] (either left or right)
+   PreC: curr_player and sus are in the players *)
+let is_adjacent (players: string list)(curr_player:string)(sus:string):bool =
+  let len = List.length players in
+  let index_curr = find curr_player players in
+  let index_sus = find sus players in
+  if (index_curr = len - 1) then (if index_sus = len - 2 || index_sus = 0 
+                      then true else false)
+  else if (index_curr = 0) then (if index_sus = 1 || index_sus = len - 1
+                  then true else false)
+  else (if index_sus = index_curr - 1 || index_sus = index_curr + 1 
+          then true else false)
+
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes player public : player =
-  let matrix = player.listen in
-  let (s_lst, w_lst, r_lst) = public.deck in
-  let deck' = s_lst @ w_lst @ r_lst in
-  let x_len = List.length deck' in
-  let y_len = List.length public.fixed_players in
-  for x_index = 0 to (x_len - 1)
-  do (if helper matrix.(x_index)
-    then (for y_index = 0 to (y_len - 1)
-        do (let f = snd (matrix.(x_index).(y_index)) in
-            matrix.(x_index).(y_index) <- (Env,f)) done)
-    else (for y_index = 0 to (y_len - 1)
-        do (let f = snd (matrix.(x_index).(y_index)) in
-            let o = fst (matrix.(x_index).(y_index)) in
-            matrix.(x_index).(y_index) <- (o,f)) done)) done;
-  player
+let take_notes player public : player = failwith "Unimplemented"
   (* TODO: Right now take_notes only compares data - it does not process all
   information such as Known/Not_in_hand and probability. This is essentially a
   massive helper function that is needed for guess and movement (in both guess

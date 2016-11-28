@@ -114,7 +114,7 @@ type listen_choice = Pure_unknown
                     | Not_in_hand of int
                     | Maybe_in_hand of int
                     | Known of int
-type listens = (listen_choice * float) array array
+type listens = listen_choice array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
@@ -132,7 +132,6 @@ type public = {curr_player: string;
                deck: deck;
                player_order: string list;
 
-               fixed_players: string list;
                mutable current_guess: card option * card option * card option;
                mutable current_response: card option
                (* needs to be added in public initiation*)
