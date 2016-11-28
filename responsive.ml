@@ -32,13 +32,16 @@ let get_movement player public move_option_list: loc= failwith "responsiveai get
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess player public :guess= failwith "responsiveai get_guess"
+(* make a guess based on the priority of listens structure  *)
 
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
  * guess and needs to be updated accordingly. Also needs to use process of
  * elimination for certain AIs. The string is who showed's suspect ID. *)
 let show_card player public answer (s,w,r) :player =
-failwith ""
+(* TODO:
+ what show_card needs to do is just to call take_note?
+ *)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
@@ -119,5 +122,12 @@ let take_notes player public : player =
             let o = fst (matrix.(x_index).(y_index)) in
             matrix.(x_index).(y_index) <- (o,f)) done)) done;
   player
+  (* TODO: Right now take_notes only compares data - it does not process all
+  information such as Known/Not_in_hand and probability. This is essentially a
+  massive helper function that is needed for guess and movement (in both guess
+  and movement, take_note is not changed - in cases where they are called to access
+ information and use it)
+  In other cases of processing others showing me card and others showing other
+player card, we need to update the matrix in take note*)
 
 
