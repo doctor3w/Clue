@@ -56,11 +56,6 @@ let get_accusation player public :guess=
       | _ -> (s, w, r) in
     List.fold_left f (Suspect "", Weapon "", Room "") bindings
 
-(* [get_accusation] takes in a game sheet and the current location and returns
- * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
- * inside the envelope. *)
-let get_accusation player public :guess= failwith "responsiveai get_accusation"
-
 let room_not_preferred lst =
   let f (c,shn) = match c with
                   | Suspect n | Weapon n -> true
