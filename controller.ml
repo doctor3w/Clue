@@ -90,6 +90,17 @@ let can_show hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.exists p hand
 
+let move_player pls sus loc =
+  let rec find_pl s tl = match tl with
+    | [] -> None
+    | h::t -> if h.suspect = s then Some h else find_pl s t in
+  let extr_pl pl = match pl with
+    | Some p -> replace_player {p with curr_loc = loc} pls
+    | None -> pls in
+  match sus with
+  | Suspect s -> extr_pl (find_pl s pls)
+  | _ -> failwith "not a suspect"
+
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -138,8 +149,9 @@ and handle_accusation curr_p next_p game =
  * the current player and then any possible shown cards will be gathered and
  * shown if possible. *)
 and handle_guess curr_p next_p game =
-  let guess = Agent.get_guess curr_p game.public in
+  let (s, w, r) as guess = Agent.get_guess curr_p game.public in
   let () = Display.display_guess guess in
+  let players' = move_player game.players s curr_p.curr_loc in
   let group = reorder_pls curr_p game.players in
   let rec get_answers pls =
     match pls with
@@ -157,14 +169,14 @@ and handle_guess curr_p next_p game =
   in match get_answers group with
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in
-    let pls' = replace_player curr_p' game.players in
+    let pls' = replace_player curr_p' players' in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
     let answer = Some (pl.suspect, card) in
     let curr_p' = Agent.show_card curr_p game.public answer guess in
     let pl' = Agent.show_person pl card curr_p'.suspect in
-    let pls' = replace_player curr_p' game.players |> replace_player pl' in
+    let pls' = replace_player curr_p' players' |> replace_player pl' in
     let pub = {game.public with curr_player=next_p.suspect} in
     step {game with players = pls'; public = pub}
 
