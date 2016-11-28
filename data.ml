@@ -107,11 +107,10 @@ type board =
 
 type move = Roll | Passage of loc
 
+
 (* [listens] represents listening data for responsive AI *)
-type listens = {cards_weight: (card * bool * float) array array;
-                (*  mutable susp_in_env: bool;
-                 mutable weap_in_env: bool;
-                 mutable room_in_env: bool; *)} 
+type listen_choice = Pure_unknown | Env | Not_in_hand of int | Known of int
+type listens = (listen_choice * float) array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
@@ -128,6 +127,8 @@ type public = {curr_player: string;
                acc_room: string;
                deck: deck;
                player_order: string list;
+
+               fixed_players: string list;
                mutable current_guess: card option * card option * card option;  
                (* needs to be added in public initiation*)
                (*listen_data: listens*)
