@@ -114,7 +114,6 @@ let get_movement (me:player) public (movelst:movement list) =
   let sus_env = knows_sus me in
   let weap_env = knows_weap me in
   let room_env = knows_room me in
-  let acc_id = public.acc_room in
   if sus_env && weap_env && room_env
   then
     match List.filter (is_acc_room public) movelst with

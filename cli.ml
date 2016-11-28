@@ -1,5 +1,28 @@
 open Data
-open ANSITerminal
+open ANSI
+
+let sleep sec = ignore (Unix.select [] [] [] sec)
+
+let rec print_list l cs = (* match l with
+	| [] -> ()
+	| h::t ->
+		ANSITerminal.print_string cs h; print_list t cs;
+		Thread.delay 0.05 *)
+	for i = 0 to (List.length l)-1 do
+		ANSI.print_string cs (List.nth l i);
+		Thread.delay 0.035;
+		flush stdout
+	done
+
+let rec string_list s l =
+	if String.length s = 1 then s::l
+	else
+		let c = String.sub s 0 1 in
+		string_list (String.sub s 1 (String.length s - 1)) (c::l)
+
+let print_string (cs: style list) s =
+	let l = string_list s [] in
+	print_list (List.rev l) cs
 
 (* Displays the provided error message stored in [e] in color red. *)
 let display_error (e:string): unit = print_string [red] (e ^ "\n")
@@ -45,7 +68,7 @@ let display_move (m:move) : unit =
 	let disp_loc l =
 		match l.info with
 		| Room_Rect (s,_) ->
-			print_endline ("The player elected to take the Passage to " ^ s)
+			print_string [] ("The player elected to take the Passage to " ^ s ^"\n")
 		| _ -> failwith "A space is not displayed here"
 	in match m with
 	| Roll -> print_string [] "The player elected to Roll "
@@ -53,7 +76,7 @@ let display_move (m:move) : unit =
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll i =
-	print_endline ("and "^(string_of_int i)^" was rolled.")
+	print_string [] ("and "^(string_of_int i)^" was rolled.\n")
 
 (* Prompts the user for his. *)
 let string_of_int_tuple (a,b) =
@@ -181,7 +204,7 @@ let display_victory pl_name =
 	print_string [magenta] pl_name;
 	print_string [] " just won the game!\n\n"
 
-let display_message s = print_endline s
+let display_message s = print_string [] (s^"\n")
 
 let print_card c = match c with
   | Suspect s -> print_string [green] (s)
