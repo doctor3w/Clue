@@ -57,9 +57,32 @@ let get_answer (me:player) public guess : card option =
 
 let get_answer player public guess : card option = failwith "responsiveai get_answer"
 
+let helper a = 
+	let len = Array.length a in
+	let default = ref true in
+	for index = 0 to (len - 1) 
+		do (let case = (match a.(index) with
+			| (Not_in_hand i, f) -> true
+			| _ -> false) in 
+		   default:= (!default) && case ) done; 
+	!default 
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
 let take_notes player public : player = 
-
+	let matrix = player.listen in
+	let (s_lst, w_lst, r_lst) = public.deck in
+	let deck' = s_lst @ w_lst @ r_lst in 
+	let x_len = List.length deck' in
+	let y_len = List.length public.fixed_players in
+	for x_index = 0 to (x_len - 1) 
+	do (if helper matrix.(x_index) 
+		then (for y_index = 0 to (y_len - 1) 
+			  do (let f = snd (matrix.(x_index).(y_index)) in
+			  	  matrix.(x_index).(y_index) <- (Env,f)) done)
+		else (for y_index = 0 to (y_len - 1) 
+			  do (let f = snd (matrix.(x_index).(y_index)) in
+			  	  let o = fst (matrix.(x_index).(y_index)) in
+			  	  matrix.(x_index).(y_index) <- (o,f)) done)) done;
+	player
 

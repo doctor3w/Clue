@@ -120,7 +120,7 @@ type player = {suspect: string;
                sheet: sheet;
                agent: agent;
                is_out: bool;
-               listen: listen}      (* need to update model *)
+               listen: listens}      (* need to update model *)
 
 type public = {curr_player: string;
                board: board;
