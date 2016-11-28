@@ -114,7 +114,7 @@ type listen_choice = Pure_unknown
                     | Not_in_hand of int
                     | Maybe_in_hand of int
                     | Known of int
-type listens = (listen_choice * float) array array
+type listens = listen_choice array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
  * same type of information. *)
