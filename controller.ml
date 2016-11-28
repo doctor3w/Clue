@@ -38,10 +38,9 @@ let handle_move game curr_p m =
     let dice_roll = (Random.int 11) + 2 in
     let () = Display.display_dice_roll dice_roll in
     let movement_opt = Model.get_movement_options game dice_roll in
-    let movement = Agent.get_movement curr_p game.public movement_opt in
-    let movement_dir = get_movement_dir movement movement_opt in
-    let () = Display.display_movement movement_dir in
-    movement
+    let (l, (s, b)) = Agent.get_movement curr_p game.public movement_opt in
+    let () = Display.display_movement (s,b) in
+    l
   | Passage l -> l
 
 (* Handles certain locations and returns the type of action that takes place

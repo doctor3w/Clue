@@ -5,8 +5,7 @@ open Model
 let rand_from_lst lst =
   let len = List.length lst in
   if len = 0 then failwith "no lst"
-  else let n = Random.int len in
-    List.nth lst n
+  else List.nth lst (Random.int len)
 
 (* true if the player [me] knows the suspect *)
 let knows_sus me =
@@ -111,15 +110,15 @@ let is_acc_room public (_, (s, _)) = s = public.acc_room
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc =
-  let sus_env = knows_room me in
-  let weap_env = knows_room me in
+let get_movement (me:player) public (movelst:movement list) =
+  let sus_env = knows_sus me in
+  let weap_env = knows_weap me in
   let room_env = knows_room me in
   let acc_id = public.acc_room in
   if sus_env && weap_env && room_env
   then
     match List.filter (is_acc_room public) movelst with
-    | [(l, _)] -> l
+    | [(l, (s, b))] -> (l, (s, b))
     | _ -> failwith "can't find accusation room"
   else
     let b = (fun x -> not (is_acc_room public x)) in
@@ -127,16 +126,16 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
     if room_env
     then
       let f acc el = match el with
-      | (l, (s, true)) when is_my_card me (Room s) -> l::acc
+      | (l, (s, true)) when is_my_card me (Room s) -> (l, (s, true))::acc
       | _ -> acc in
       let g acc el = match el with
-      | (l, (s, true)) when is_env_card me (Room s) -> l::acc
+      | (l, (s, true)) when is_env_card me (Room s) -> (l, (s, true))::acc
       | _ -> acc in
       let h acc el = match el with
-      | (l, (s, false)) when is_my_card me (Room s) -> l::acc
+      | (l, (s, false)) when is_my_card me (Room s) -> (l, (s, false))::acc
       | _ -> acc in
       let p acc el = match el with
-      | (l, (s, false)) when is_env_card me (Room s) -> l::acc
+      | (l, (s, false)) when is_env_card me (Room s) -> (l, (s, false))::acc
       | _ -> acc in
       let fs = List.fold_left f [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
@@ -149,10 +148,10 @@ let get_movement (me:player) public (movelst:(loc * (string * bool)) list) : loc
       else failwith ("impossible " ^ Pervasives.__LOC__)
     else
       let f' acc el = match el with
-      | (l, (s, true)) when is_unknown_card me (Room s) -> l::acc
+      | (l, (s, true)) when is_unknown_card me (Room s) -> (l, (s, true))::acc
       | _ -> acc in
       let h' acc el = match el with
-      | (l, (s, false)) when is_unknown_card me (Room s) -> l::acc
+      | (l, (s, false)) when is_unknown_card me (Room s)-> (l, (s, false))::acc
       | _ -> acc in
       let fs = List.fold_left f' [] movelst' in
       if List.length fs > 0 then rand_from_lst fs

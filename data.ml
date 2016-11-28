@@ -107,6 +107,9 @@ type board =
 
 type move = Roll | Passage of loc
 
+(* Represents the movement of a player *)
+type movement = (loc * (string * bool))
+
 (* [listens] represents listening data for responsive AI *)
 type listens
 

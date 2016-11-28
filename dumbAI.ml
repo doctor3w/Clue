@@ -33,25 +33,23 @@ exception No_place_to_go
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement pl pub move_ops : loc =
+let get_movement pl pub move_ops : movement =
   let () = sleep 1. in
   let rec go mops =
     match pick_random mops with
     | Some (l, (s, b)) ->
       let r_info = (CardMap.find (Room(s)) pl.sheet).card_info in
-      if r_info = Unknown then l
+      if r_info = Unknown then (l, (s, b))
       else go (remove_op (l, (s, b)) [] mops)
     | None -> raise No_place_to_go in
   let go_acc () =
     let accl =
         List.filter (fun (_, (s, _)) -> (s = pub.acc_room)) move_ops in
-      let (l, (s, b)) =
-        if List.length accl = 0 then failwith "No acc room exists"
-        else List.hd accl in
-      l in
+    if List.length accl = 0 then failwith "No acc room exists"
+    else List.hd accl in
   let no_acc =
     List.filter (fun (_, (s, _)) -> not (s = pub.acc_room)) move_ops in
-  if List.length no_acc = 0 then pl.curr_loc
+  if List.length no_acc = 0 then (pl.curr_loc, ("no where", false))
   else
     let filtered = List.filter (fun (l, (s, b)) -> b) no_acc in
     if List.length filtered = 0 then
@@ -60,16 +58,6 @@ let get_movement pl pub move_ops : loc =
       try go filtered with No_place_to_go ->
       try go no_acc with No_place_to_go -> go_acc ()
 
-let print_card c = match c with
-  | Suspect s -> print_string ("Suspect "^s^": ")
-  | Weapon s -> print_string ("Weapon "^s^": ")
-  | Room s -> print_string ("Room "^s^": ")
-
-let print_data d = match d.card_info with
-  | Mine _ -> print_endline ("Mine")
-  | ShownBy s -> print_endline ("Shown by "^s)
-  | Unknown -> print_endline ("Unknown")
-  | Envelope -> print_endline ("Envelope")
 
 let get_cards_with_info info sheet =
   let l = CardMap.filter (fun _ data -> (data.card_info = info)) sheet in
@@ -93,24 +81,18 @@ let get_accusation pl pub : guess =
   let unks_r = List.filter r_only unks in
   let s = if List.length env_s = 0 then
             if List.length unks_s = 0 then
-              (* print_sheet *)
-              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
               failwith "No card"
             else
               List.nth unks_s (Random.int (List.length unks_s))
           else List.hd env_s in
   let w = if List.length env_w = 0 then
             if List.length unks_w = 0 then
-              (* print_sheet *)
-              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
               failwith "No card"
             else
               List.nth unks_w (Random.int (List.length unks_w))
           else List.hd env_w in
   let r = if List.length env_r = 0 then
             if List.length unks_r = 0 then
-              (* print_sheet *)
-              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
               failwith "No card"
             else
               List.nth unks_r (Random.int (List.length unks_r))
@@ -136,16 +118,12 @@ let get_guess pl pub: guess =
   let unks_w = List.filter w_only unks in
   let s = if List.length env_s = 0 then
             if List.length unks_s = 0 then
-              (* print_sheet *)
-              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
               failwith "No card"
             else
               List.nth unks_s (Random.int (List.length unks_s))
           else List.hd env_s in
   let w = if List.length env_w = 0 then
             if List.length unks_w = 0 then
-              (* print_sheet *)
-              let () = ignore (List.map (fun (c,d) -> print_card c; print_data d; c) (CardMap.bindings pl.sheet)) in
               failwith "No card"
             else
               List.nth unks_w (Random.int (List.length unks_w))
