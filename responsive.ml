@@ -1,5 +1,18 @@
 open Data
 
+let rec find x lst =
+    match lst with
+    | [] -> failwith "Not Found"
+    | h :: t -> if x = h then 0 else 1 + find x t
+
+let suspect_to_index public sus =
+	find sus public.fixed_players
+
+let card_to_index public card = 
+	let (s_lst, w_lst, r_lst) = public.deck in
+	let deck' = s_lst @ w_lst @ r_lst in 
+	find card deck'
+
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move player public  move_list : move = failwith "responsiveai answer_move"
@@ -44,20 +57,9 @@ let get_answer (me:player) public guess : card option =
 
 let get_answer player public guess : card option = failwith "responsiveai get_answer"
 
-let rec find x lst =
-    match lst with
-    | [] -> failwith "Not Found"
-    | h :: t -> if x = h then 0 else 1 + find x t
-
-let suspect_to_index public sus =
-	find sus public.fixed_players
-
-let card_to_index public card = 
-	let (s_lst, w_lst, r_lst) = public.deck in
-	let deck' = s_lst @ w_lst @ r_lst in 
-	find card deck'
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes player public : player = failwith "responsiveai take_notes"
+let take_notes player public : player = 
+
 
