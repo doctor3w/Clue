@@ -33,5 +33,5 @@ val show_person : player -> card -> string -> player
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-val take_notes : player -> public -> player
+val take_notes : player -> public -> guess -> string option -> player
 

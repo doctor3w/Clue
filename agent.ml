@@ -121,9 +121,9 @@ let show_person pl card sus =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes pl pub = match pl.agent with
-  | DumbAI_t -> DumbAI.take_notes pl pub
-  | SmartAI_t -> SmartAI.take_notes pl pub
-  | Human_t -> Human.take_notes pl pub
-  | _ -> DumbAI.take_notes pl pub
+let take_notes pl pub current_guess suspect_option= match pl.agent with
+  | DumbAI_t -> DumbAI.take_notes pl pub current_guess suspect_option
+  | SmartAI_t -> SmartAI.take_notes pl pub current_guess suspect_option
+  | Human_t -> Human.take_notes pl pub current_guess suspect_option
+  | _ -> DumbAI.take_notes pl pub current_guess suspect_option
 
