@@ -19,7 +19,7 @@ let window = {
     win_bounds = (600, 450);
     sheet_disp = "";
     b_window = (10, 80, 360, 360);
-    roll_window = (370, 10, 70, 60);
+    roll_window = (380, 10, 210, 60);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -309,7 +309,8 @@ let prompt_move_gui (movelst: move list) : move =
     | ("board", pt) -> let coord = translate_to_coord pt in
                        let loc = CoordMap.find coord window.board.loc_map in
                        if List.mem loc loclst then Passage loc else loop ()
-    | ("roll", _) -> draw_roll (); Roll in
+    | ("roll", _) -> draw_roll (); Roll
+    | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
   loop ()
 
 
@@ -397,7 +398,9 @@ let init game =
     let color = Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
     in window.player_locs <- StringMap.add sus me.curr_loc window.player_locs;
     window.player_colors <- StringMap.add sus color window.player_colors
-  in List.iter f game.players
+  in List.iter f game.players;
+  Graphics.open_graph "";
+  redraw ()
 
 let show_sheet sheet : unit =
   ()
