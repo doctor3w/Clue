@@ -104,6 +104,11 @@ let move_player pls sus loc =
   | Suspect s -> extr_pl (find_pl s pls)
   | _ -> failwith "not a suspect"
 
+let pl_eq (s:card) (pl:player) =
+  match s with
+  | Suspect name -> pl.suspect = name
+  | _ -> false
+
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -154,7 +159,9 @@ and handle_accusation curr_p next_p game =
 and handle_guess curr_p next_p game =
   let (s, w, r) as guess = Agent.get_guess curr_p game.public in
   let () = Display.display_guess guess in
-  let players' = move_player game.players s curr_p.curr_loc in
+  let players' =
+    if pl_eq s curr_p then game.players
+    else move_player game.players s curr_p.curr_loc in
   let group = reorder_pls curr_p game.players in
   let rec get_answers pls =
     match pls with
