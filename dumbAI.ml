@@ -1,11 +1,8 @@
 open Data
 
-let sleep sec = ignore (Unix.select [] [] [] sec)
-
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let rec answer_move pl pub moves : move =
-  let () = sleep 1. in
   match moves with
   | []-> Roll
   | h::t->
@@ -34,7 +31,6 @@ exception No_place_to_go
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let get_movement pl pub move_ops : movement =
-  let () = sleep 1. in
   let rec go mops =
     match pick_random mops with
     | Some (l, (s, b)) ->
@@ -67,7 +63,6 @@ let get_cards_with_info info sheet =
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
  * inside the envelope. *)
 let get_accusation pl pub : guess =
-  let () = sleep 2. in
   let unks = get_cards_with_info Unknown pl.sheet in
   let envs = get_cards_with_info Envelope pl.sheet in
   let s_only c = match c with Suspect s -> true | _ -> false in
@@ -106,7 +101,6 @@ let get_card_for_loc l = match l.info with
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess pl pub: guess =
-  let () = sleep 1.5 in
   let r = get_card_for_loc pl.curr_loc in
   let unks = get_cards_with_info Unknown pl.sheet in
   let envs = get_cards_with_info Envelope pl.sheet in
@@ -143,7 +137,6 @@ let rec get_answer_hand hand pub ((s,w,r) as guess) : card option=
  * if a card from the hand and also in the list can be shown. Returns None
  * if no card can be shown. *)
 let get_answer pl pub guess :card option =
-  let () = sleep 1. in
   get_answer_hand pl.hand pub guess
 
 

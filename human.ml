@@ -16,7 +16,7 @@ let contains_xs s xs =
   let cat = if List.length xs = 1 then List.hd xs
             else List.fold_left (fun acc el -> match acc with
                                                | "" -> el
-                                               | a -> a^"\|"^el) "" xs in
+                                               | a -> a^"\\|"^el) "" xs in
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
