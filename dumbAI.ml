@@ -54,6 +54,7 @@ exception No_place_to_go
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let get_movement pl pub move_ops : movement =
+  let mops = move_ops in
   let rec go mops =
     match pick_random mops with
     | Some (l, (s, b)) ->
