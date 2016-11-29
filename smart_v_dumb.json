@@ -1,0 +1,211 @@
+{
+  "dim":
+  {
+    "row_count": 12,
+    "col_count": 12
+  },
+  "rooms":
+  [
+    {
+      "id": "room 1",
+      "rect":
+      {
+        "left": 0,
+        "right": 4,
+        "top": 11,
+        "bottom": 9
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 8,
+            "col": 1
+          },
+          {
+            "row": 10,
+            "col": 5
+          }
+        ]
+    },
+    {
+      "id": "room 2",
+      "rect":
+      {
+        "left": 9,
+        "right": 11,
+        "top": 11,
+        "bottom": 7
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 10,
+            "col": 8
+          },
+          {
+            "row": 6,
+            "col": 10
+          }
+        ]
+    },
+    {
+      "id": "room 3",
+      "rect":
+      {
+        "left": 7,
+        "right": 11,
+        "top": 2,
+        "bottom": 0
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 1,
+            "col": 6
+          },
+          {
+            "row": 3,
+            "col": 10
+          }
+        ]
+    },
+    {
+      "id": "room 4",
+      "rect":
+      {
+        "left": 0,
+        "right": 2,
+        "top": 4,
+        "bottom": 0
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 5,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 3
+          }
+        ]
+    },
+    {
+      "id": "acc room",
+      "rect":
+      {
+        "left": 4,
+        "right": 7,
+        "top": 7,
+        "bottom": 4
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 8,
+            "col": 5
+          },
+          {
+            "row": 8,
+            "col": 6
+          },
+          {
+            "row": 3,
+            "col": 5
+          },
+          {
+            "row": 3,
+            "col": 6
+          },
+          {
+            "row": 5,
+            "col": 3
+          },
+          {
+            "row": 6,
+            "col": 3
+          },
+          {
+            "row": 5,
+            "col": 8
+          },
+          {
+            "row": 6,
+            "col": 8
+          }
+        ]
+    }
+  ],
+  "acc_room": "acc room",
+  "suspects":
+    [
+      {
+        "id": "Red",
+        "play_order": 0,
+        "start_space":
+        {
+          "row": 10,
+          "col": 6
+        }
+      },
+      {
+        "id": "Yellow",
+        "play_order": 1,
+        "start_space":
+        {
+          "row": 1,
+          "col": 5
+        }
+      },
+      {
+        "id": "Green",
+        "play_order": 2,
+        "start_space":
+        {
+          "row": 6,
+          "col": 1
+        }
+      },
+      {
+        "id": "Blue",
+        "play_order": 3,
+        "start_space":
+        {
+          "row": 5,
+          "col": 10
+        }
+      }
+    ],
+    "weapons":
+    [
+      "gun",
+      "sword",
+      "rope"
+    ],
+    "agent_config":
+    [
+      {
+        "suspect": "Red",
+        "agent_type": "DumbAI"
+      }, {
+        "suspect": "Yellow",
+        "agent_type": "DumbAI"
+      }, {
+        "suspect": "Green",
+        "agent_type": "DumbAI"
+      }, {
+        "suspect": "Blue",
+        "agent_type": "SmartAI"
+      }
+    ]
+}

@@ -74,36 +74,41 @@ let print_with pr style txt =
 let print_string style txt = print_with print_string style txt
 
 (* turn the testing flag on to remove the delay *)
-let testing = false
+let testing = true
 let char_delay = if testing then 0. else 0.035
 
 (* Possible way to delay instead of with Thread *)
 let sleep sec = ignore (Unix.select [] [] [] sec)
 
-let rec print_list l cs =
-  for i = 0 to (List.length l)-1 do
-    print_string cs (List.nth l i);
-    Thread.delay char_delay;
-    flush stdout
-  done
-
-let rec string_list s l =
-  if String.length s = 1 then s::l
-  else
-    let c = String.sub s 0 1 in
-    string_list (String.sub s 1 (String.length s - 1)) (c::l)
-
 (* takes in a string and prints one character at a time *)
 let print_chars (cs: style list) s =
-  let l = string_list s [] in
-  print_list (List.rev l) cs
+  let print_char cs c =
+    print_string cs (String.make 1 c);
+    Thread.delay char_delay;
+    flush stdout
+  in String.iter (print_char cs) s
+
+let print_lines (cs) s =
+  let ss = Str.split (Str.regexp "[\n\r]+") s in
+  for i = 0 to (List.length ss)-1 do
+    print_string cs (List.nth ss i);
+    print_string cs "\n";
+    Thread.delay 0.05;
+    flush stdout
+  done
 
 (* ASCII art was generated using:
  * http://patorjk.com/software/taag/#p=display&f=Bloody&t=Clue!
  * using their bloody font. *)
 let print_title () =
-  let s =
-  " ▄████▄   ██▓     █    ██ ▓█████  ▐██▌
+  let intro =
+  "
+|  | _| _ _  _  _  |_ _
+|/\|(-|(_(_)|||(-  |_(_)
+                         " in
+  let title =
+  "
+ ▄████▄   ██▓     █    ██ ▓█████  ▐██▌
 ▒██▀ ▀█  ▓██▒     ██  ▓██▒▓█   ▀  ▐██▌
 ▒▓█    ▄ ▒██░    ▓██  ▒██░▒███    ▐██▌
 ▒▓▓▄ ▄██▒▒██░    ▓▓█  ░██░▒▓█  ▄  ▓██▒
@@ -114,4 +119,6 @@ let print_title () =
 ░ ░          ░  ░   ░        ░  ░ ░
 ░                                      " in
   print_string [] "\n\n\n\n";
-  print_string [red] s; print_string [] "\n"
+  print_string [] intro;
+  print_string [red] title;
+  print_string [] "\n\n"

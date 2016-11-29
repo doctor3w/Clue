@@ -144,7 +144,7 @@ let get_movement (me:player) public (movelst:movement list) =
       if List.length hs > 0 then rand_from_lst hs
       else let ps = List.fold_left p [] movelst' in
       if List.length ps > 0 then rand_from_lst ps
-      else failwith ("impossible " ^ Pervasives.__LOC__)
+      else failwith ("impossible in " ^ Pervasives.__LOC__)
     else
       let f' acc el = match el with
       | (l, (s, true)) when is_unknown_card me (Room s) -> (l, (s, true))::acc
@@ -156,7 +156,7 @@ let get_movement (me:player) public (movelst:movement list) =
       if List.length fs > 0 then rand_from_lst fs
       else let hs = List.fold_left h' [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
-      else failwith ("impossible " ^ Pervasives.__LOC__)
+      else failwith ("impossible in " ^ Pervasives.__LOC__)
 
 
 (* [get_guess] takes in a game sheet and the current location and returns
