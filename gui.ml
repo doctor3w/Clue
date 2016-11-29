@@ -9,7 +9,8 @@ type graphic_board = {
   mutable board: board;
   mutable sheet_disp: string;
   mutable win_bounds: int*int;
-  mutable b_window: rect;
+  mutable b_window: grect;
+  mutable roll_window: grect;
   mutable player_locs: loc StringMap.t;
   mutable player_colors: Graphics.color StringMap.t;
 }
@@ -18,6 +19,7 @@ let window = {
     win_bounds = (600, 450);
     sheet_disp = "";
     b_window = (10, 80, 360, 360);
+    roll_window = (370, 10, 70, 60);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -32,6 +34,7 @@ let room_color = Graphics.rgb 191 191 191
 let space_color = Graphics.rgb 255 255 255
 let door_color = Graphics.rgb 119 61 20
 let highlight_color = Graphics.rgb 126 249 32
+let roll_color = Graphics.rgb 249 83 32
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -136,6 +139,13 @@ let get_mults () =
   let (_, _, winw, winh) = window.b_window in
   (winw/dimx, winh/dimy)
 
+let get_b_transform () =
+  let (xb, yb, wb, hb) = window.b_window in
+  let (x_mult, y_mult) = get_mults () in
+  let transform x = x |> scale_grect (x_mult, y_mult)
+                      |> shift_grect (xb, yb) in
+  transform
+
 (* translates a relative mouse position in the board_window with a coord that
  * can be looked up in the board *)
 let translate_to_coord pt =
@@ -173,7 +183,6 @@ let draw_exits transform loc =
 
 (* clears the window and draws the board *)
 let draw_board () =
-  Graphics.clear_graph();
   (grect_curry draw_filled_rect window.b_window) Graphics.black Graphics.white;
   let room_bind = StringMap.bindings window.board.room_coords in
   let (xb, yb, wb, hb) = window.b_window in
@@ -240,14 +249,24 @@ let draw_players () =
   List.iter f sus_binds;
   draw_players_in_rooms transform !rlst
 
+let draw_roll () =
+  let grect = window.roll_window in
+  (grect_curry draw_filled_rect grect) Graphics.black roll_color;
+  (grect_curry center_text_in_rect grect) "ROLL"
+
+let highlight_roll () =
+  let grect = window.roll_window in
+  (grect_curry draw_filled_rect grect) Graphics.black highlight_color;
+  (grect_curry center_text_in_rect grect) "ROLL"
 
 let redraw () =
   draw_board ();
   draw_players ();
+  draw_roll ();
   ()
 
-let highlight_coord transform coord =
-  match (CoordMap.find coord window.board.loc_map).info with
+let highlight_loc transform loc =
+  match loc.info with
   | Space (x, y) -> let (gx, gy, gw, gh) = transform (x, y, 1, 1) in
                     let grect' = (gx+1, gy+1, gw-2, gh-2) in
                     Graphics.set_color highlight_color;
@@ -256,6 +275,10 @@ let highlight_coord transform coord =
                     let grect' = (gx+1, gy+1, gw-2, gh-2) in
                     Graphics.set_color highlight_color;
                     (grect_curry Graphics.draw_rect grect')
+
+let highlight_coord transform coord =
+  let loc = (CoordMap.find coord window.board.loc_map) in
+  highlight_loc transform loc
 
 (* Displays the provided error message. *)
 let display_error (e_msg: string) : unit =
@@ -272,6 +295,23 @@ let prompt_filename () : string =
 (* Prompts the user for whether he rolls dice or not. *)
 let prompt_move (movelst: move list) : string =
   failwith "Unimplemented gui.prompt_move"
+
+let prompt_move_gui (movelst: move list) : move =
+  let transform = get_b_transform () in
+  let f acc move =
+    match move with
+    | Passage loc -> highlight_loc transform loc; loc::acc
+    | Roll -> highlight_roll (); acc in
+  let loclst = List.fold_left f [] movelst in
+  let rectlst = [("board", window.b_window); ("roll", window.roll_window)] in
+  let rec loop () =
+    match get_next_click_in_rects rectlst () with
+    | ("board", pt) -> let coord = translate_to_coord pt in
+                       let loc = CoordMap.find coord window.board.loc_map in
+                       if List.mem loc loclst then Passage loc else loop ()
+    | ("roll", _) -> draw_roll (); Roll in
+  loop ()
+
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
