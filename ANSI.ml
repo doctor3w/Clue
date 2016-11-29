@@ -98,7 +98,9 @@ let print_chars (cs: style list) s =
   let l = string_list s [] in
   print_list (List.rev l) cs
 
-
+(* ASCII art was generated using:
+ * http://patorjk.com/software/taag/#p=display&f=Bloody&t=Clue!
+ * using their bloody font. *)
 let print_title () =
   let s =
   " ▄████▄   ██▓     █    ██ ▓█████  ▐██▌
