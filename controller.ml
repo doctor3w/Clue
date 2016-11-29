@@ -207,6 +207,9 @@ let start file_name =
     try step (Model.import_board fl) with
     | No_players -> Display.display_error "No players in game file"
     | Player_not_found -> Display.display_error "No player with suspect name"
+    | Failure s ->
+      Display.display_error ("Something went wrong, here's what's up: "^s)
+    | _ -> Display.display_error "Whoa, that's bad. Goodbye."
   in match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s

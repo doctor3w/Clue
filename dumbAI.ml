@@ -1,5 +1,28 @@
 open Data
 
+(* true if the player [me] knows the suspect *)
+let knows_sus me =
+  let pairs = CardMap.bindings me.sheet in
+  let f acc (c, i) = match (c, i.card_info) with
+                 | (Suspect _, Envelope) -> acc || true
+                 | _ -> acc in
+  List.fold_left f false pairs
+
+(* true if the player [me] knows the weapon *)
+let knows_weap me =
+  let pairs = CardMap.bindings me.sheet in
+  let f acc (c, i) = match (c, i.card_info) with
+                 | (Weapon _, Envelope) -> acc || true
+                 | _ -> acc in
+  List.fold_left f false pairs
+
+(* true if the player [me] knows the room *)
+let knows_room me =
+  let f c i acc = match (c, i.card_info) with
+                 | (Room _, Envelope) -> acc || true
+                 | _ -> acc in
+  CardMap.fold f me.sheet false
+
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let rec answer_move pl pub moves : move =
@@ -43,16 +66,25 @@ let get_movement pl pub move_ops : movement =
         List.filter (fun (_, (s, _)) -> (s = pub.acc_room)) move_ops in
     if List.length accl = 0 then failwith "No acc room exists"
     else List.hd accl in
-  let no_acc =
-    List.filter (fun (_, (s, _)) -> not (s = pub.acc_room)) move_ops in
-  if List.length no_acc = 0 then (pl.curr_loc, ("no where", false))
+  if knows_sus pl && knows_weap pl && knows_room pl then (* Knows All *)
+    go_acc ()
   else
-    let filtered = List.filter (fun (l, (s, b)) -> b) no_acc in
-    if List.length filtered = 0 then
-      try go no_acc with No_place_to_go -> go_acc ()
+    let no_acc_f = (fun (_, (s, _)) -> not (s = pub.acc_room)) in
+    let no_acc = List.filter no_acc_f move_ops in
+    if List.length no_acc = 0 then (pl.curr_loc, ("no where", false))
     else
-      try go filtered with No_place_to_go ->
-      try go no_acc with No_place_to_go -> go_acc ()
+      let can_reach = List.filter (fun (l, (s, b)) -> b) no_acc in
+      if List.length can_reach = 0 then
+        try go no_acc with No_place_to_go ->
+        match pick_random mops with
+        | Some (l, (s, b)) -> (l, (s, b))
+        | None -> (pl.curr_loc, ("no where", false))
+      else
+        try go can_reach with No_place_to_go ->
+        try go no_acc with No_place_to_go ->
+        match pick_random mops with
+        | Some (l, (s, b)) -> (l, (s, b))
+        | None -> (pl.curr_loc, ("no where", false))
 
 
 let get_cards_with_info info sheet =
