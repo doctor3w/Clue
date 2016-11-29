@@ -112,6 +112,25 @@ let rec get_next_click_in_rect x y w h () =
     (x' - x, y' - y)
   else get_next_click_in_rect x y w h ()
 
+
+(* returns the relative (x, y) of the next mouse click within one of the
+ * grects defined in rects, doesn't terminate until the mouse is clicked
+ * within the bounds of one of those rects. *)
+let rec get_next_click_in_rects (rects: (string*grect) list) () =
+  (*let rect = (x, y, w, h) in*)
+  let pt = get_next_click_pos () in
+  let rec loop lst =
+    match lst with
+    | [] -> get_next_click_in_rects rects ()
+    | (s, (x, y, w, h))::t -> if is_in_rect pt (x, y, w, h)
+                      then
+                        let (x', y') = pt in
+                          (s, (x' - x, y' - y))
+                      else loop t in
+  loop rects
+
+(* gets (x_mult, y_mult) used to scale a 1x1 square to the correct size in
+ * window.b_window *)
 let get_mults () =
   let (dimx, dimy) = window.board.dim in
   let (_, _, winw, winh) = window.b_window in
