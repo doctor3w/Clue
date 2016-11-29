@@ -162,9 +162,10 @@ let game_init = {
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
-      room_coords = StringMap.empty
-    current_guess = (None, None, None)  (* every time we have a new guess, we need to update game.current_guess *)
+      room_coords = StringMap.empty;
     };
+    current_guess = (None,None,None); (* every time we have a new guess, we need to update game.current_guess *)
+    current_response = None;
     deck = ([],[],[]);
     player_order = []
   };

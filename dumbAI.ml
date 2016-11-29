@@ -171,4 +171,4 @@ let get_answer pl pub guess :card option =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes pl pub = pl
+let take_notes pl pub current_guess suspect_option = pl

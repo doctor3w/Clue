@@ -125,5 +125,5 @@ let take_notes pl pub current_guess suspect_option= match pl.agent with
   | DumbAI_t -> DumbAI.take_notes pl pub current_guess suspect_option
   | SmartAI_t -> SmartAI.take_notes pl pub current_guess suspect_option
   | Human_t -> Human.take_notes pl pub current_guess suspect_option
-  | _ -> DumbAI.take_notes pl pub current_guess suspect_option
+  | _ -> Responsive.take_notes pl pub current_guess suspect_option
 

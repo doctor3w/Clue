@@ -300,4 +300,4 @@ let deduce_env me:player =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes (me:player) public : player = me
+let take_notes pl pub current_guess suspect_option = pl
