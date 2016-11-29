@@ -74,17 +74,11 @@ let get_movement pl pub move_ops : movement =
     if List.length no_acc = 0 then (pl.curr_loc, ("no where", false))
     else
       let can_reach = List.filter (fun (l, (s, b)) -> b) no_acc in
-      if List.length can_reach = 0 then
-        try go no_acc with No_place_to_go ->
-        match pick_random mops with
-        | Some (l, (s, b)) -> (l, (s, b))
-        | None -> (pl.curr_loc, ("no where", false))
-      else
-        try go can_reach with No_place_to_go ->
-        try go no_acc with No_place_to_go ->
-        match pick_random mops with
-        | Some (l, (s, b)) -> (l, (s, b))
-        | None -> (pl.curr_loc, ("no where", false))
+      try go can_reach with No_place_to_go ->
+      try go no_acc with No_place_to_go ->
+      match pick_random mops with
+      | Some (l, (s, b)) -> (l, (s, b))
+      | None -> (pl.curr_loc, ("no where", false))
 
 
 let get_cards_with_info info sheet =
