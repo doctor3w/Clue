@@ -253,7 +253,7 @@ let get_answer (me:player) public guess : card option =
 (* if there is no player showing a card, then the responsive AI can
   make sure that all of the other players other than the guesser
   don't have the three card *)
-let none_helper (matrix:listens) public s_index w_index r_index = 
+let none_helper (matrix:listens) public s_index w_index r_index =
   let y_len = List.length public.player_order in
   for p_index1 = 0 to (y_len - 1)
     do (if (p_index1 = suspect_to_index public public.curr_player)
@@ -266,38 +266,38 @@ let none_helper (matrix:listens) public s_index w_index r_index =
   for p_index3 = 0 to (y_len - 1)
     do (if (p_index3 = suspect_to_index public public.curr_player)
       then ()
-      else ((matrix.(r_index)).(p_index3) <- Not_in_hand p_index3)) done;
+      else ((matrix.(r_index)).(p_index3) <- Not_in_hand p_index3)) done
 
-(* Given a [matrix], and a specific location in the matrix, 
+(* Given a [matrix], and a specific location in the matrix,
   check if it's Pure_unknown then.
   If it is, then turn it into Maybe_in_hand;
   else, nothing changed *)
-let match_helper matrix x_index y_index = 
-  let new_cell = 
-    (match matrix.(x_index).(y_index) with
+let match_helper matrix x_index y_index =
+  let new_cell =
+    match matrix.(x_index).(y_index) with
     | Pure_unknown -> Maybe_in_hand y_index
-    | _ -> matrix.(x_index).(y_index)) in
-  matrix.(x_index).(y_index) <- new_cell
+    | _ -> matrix.(x_index).(y_index) in
+        matrix.(x_index).(y_index) <- new_cell
 
 (* return the number of rows where the cards are known for player [j].
   [i_len] is the number of total cards *)
-let if_column_helper matrix j i_len= 
+let if_column_helper matrix j i_len=
   let counter = ref 0 in
-  for index = 0 to (i_len-1) 
-  do (if matrix.(index).(j) = Known j 
+  for index = 0 to (i_len-1)
+  do (if matrix.(index).(j) = Known j
     then counter := !counter + 1
     else ()) done;
   !counter
 
-(* If the number of rows where the cards are known for player [j] 
-  is equal to the number of cards player [j] has, 
+(* If the number of rows where the cards are known for player [j]
+  is equal to the number of cards player [j] has,
   then turn all Pure_unknown and Maybe_in_hand into Not_in_hand;
   else, nothing changes. *)
-let column_helper matrix j i_len player = 
+let column_helper matrix j i_len player =
   if ((if_column_helper matrix j i_len) = List.length player.hand)
-  then for index = 0 to (i_len - 1) 
-     do (if matrix.(index).(j) = Pure_unknown 
-          || matrix.(index).(j) = Maybe_in_hand j 
+  then for index = 0 to (i_len - 1)
+     do (if matrix.(index).(j) = Pure_unknown
+          || matrix.(index).(j) = Maybe_in_hand j
        then matrix.(index).(j) <- Not_in_hand j
        else ()) done
   else ()
@@ -314,27 +314,27 @@ let is_all_notinhand a =
   !default
 
 (* change all of the elements in array [a] into Env *)
-let rewrite_env a = 
+let rewrite_env a =
   let len = Array.length a in
-  for index = 0 to (len-1) 
+  for index = 0 to (len-1)
   do a.(index) <- Env done
 
-(* [take_notes] is only called 
+(* [take_notes] is only called
   when another player is showing a card to another player
-  /no one could show a card to another player. 
-  
+  /no one could show a card to another player.
+
   It takes four inputs:  player, public, current_guess and string_option,
-  where player is responsive AI itself, public is just the type public, 
-  guess is the current guess by some other player and 
-  string_option is if there is a player having any card to show him. 
-  
-  It returns a new player as the output 
+  where player is responsive AI itself, public is just the type public,
+  guess is the current guess by some other player and
+  string_option is if there is a player having any card to show him.
+
+  It returns a new player as the output
   where we mainly change the player.listen and possibly player.sheet.
  *)
 
- (* !!!!!!!!!!!!! need to update the note when responsive AI gets the hand. 
+ (* !!!!!!!!!!!!! need to update the note when responsive AI gets the hand.
     However, take_note is not called at that time *)
-let take_notes player public guess str_option: player = 
+let take_notes player public guess str_option: player =
   let (s_lst, w_lst, r_lst) = public.deck in
   let deck' = s_lst@w_lst@r_lst in
   let x_len = List.length deck' in
@@ -342,13 +342,13 @@ let take_notes player public guess str_option: player =
   let (s,w,r) = guess in
   let s_index = card_to_index public s in
   let w_index = card_to_index public w in
-  let r_index = card_to_index public r in 
+  let r_index = card_to_index public r in
   let matrix = player.listen in
   match str_option with
   (* None should be find *)
   | None -> (none_helper matrix public s_index w_index r_index;
-         player) 
-  | Some str -> 
+         player)
+  | Some str ->
   (* update all the Pure_unknown to Maybe_in_hand *)
     (let p_index = suspect_to_index public str in
      match_helper matrix s_index p_index;
@@ -356,29 +356,29 @@ let take_notes player public guess str_option: player =
      match_helper matrix r_index p_index;
   (* if two cards are not in the string's hand, then the third card must in
     it's hand, since the string showed the player something *)
-    (match matrix.(s_index).(p_index), 
-        matrix.(w_index).(p_index), 
+    (match matrix.(s_index).(p_index),
+        matrix.(w_index).(p_index),
         matrix.(r_index).(p_index) with
-    | Not_in_hand a, Not_in_hand b, Maybe_in_hand c 
+    | Not_in_hand a, Not_in_hand b, Maybe_in_hand c
       -> (matrix.(r_index).(p_index) <- Known c;
          for i_r1 = 0 to (p_index-1)
          do (matrix.(r_index).(i_r1) <- Not_in_hand i_r1) done;
          for i_r2 = (p_index+1) to (y_len-1)
          do (matrix.(r_index).(i_r2) <- Not_in_hand i_r2) done;)
-    | Not_in_hand a, Maybe_in_hand b, Not_in_hand c 
+    | Not_in_hand a, Maybe_in_hand b, Not_in_hand c
       -> (matrix.(w_index).(p_index) <- Known b;
          for i_w1 = 0 to (p_index-1)
          do (matrix.(r_index).(i_w1) <- Not_in_hand i_w1) done;
          for i_w2 = (p_index+1) to (y_len-1)
          do (matrix.(r_index).(i_w2) <- Not_in_hand i_w2) done;)
-    | Maybe_in_hand a, Not_in_hand b, Not_in_hand c 
+    | Maybe_in_hand a, Not_in_hand b, Not_in_hand c
       -> matrix.(s_index).(p_index) <- Known a;
          for i_s1 = 0 to (p_index-1)
          do (matrix.(r_index).(i_s1) <- Not_in_hand i_s1) done;
          for i_s2 = (p_index+1) to (y_len-1)
          do (matrix.(r_index).(i_s2) <- Not_in_hand i_s2) done;
     | _,_,_ -> ());
-  (* if the player only has n cards in hands and he already has n known, 
+  (* if the player only has n cards in hands and he already has n known,
     then any maybe_in_hand must be not_in_hand *)
     column_helper matrix p_index x_len player;
   (* might need to do more to compile the data *)
@@ -386,15 +386,15 @@ let take_notes player public guess str_option: player =
     to the player asking*)
     let asking_index = suspect_to_index public player.suspect in
     let answering_index = suspect_to_index public str in
-    if (asking_index < answering_index) 
-    then (for new_i = (asking_index+1) to (answering_index-1) 
+    if (asking_index < answering_index)
+    then (for new_i = (asking_index+1) to (answering_index-1)
         do (matrix.(s_index).(new_i) <- Not_in_hand (new_i);
           matrix.(w_index).(new_i) <- Not_in_hand (new_i);
           matrix.(r_index).(new_i) <- Not_in_hand (new_i);) done)
     else (for new_i1 = 0 to (answering_index-1)
         do  (matrix.(s_index).(new_i1) <- Not_in_hand (new_i1);
            matrix.(w_index).(new_i1) <- Not_in_hand (new_i1);
-           matrix.(r_index).(new_i1) <- Not_in_hand (new_i1);) done; 
+           matrix.(r_index).(new_i1) <- Not_in_hand (new_i1);) done;
         for new_i2 = (asking_index+1) to (y_len-1)
         do  (matrix.(s_index).(new_i2) <- Not_in_hand (new_i2);
            matrix.(w_index).(new_i2) <- Not_in_hand (new_i2);
@@ -408,9 +408,9 @@ let take_notes player public guess str_option: player =
         then (rewrite_env matrix.(ii);
           l:= (index_to_card public ii)::(!l))
         else ()) done;
-    let rec update_player player l = match !l with 
+    let rec update_player player l = match !l with
       | [] -> player
-      | h::t -> 
+      | h::t ->
           let data = CardMap.find h player.sheet in
             let data' = {data with card_info = Envelope} in
             let sheet' = CardMap.add h data' player.sheet in
