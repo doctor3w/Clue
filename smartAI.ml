@@ -144,6 +144,7 @@ let get_movement (me:player) public (movelst:movement list) =
       if List.length hs > 0 then rand_from_lst hs
       else let ps = List.fold_left p [] movelst' in
       if List.length ps > 0 then rand_from_lst ps
+      else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
     else
       let f' acc el = match el with
@@ -156,6 +157,7 @@ let get_movement (me:player) public (movelst:movement list) =
       if List.length fs > 0 then rand_from_lst fs
       else let hs = List.fold_left h' [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
+      else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
 
 
