@@ -97,3 +97,19 @@ let rec string_list s l =
 let print_chars (cs: style list) s =
   let l = string_list s [] in
   print_list (List.rev l) cs
+
+
+let print_title () =
+  let s =
+  " ▄████▄   ██▓     █    ██ ▓█████  ▐██▌
+▒██▀ ▀█  ▓██▒     ██  ▓██▒▓█   ▀  ▐██▌
+▒▓█    ▄ ▒██░    ▓██  ▒██░▒███    ▐██▌
+▒▓▓▄ ▄██▒▒██░    ▓▓█  ░██░▒▓█  ▄  ▓██▒
+▒ ▓███▀ ░░██████▒▒▒█████▓ ░▒████▒ ▒▄▄
+░ ░▒ ▒  ░░ ▒░▓  ░░▒▓▒ ▒ ▒ ░░ ▒░ ░ ░▀▀▒
+  ░  ▒   ░ ░ ▒  ░░░▒░ ░ ░  ░ ░  ░ ░  ░
+░          ░ ░    ░░░ ░ ░    ░       ░
+░ ░          ░  ░   ░        ░  ░ ░
+░                                      " in
+  print_string [] "\n\n\n\n";
+  print_string [red] s; print_string [] "\n"

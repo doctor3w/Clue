@@ -8,7 +8,7 @@ let display_error (e:string): unit = print_string [red] (e ^ "\n")
    The format of print statment is "This is [player]'s turn",
    where the information about the [player] is stored in [pub] *)
 let display_turn (pub:public): unit =
-	let () = print_string [] "\n-----------------------------------\n" in
+	let () = print_string [] "\n---------------------------------------\n" in
 	let () = print_chars [] "\nThis is " in
 	let () = print_chars [cyan] pub.curr_player in
 	print_chars [] "'s turn.\n"
