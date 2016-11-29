@@ -208,3 +208,9 @@ let show_hand hand =
 		print_string [] ", " in
 	ignore (List.mapi print hand);
 	print_string [] "\n\n"
+
+let prompt_continue () : unit =
+	let intro = "\nPress [Enter] to continue." in
+	let i = print_chars [Bold] intro; read_line () in
+	let s = String.lowercase_ascii (String.trim i) in
+	if s = "sheet" then () else ()

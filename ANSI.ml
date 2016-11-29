@@ -74,7 +74,7 @@ let print_with pr style txt =
 let print_string style txt = print_with print_string style txt
 
 (* turn the testing flag on to remove the delay *)
-let testing = true
+let testing = false
 let char_delay = if testing then 0. else 0.035
 
 (* Possible way to delay instead of with Thread *)

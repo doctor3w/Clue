@@ -148,6 +148,7 @@ and handle_accusation curr_p next_p game =
     let guard = (game.ai_only || check_for_humans pls') in
     if guard && not (check_all_out pls') then
       let pub = {game.public with curr_player=next_p.suspect} in
+      let () = Cli.prompt_continue () in
       step {game with players = pls'; public = pub}
     else
       Display.display_message "\n\nGame over."
@@ -182,6 +183,7 @@ and handle_guess curr_p next_p game =
     let pls' = replace_player curr_p' players' in
     let pub = {game.public with curr_player=next_p.suspect} in
     (* Add take notes here *)
+    let () = Cli.prompt_continue () in
     step {game with players = pls'; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
     let answer = Some (pl.suspect, card) in
@@ -190,6 +192,7 @@ and handle_guess curr_p next_p game =
     let pls' = replace_player curr_p' players' |> replace_player pl' in
     let pub = {game.public with curr_player=next_p.suspect} in
     (* Add take notes here *)
+    let () = Cli.prompt_continue () in
     step {game with players = pls'; public = pub}
 
 (* [handle_end_turn curr_p next_p game] is called when the current player
@@ -198,6 +201,7 @@ and handle_guess curr_p next_p game =
 and handle_end_turn curr_p next_p game =
   let pub = {game.public with curr_player=next_p.suspect} in
   let pls = replace_player curr_p game.players in
+  let () = Cli.prompt_continue () in
   step {game with public=pub; players=pls}
 
 (* Called when starting a game. Loads the provided file if given. Takes a
