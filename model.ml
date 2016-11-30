@@ -309,7 +309,7 @@ module PathMap = struct
 
 end
 
-let make_pathmap board start_loc fast_out =
+let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
   let settled = PathMap.make start_loc in
   let frontier = PathMap.empty in
   let (x,y) = start_loc in
@@ -329,7 +329,7 @@ let make_pathmap board start_loc fast_out =
     match l.info with Room_Rect _ -> false | Space _ -> true in
   let g acc el = PathMap.put el (1, start_loc) acc in
   let rec loop frnt stld =
-    if PathMap.is_empty frnt || fast_out then stld else
+    if PathMap.is_empty frnt || (fast_out frnt) then stld else
     let (k, (n, bp), frnt') = PathMap.poll_min frnt in
     let stld' = PathMap.put k (n, bp) stld in
     let frnt'' = add_next k (n+1) frnt' stld' in
@@ -352,7 +352,7 @@ let get_movement_options (g: game) (steps: int) =
   let coord =
     match start_loc.info with
     | Space (x,y) | Room_Rect (_,(x,_,y,_)) -> (x, y) in
-  let full_paths = make_pathmap b coord false in
+  let full_paths = make_pathmap b coord (fun pm -> false) in
   let room_lst = StringMap.bindings b.room_coords in
   let room_lst = match start_loc.info with
     | Room_Rect (s, _) -> List.filter (fun (s', bi) -> s <> s') room_lst

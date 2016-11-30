@@ -7,19 +7,27 @@ type transform = grect -> grect
 
 type graphic_board = {
   mutable board: board;
+  mutable sheet: sheet;
   mutable sheet_disp: string;
   mutable win_bounds: int*int;
   mutable b_window: grect;
+  mutable s_window: grect;
   mutable roll_window: grect;
+  mutable info_window: grect;
   mutable player_locs: loc StringMap.t;
   mutable player_colors: Graphics.color StringMap.t;
+  mutable last_info: string;
+  mutable curr_player: string;
 }
 
 let window = {
     win_bounds = (600, 450);
     sheet_disp = "";
+    sheet = CardMap.empty;
     b_window = (10, 80, 360, 360);
+    s_window = (380, 80, 210, 360);
     roll_window = (380, 10, 210, 60);
+    info_window = (10, 10, 360, 60);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -27,6 +35,8 @@ let window = {
     };
     player_locs = StringMap.empty;
     player_colors = StringMap.empty;
+    last_info = "CLUE";
+    curr_player = "";
   }
 
 let player_border = Graphics.black
@@ -35,6 +45,10 @@ let space_color = Graphics.rgb 255 255 255
 let door_color = Graphics.rgb 119 61 20
 let highlight_color = Graphics.rgb 126 249 32
 let roll_color = Graphics.rgb 249 83 32
+let suspect_color = Graphics.rgb 186 244 141
+let weapon_color = Graphics.rgb 244 224 141
+let room_sheet_color = Graphics.rgb 141 225 244
+let deck_border_color = Graphics.black
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -259,10 +273,70 @@ let highlight_roll () =
   (grect_curry draw_filled_rect grect) Graphics.black highlight_color;
   (grect_curry center_text_in_rect grect) "ROLL"
 
+type marking = MyCard of int | Env | Unk | SB of Graphics.color
+
+let make_mark grect marking =
+  match marking with
+  | MyCard n ->
+    let c = StringMap.find (window.sheet_disp) window.player_colors in
+    (grect_curry draw_filled_rect grect) deck_border_color c;
+    (grect_curry center_text_in_rect grect) (Pervasives.string_of_int n)
+  | SB c -> (grect_curry draw_filled_rect grect) deck_border_color c
+  | Unk -> (grect_curry draw_filled_rect grect) deck_border_color Graphics.white;
+           (grect_curry center_text_in_rect grect) "?"
+  | Env -> let (gx, gy, gw, gh) = grect in
+           let (gx', gy') = (gx + gw/2, gy + gh/2) in
+           (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+           Graphics.set_color Graphics.black;
+           Graphics.moveto gx (gy+gh);
+           Graphics.lineto gx' gy';
+           Graphics.lineto (gx+gw) (gy+gh)
+
+let draw_sheet () =
+  let grect = window.s_window in
+  let (sx, sy, sw, sh) = grect in
+  (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+  let card_counts = CardMap.cardinal window.sheet in
+  let hght = if card_counts = 0 then 0 else sh/card_counts in
+  let n = ref 0 in
+  let f card c_info =
+    let (back_color, name) =
+      match (card) with
+      | Suspect s -> (suspect_color, s)
+      | Weapon s -> (weapon_color, s)
+      | Room s -> (room_sheet_color, s) in
+    let marking =
+      match (c_info.card_info) with
+      | Mine lst -> MyCard (List.length lst)
+      | ShownBy who -> SB (StringMap.find who window.player_colors)
+      | Unknown -> Unk
+      | Envelope -> Env in
+    let y' = sy + (card_counts - 1 - !n)*hght in
+    n := !n + 1;
+    let grect' = (sx, y', sw, hght) in
+    let grect_text = (sx, y', sw - hght, hght) in
+    let grect_mark = (sx + sw - hght, y', hght, hght) in
+    (grect_curry draw_filled_rect grect') deck_border_color back_color;
+    (grect_curry center_text_in_rect grect_text) name;
+    make_mark grect_mark marking in
+  if window.sheet_disp = "" then ()
+  else CardMap.iter f window.sheet
+
+
+let draw_info () =
+  let grect = window.info_window in
+  (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+  (grect_curry center_text_in_rect grect) window.last_info
+
+let set_info s =
+  window.last_info <- s; draw_info ()
+
 let redraw () =
   draw_board ();
   draw_players ();
   draw_roll ();
+  draw_sheet ();
+  draw_info ();
   ()
 
 let highlight_loc transform loc =
@@ -282,11 +356,13 @@ let highlight_coord transform coord =
 
 (* Displays the provided error message. *)
 let display_error (e_msg: string) : unit =
-  failwith "Unimplemented gui.display_error"
+  set_info e_msg
 
 (* Displays a description of who's turn it is. *)
 let display_turn public : unit =
-  failwith "Unimplemented gui.display_turn"
+  let this_turn = public.curr_player in
+  window.curr_player <- this_turn;
+  set_info ("It is " ^ window.curr_player ^ "'s turn.")
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
@@ -316,11 +392,19 @@ let prompt_move_gui (movelst: move list) : move =
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
-  failwith "Unimplemented gui.display_dice_roll"
+  let s = (" has rolled a " ^ (Pervasives.string_of_int roll) ^ ".") in
+  set_info (window.curr_player ^ s)
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move move : unit =
-  failwith "Unimplemented gui.display_move"
+  let f loc = match loc.info with
+  | Room_Rect (s,_) -> s
+  | Space _ -> failwith ("can't take a passage to a space: " ^ Pervasives.__LOC__)
+  in match move with
+  | Passage loc ->
+    let s = window.curr_player ^ " has taken the passage to " ^ (f loc) in
+    set_info s
+  | Roll -> set_info (window.curr_player ^ " rolled the dice.")
 
 (* Prompts the user for the room they would like to go to.
  * [loc * (string * bool)] the location and whether or not room [string] is
@@ -354,6 +438,9 @@ let display_movement (end_move :(string * bool)) : unit =
 let display_relocate (who:string) loc : unit =
   window.player_locs <- StringMap.add who loc window.player_locs;
   redraw ()
+
+let display_movement loc : unit =
+  display_relocate window.curr_player loc
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -393,12 +480,23 @@ let display_message (text: string) : unit =
 
 let init game =
   window.board <- game.public.board;
+  window.player_locs <- StringMap.empty;
+  window.player_colors <- StringMap.empty;
   let f me =
     let sus = me.suspect in
     let color = Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
     in window.player_locs <- StringMap.add sus me.curr_loc window.player_locs;
-    window.player_colors <- StringMap.add sus color window.player_colors
+    window.player_colors <- StringMap.add sus color window.player_colors;
+    if me.agent = Human_t then
+      if true (* window.sheet_disp = "" *)
+      then (window.sheet_disp <- sus; window.sheet <- me.sheet)
+      else failwith ("found two human agents: " ^ Pervasives.__LOC__)
+    else ()
   in List.iter f game.players;
+  if List.length game.players > 0 && window.sheet_disp = ""
+  then let p = List.hd game.players in
+    (window.sheet_disp <- p.suspect; window.sheet <- p.sheet)
+  else ();
   Graphics.open_graph "";
   redraw ()
 
