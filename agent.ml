@@ -1,9 +1,6 @@
 open Data
-(* open DumbAI *)
-(* open SmartAI *)
-(* open Human *)
 
-module Display = Cli
+module Display = View
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)

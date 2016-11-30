@@ -1,6 +1,6 @@
 open Data
 
-module Display = Cli
+module Display = View
 
 exception Bad_input
 exception Wrong_room
