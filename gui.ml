@@ -81,8 +81,12 @@ let is_in_rect pt grect =
 
 (* fills the rect with color [fl] then outlines in with color [ln] *)
 let draw_filled_rect x y w h ln fl =
-  if x < 0 || y < 0 || w < 2 || h < 2
-  then failwith "bad_rectangle to draw"
+  if x < 0 || y < 0 || w < 1 || h < 1
+  then let rcts = ("(" ^ Pervasives.string_of_int x ^ ", "
+                      ^ Pervasives.string_of_int y ^ ", "
+                      ^ Pervasives.string_of_int w ^ ", "
+                      ^ Pervasives.string_of_int h ^ ")" ) in
+    failwith ("bad_rectangle to draw: " ^ rcts)
   else
     Graphics.set_color fl;
     Graphics.fill_rect (x) (y) (w) (h);
@@ -344,23 +348,29 @@ let make_mark grect marking =
 let draw_sheet () =
   let grect = window.s_window in
   let (sx, sy, sw, sh) = grect in
-  (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+  (grect_curry draw_filled_rect grect) Graphics.black Graphics.black;
   let card_counts = CardMap.cardinal window.sheet in
   let hght = if card_counts = 0 then 0 else sh/card_counts in
+  let spacer = (sh - (hght * card_counts))/2 in
   let n = ref 0 in
+  let spaces = ref 0 in
+  let space1 = ref 0 in
+  let space2 = ref 0 in
   let f card c_info =
     let (back_color, name) =
       match (card) with
       | Suspect s -> (suspect_color, s)
-      | Weapon s -> (weapon_color, s)
-      | Room s -> (room_sheet_color, s) in
+      | Weapon s -> (if !spaces = 0 then (space1 := !n; spaces := 1) else ());
+                    (weapon_color, s)
+      | Room s ->   (if !spaces = 1 then (space2 := !n; spaces := 2) else ());
+                    (room_sheet_color, s) in
     let marking =
       match (c_info.card_info) with
       | Mine lst -> MyCard (List.length lst)
       | ShownBy who -> SB (StringMap.find who window.player_colors)
       | Unknown -> Unk
       | Envelope -> Env in
-    let y' = sy + (card_counts - 1 - !n)*hght in
+    let y' = sy + (card_counts - 1 - !n)*hght + (2- !spaces)*spacer in
     n := !n + 1;
     let grect' = (sx, y', sw, hght) in
     let grect_text = (sx, y', sw - hght, hght) in
@@ -389,6 +399,11 @@ let redraw () =
   draw_sheet ();
   draw_info ();
   ()
+
+(* Displays the relocation of suspect [string] to the Room loc *)
+let display_relocate (who:string) loc : unit =
+  window.player_locs <- StringMap.add who loc window.player_locs;
+  redraw ()
 
 (* highlights a location on the board *)
 let highlight_loc transform loc =
@@ -422,9 +437,6 @@ let prompt_filename () : string =
   failwith "Unimplemented gui.prompt_filename"
 
 (* Prompts the user for whether he rolls dice or not. *)
-let prompt_move (movelst: move list) : string =
-  failwith "Unimplemented gui.prompt_move"
-
 let prompt_move_gui (movelst: move list) : move =
   let transform = get_b_transform () in
   let f acc move =
@@ -442,6 +454,13 @@ let prompt_move_gui (movelst: move list) : move =
     | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
   loop ()
 
+let prompt_move (movelst: move list) : string =
+  let loc_name loc = match loc.info with
+  | Room_Rect (s, _) -> s
+  | _ -> failwith ("can't have passage to space: " ^ Pervasives.__LOC__) in
+  match prompt_move_gui movelst with
+  | Roll -> "roll"
+  | Passage loc -> loc_name loc
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
@@ -456,7 +475,7 @@ let display_move move : unit =
   in match move with
   | Passage loc ->
     let s = window.curr_player ^ " has taken the passage to " ^ (f loc) in
-    set_info s
+    set_info s; display_relocate window.curr_player loc
   | Roll -> set_info (window.curr_player ^ " rolled the dice.")
 
 (* Prompts the user for the room they would like to go to.
@@ -482,11 +501,6 @@ let prompt_movement_with_pm pathmap acc_room roll : loc =
     then CoordMap.find click_coord window.board.loc_map
     else loop () in
   loop ()
-
-(* Displays the relocation of suspect [string] to the Room loc *)
-let display_relocate (who:string) loc : unit =
-  window.player_locs <- StringMap.add who loc window.player_locs;
-  redraw ()
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (l, (s, b)) : unit =
