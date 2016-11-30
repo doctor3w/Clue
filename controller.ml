@@ -113,9 +113,7 @@ let rec step game =
       step {game with public={game.public with curr_player=next_p.suspect}}
     else Display.display_message "Game over."
   else
-    let () = print_endline "Line 117" in
     let () = Display.display_turn game.public in
-    let () = print_endline "Line 119" in
     let move_ops = Model.get_move_options game in
     let move = Agent.answer_move curr_p game.public move_ops in
     let () = Display.display_move move in
@@ -206,7 +204,9 @@ let start file_name g_or_c =
   let load_go fl =
     try
       let game = Model.import_board fl in
-      let () = Gui.init game in
+      (match !view_type with
+      | CLI -> ()
+      | GUI -> Gui.init game);
       step game
     with
     | No_players -> Display.display_error "\nNo players in game file"
@@ -218,9 +218,10 @@ let start file_name g_or_c =
     if g_or_c = GUI then
       let (w, h) = Gui.window.win_bounds in
       let win_s = " "^(string_of_int w)^"x"^(string_of_int h) in
+      print_endline "GUI enabled";
       Graphics.open_graph win_s;
       Data.view_type := g_or_c
-    else () in
+    else Data.view_type := CLI in
   match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s
