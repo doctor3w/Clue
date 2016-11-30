@@ -69,13 +69,18 @@ let parse_movement str move_ops =
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let rec get_movement pl pub move_ops =
-  let text = Display.prompt_movement move_ops pub.acc_room in
-  try parse_movement text move_ops with
-  | Bad_input ->
-    if check_sheet_or_hand text pl then ()
-    else Display.display_error "Please enter a valid location to move to.";
-    get_movement pl pub move_ops
+let rec get_movement pl pub move_ops roll pm =
+  if !view_type = GUI then
+    let l = Gui.prompt_movement pm pub.acc_room roll in
+    let (s, b) = try List.assoc l move_ops with | _ -> ("nowhere", false)
+    in (l, (s, b))
+  else
+    let text = Display.prompt_movement move_ops pub.acc_room in
+    try parse_movement text move_ops with
+    | Bad_input ->
+      if check_sheet_or_hand text pl then ()
+      else Display.display_error "Please enter a valid location to move to.";
+      get_movement pl pub move_ops roll pm
 
 (* [card_norm_map card] takes a list of cards and normalizes the card names
  * and returns a map of the normalized cards to the original card. *)

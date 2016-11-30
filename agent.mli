@@ -6,7 +6,7 @@ val answer_move : player -> public -> move list -> move
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-val get_movement : player -> public -> movement list -> movement
+val get_movement : player -> public -> movement list -> int -> Model.PathMap.t -> movement
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)

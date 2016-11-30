@@ -462,10 +462,7 @@ let display_move move : unit =
 (* Prompts the user for the room they would like to go to.
  * [loc * (string * bool)] the location and whether or not room [string] is
  * accessible. The second string parameter is the acc_room name. *)
-let prompt_movement (movelst : (loc * (string * bool)) list) (acc_room:string) : string =
-  failwith "Unimplemented gui.prompt_movement"
-
-let prompt_movement_with_pm pathmap acc_room roll : loc =
+let prompt_movement pathmap acc_room roll : loc =
   let pm = PathMap.filter (fun (x, y) (n, (x', y')) -> n <= roll) pathmap in
   let highlight_coords = PathMap.keys pm in
   let (xb, yb, wb, hb) = window.b_window in
