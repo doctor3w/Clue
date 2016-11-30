@@ -209,11 +209,11 @@ let start file_name g_or_c =
       let () = Gui.init game in
       step game
     with
-    | No_players -> Display.display_error "No players in game file"
-    | Player_not_found -> Display.display_error "No player with suspect name"
+    | No_players -> Display.display_error "\nNo players in game file"
+    | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
-      Display.display_error ("Something went wrong, here's what's up: "^s)
-    | _ -> Display.display_error "Whoa, that's bad. Goodbye." in
+      Display.display_error ("\nSomething went wrong, here's what's up: "^s)
+    | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in
   let () =
     if g_or_c = GUI then
       let (w, h) = Gui.window.win_bounds in

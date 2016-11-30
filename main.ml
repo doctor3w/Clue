@@ -17,24 +17,24 @@ let print_usage () =
   print_endline ""
 
 let parse_args () =
-  if Array.length argv > 2 then
+  if Array.length Sys.argv > 2 then
     let g_or_c =
       try
         if Sys.argv.(1) = "-gui" then GUI else raise Not_an_option
       with
       | Invalid_argument _ -> CLI in
-    let file_name = try Some Sys.argv.(2) with Invalid_argument _ -> None
+    let file_name = try Some Sys.argv.(2) with Invalid_argument _ -> None in
     (file_name, g_or_c)
   else
-    let file_name = try Some Sys.argv.(1) with Invalid_argument _ -> None
+    let file_name = try Some Sys.argv.(1) with Invalid_argument _ -> None in
     (file_name, CLI)
 
 let () =
   let () = ANSI.print_title () in
   try
-    let (fn, gc) = parse_args
+    let (fn, gc) = parse_args () in
     Controller.start fn gc
   with
   | Not_an_option ->
     Cli.display_error "\nThat's an invalid argument option!";
-    print_usage ();;
+    print_usage ()
