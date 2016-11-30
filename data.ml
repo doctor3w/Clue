@@ -157,11 +157,8 @@ end
 
 type move = Roll | Passage of loc
 
-<<<<<<< HEAD
-=======
 (* Represents the movement of a player *)
 type movement = (loc * (string * bool))
->>>>>>> master
 
 (* [listens] represents listening data for responsive AI *)
 type listen_choice = Pure_unknown
