@@ -38,10 +38,9 @@ let handle_move game curr_p m =
     let dice_roll = (Random.int 11) + 2 in
     let () = Display.display_dice_roll dice_roll in
     let movement_opt = Model.get_movement_options game dice_roll in
-    let movement = Agent.get_movement curr_p game.public movement_opt in
-    let movement_dir = get_movement_dir movement movement_opt in
-    let () = Display.display_movement movement_dir in
-    movement
+    let (l, (s, b)) = Agent.get_movement curr_p game.public movement_opt in
+    let () = Display.display_movement (s,b) in
+    l
   | Passage l -> l
 
 (* Handles certain locations and returns the type of action that takes place
@@ -91,6 +90,25 @@ let can_show hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.exists p hand
 
+(* Moves a player and returns the new player list *)
+let move_player pls sus loc =
+  let rec find_pl s tl = match tl with
+    | [] -> None
+    | h::t -> if h.suspect = s then Some h else find_pl s t in
+  let extr_pl pl = match pl with
+    | Some p ->
+      Display.display_relocate p.suspect loc;
+      replace_player {p with curr_loc = loc} pls
+    | None -> pls in
+  match sus with
+  | Suspect s -> extr_pl (find_pl s pls)
+  | _ -> failwith "not a suspect"
+
+let pl_eq (s:card) (pl:player) =
+  match s with
+  | Suspect name -> pl.suspect = name
+  | _ -> false
+
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -130,6 +148,7 @@ and handle_accusation curr_p next_p game =
     let guard = (game.ai_only || check_for_humans pls') in
     if guard && not (check_all_out pls') then
       let pub = {game.public with curr_player=next_p.suspect} in
+      let () = Cli.prompt_continue () in
       step {game with players = pls'; public = pub}
     else
       Display.display_message "\n\nGame over."
@@ -139,8 +158,11 @@ and handle_accusation curr_p next_p game =
  * the current player and then any possible shown cards will be gathered and
  * shown if possible. *)
 and handle_guess curr_p next_p game =
-  let guess = Agent.get_guess curr_p game.public in
+  let (s, w, r) as guess = Agent.get_guess curr_p game.public in
   let () = Display.display_guess guess in
+  let players' =
+    if pl_eq s curr_p then game.players
+    else move_player game.players s curr_p.curr_loc in
   let group = reorder_pls curr_p game.players in
   let rec get_answers pls =
     match pls with
@@ -158,15 +180,19 @@ and handle_guess curr_p next_p game =
   in match get_answers group with
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in
-    let pls' = replace_player curr_p' game.players in
+    let pls' = replace_player curr_p' players' in
     let pub = {game.public with curr_player=next_p.suspect} in
+    (* Add take notes here *)
+    let () = Cli.prompt_continue () in
     step {game with players = pls'; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
     let answer = Some (pl.suspect, card) in
     let curr_p' = Agent.show_card curr_p game.public answer guess in
     let pl' = Agent.show_person pl card curr_p'.suspect in
-    let pls' = replace_player curr_p' game.players |> replace_player pl' in
+    let pls' = replace_player curr_p' players' |> replace_player pl' in
     let pub = {game.public with curr_player=next_p.suspect} in
+    (* Add take notes here *)
+    let () = Cli.prompt_continue () in
     step {game with players = pls'; public = pub}
 
 (* [handle_end_turn curr_p next_p game] is called when the current player
@@ -175,6 +201,7 @@ and handle_guess curr_p next_p game =
 and handle_end_turn curr_p next_p game =
   let pub = {game.public with curr_player=next_p.suspect} in
   let pls = replace_player curr_p game.players in
+  let () = Cli.prompt_continue () in
   step {game with public=pub; players=pls}
 
 (* Called when starting a game. Loads the provided file if given. Takes a
@@ -184,6 +211,9 @@ let start file_name =
     try step (Model.import_board fl) with
     | No_players -> Display.display_error "No players in game file"
     | Player_not_found -> Display.display_error "No player with suspect name"
+    | Failure s ->
+      Display.display_error ("Something went wrong, here's what's up: "^s)
+    | _ -> Display.display_error "Whoa, that's bad. Goodbye."
   in match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s

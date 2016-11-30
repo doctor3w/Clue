@@ -16,7 +16,7 @@ let contains_xs s xs =
   let cat = if List.length xs = 1 then List.hd xs
             else List.fold_left (fun acc el -> match acc with
                                                | "" -> el
-                                               | a -> a^"\|"^el) "" xs in
+                                               | a -> a^"\\|"^el) "" xs in
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
@@ -62,7 +62,8 @@ let parse_movement str move_ops =
   let rooms = List.map (fun (_, (s, _)) -> normalize s) move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
-    let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
+    let norm_moves =
+      List.map (fun (l, (s, b)) -> (normalize s, (l, (s, b)))) move_ops in
     try List.assoc selected norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
 
