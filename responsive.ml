@@ -41,8 +41,7 @@ let count_listenchoice a t =
 (* check if the entire array [a] is all Not_in_hand*)
 let is_all_notinhand a =
   let count = count_listenchoice a Not_in_hand in
-  if Array.length a = count
-  then true else false
+  Array.length a = count
 
 let rec helper matrix public (lst: card list) counter =
   match lst with
@@ -60,8 +59,13 @@ let rec helper matrix public (lst: card list) counter =
 let rec all_but_one_known matrix public (lst: card list) =
   let counter = ref 0 in
   helper matrix public lst counter;
-  if !counter = (List.length lst)-1
-  then true else false
+  !counter = (List.length lst)-1
+
+(* change all of the elements in array [a] into Env *)
+let rewrite_env a =
+  let len = Array.length a in
+  for index = 0 to (len-1)
+  do a.(index) <- Env done
 
 (* turns a passage into a room card *)
 let p_to_room passage =
@@ -220,14 +224,24 @@ let listen_ans_update listen sus card player public =
   let c_index = card_to_index public card in
   let sus_index = suspect_to_index public sus in
   let pl_index = suspect_to_index public player.suspect in
-  if pl_index < sus_index then
-    for j = pl_index + 1 to (sus_index -1)
-    do (listen.(c_index).(j)<-Not_in_hand) done
-  else
-    for j = sus_index - 1 downto 0
-    do (listen.(c_index).(j)<-Not_in_hand) done;
-    for j = pl_index + 1 to List.length public.player_order -1
-    do (listen.(c_index).(j)<-Not_in_hand) done
+    listen.(c_index).(sus_index)<-Known;
+    if pl_index < sus_index then
+      for j = pl_index + 1 to (sus_index -1)
+      do (listen.(c_index).(j)<-Not_in_hand) done
+    else
+      for j = sus_index - 1 downto 0
+      do (listen.(c_index).(j)<-Not_in_hand) done;
+      for j = pl_index + 1 to List.length public.player_order -1
+      do (listen.(c_index).(j)<-Not_in_hand) done;
+    if is_all_notinhand listen.(c_index) then rewrite_env listen.(c_index)
+    else
+      let (ss, ws, rs) = public.deck in
+      if all_but_one_known listen public ss then rewrite_env listen.(c_index)
+      else ();
+      if all_but_one_known listen public ws then rewrite_env listen.(c_index)
+      else ();
+      if all_but_one_known listen public rs then rewrite_env listen.(c_index)
+      else ()
 
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
@@ -391,12 +405,6 @@ let column_helper matrix j i_len player =
        then matrix.(index).(j) <- Not_in_hand
        else ()) done
   else ()
-
-(* change all of the elements in array [a] into Env *)
-let rewrite_env a =
-  let len = Array.length a in
-  for index = 0 to (len-1)
-  do a.(index) <- Env done
 
 (* [take_notes] is only called
 
