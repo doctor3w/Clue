@@ -28,6 +28,31 @@ let rand_from_lst lst =
   else let n = Random.int len in
     List.nth lst n
 
+(* count how many [t] the array [a] has *)
+let count_listenchoice a t = 
+  let counter = ref 0 in
+  let len = Array.length a in
+  for index = 0 to (len-1) 
+  do (if a.(index) = t
+     then counter := !counter + 1
+     else ()) done;
+  !counter
+
+(* check if the entire array [a] is all Not_in_hand*)
+let is_all_notinhand a =
+  let count = count_listenchoice a Not_in_hand in
+  if Array.length a = count 
+  then true else false
+
+(* Given a card list, which contains either suspects, or weapons,
+  or rooms, check if all but one is known 
+  PreC: lst contains all cards for one type *)
+let rec all_but_one_known matrix public (lst: card list) =
+  let counter = ref 0 in 
+  helper matrix public lst counter;
+  if !counter = (List.length lst)-1
+  then true else false
+
 (* Given a string [sus], a string [curr_player] and a string list [players],
    return true if [sus] is adjacent to [curr_player] (either left or right)
    PreC: curr_player and sus are in the players *)
@@ -56,10 +81,11 @@ let rec answer_move player public move_list : move =
  * and returns the agent's choice of movement *)
 let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
 
+
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
 let get_guess player public :guess= failwith "responsiveai get_guess"
-(* make a guess based on the priority of listens structure  *)
+
 
 (* Turns card data from unknown to envelope in sheet. Only if unknown is
  * the data changed. *)
@@ -258,15 +284,15 @@ let none_helper (matrix:listens) public s_index w_index r_index =
   for p_index1 = 0 to (y_len - 1)
     do (if (p_index1 = suspect_to_index public public.curr_player)
       then ()
-      else ((matrix.(s_index)).(p_index1) <- Not_in_hand p_index1)) done;
+      else ((matrix.(s_index)).(p_index1) <- Not_in_hand )) done;
   for p_index2 = 0 to (y_len - 1)
     do (if (p_index2 = suspect_to_index public public.curr_player)
       then ()
-      else ((matrix.(w_index)).(p_index2) <- Not_in_hand p_index2)) done;
+      else ((matrix.(w_index)).(p_index2) <- Not_in_hand )) done;
   for p_index3 = 0 to (y_len - 1)
     do (if (p_index3 = suspect_to_index public public.curr_player)
       then ()
-      else ((matrix.(r_index)).(p_index3) <- Not_in_hand p_index3)) done
+      else ((matrix.(r_index)).(p_index3) <- Not_in_hand )) done
 
 (* Given a [matrix], and a specific location in the matrix,
   check if it's Pure_unknown then.
@@ -275,7 +301,7 @@ let none_helper (matrix:listens) public s_index w_index r_index =
 let match_helper matrix x_index y_index =
   let new_cell =
     match matrix.(x_index).(y_index) with
-    | Pure_unknown -> Maybe_in_hand y_index
+    | Pure_unknown -> Maybe_in_hand
     | _ -> matrix.(x_index).(y_index) in
         matrix.(x_index).(y_index) <- new_cell
 
@@ -284,7 +310,7 @@ let match_helper matrix x_index y_index =
 let if_column_helper matrix j i_len=
   let counter = ref 0 in
   for index = 0 to (i_len-1)
-  do (if matrix.(index).(j) = Known j
+  do (if matrix.(index).(j) = Known
     then counter := !counter + 1
     else ()) done;
   !counter
@@ -297,21 +323,10 @@ let column_helper matrix j i_len player =
   if ((if_column_helper matrix j i_len) = List.length player.hand)
   then for index = 0 to (i_len - 1)
      do (if matrix.(index).(j) = Pure_unknown
-          || matrix.(index).(j) = Maybe_in_hand j
-       then matrix.(index).(j) <- Not_in_hand j
+          || matrix.(index).(j) = Maybe_in_hand
+       then matrix.(index).(j) <- Not_in_hand
        else ()) done
   else ()
-
-(* check if the entire array [a] is all Not_in_hand*)
-let is_all_notinhand a =
-  let len = Array.length a in
-  let default = ref true in
-  for index = 0 to (len-1)
-    do (let case = (match a.(index) with
-      | Not_in_hand j -> true
-      | _ -> false) in
-       default:= (!default) && case ) done;
-  !default
 
 (* change all of the elements in array [a] into Env *)
 let rewrite_env a =
@@ -319,35 +334,15 @@ let rewrite_env a =
   for index = 0 to (len-1)
   do a.(index) <- Env done
 
-(* count how many Known the array [a] has *)
-let count_known a = 
-  let counter = ref 0 in
-  let len = Array.length a in
-  for index = 0 to (len-1) 
-  do (if a.(index) = Known index 
-     then counter := !counter + 1
-     else ()) done;
-  !counter
-
 let rec helper matrix public (lst: card list) counter = 
   match lst with 
   | [] -> ()
   | h::t -> 
             (let h_index = card_to_index public h in 
-            (if count_known matrix.(h_index) = 1
+            (if count_listenchoice matrix.(h_index) Known = 1
             then counter:= !counter +1 
             else ());
-            helper matrix public t)
-
-(* Given a card list, which contains either suspects, or weapons,
-  or rooms, check if all but one is known 
-  PreC: lst contains all cards for one type *)
-let rec all_but_one_known matrix public (lst: card list) =
-  let counter = ref 0 in 
-  helper matrix public lst counter;
-  if !counter = (List.length lst)-1
-  then true else false
-
+            helper matrix public t counter)
 
 (* [take_notes] is only called 
 
@@ -390,24 +385,24 @@ let take_notes player public guess str_option: player =
     (match matrix.(s_index).(p_index),
         matrix.(w_index).(p_index),
         matrix.(r_index).(p_index) with
-    | Not_in_hand a, Not_in_hand b, Maybe_in_hand c
-      -> (matrix.(r_index).(p_index) <- Known c;
+    | Not_in_hand, Not_in_hand, Maybe_in_hand
+      -> (matrix.(r_index).(p_index) <- Known;
          for i_r1 = 0 to (p_index-1)
-         do (matrix.(r_index).(i_r1) <- Not_in_hand i_r1) done;
+         do (matrix.(r_index).(i_r1) <- Not_in_hand) done;
          for i_r2 = (p_index+1) to (y_len-1)
-         do (matrix.(r_index).(i_r2) <- Not_in_hand i_r2) done;)
-    | Not_in_hand a, Maybe_in_hand b, Not_in_hand c
-      -> (matrix.(w_index).(p_index) <- Known b;
+         do (matrix.(r_index).(i_r2) <- Not_in_hand) done;)
+    | Not_in_hand, Maybe_in_hand, Not_in_hand 
+      -> (matrix.(w_index).(p_index) <- Known;
          for i_w1 = 0 to (p_index-1)
-         do (matrix.(r_index).(i_w1) <- Not_in_hand i_w1) done;
+         do (matrix.(r_index).(i_w1) <- Not_in_hand) done;
          for i_w2 = (p_index+1) to (y_len-1)
-         do (matrix.(r_index).(i_w2) <- Not_in_hand i_w2) done;)
-    | Maybe_in_hand a, Not_in_hand b, Not_in_hand c
-      -> matrix.(s_index).(p_index) <- Known a;
+         do (matrix.(r_index).(i_w2) <- Not_in_hand) done;)
+    | Maybe_in_hand, Not_in_hand, Not_in_hand 
+      -> matrix.(s_index).(p_index) <- Known;
          for i_s1 = 0 to (p_index-1)
-         do (matrix.(r_index).(i_s1) <- Not_in_hand i_s1) done;
+         do (matrix.(r_index).(i_s1) <- Not_in_hand) done;
          for i_s2 = (p_index+1) to (y_len-1)
-         do (matrix.(r_index).(i_s2) <- Not_in_hand i_s2) done;
+         do (matrix.(r_index).(i_s2) <- Not_in_hand) done;
     | _,_,_ -> ());
   (* if the player only has n cards in hands and he already has n known,
     then any maybe_in_hand must be not_in_hand *)
@@ -419,17 +414,17 @@ let take_notes player public guess str_option: player =
     let answering_index = suspect_to_index public str in
     if (asking_index < answering_index)
     then (for new_i = (asking_index+1) to (answering_index-1)
-        do (matrix.(s_index).(new_i) <- Not_in_hand (new_i);
-          matrix.(w_index).(new_i) <- Not_in_hand (new_i);
-          matrix.(r_index).(new_i) <- Not_in_hand (new_i);) done)
+        do (matrix.(s_index).(new_i) <- Not_in_hand;
+          matrix.(w_index).(new_i) <- Not_in_hand;
+          matrix.(r_index).(new_i) <- Not_in_hand;) done)
     else (for new_i1 = 0 to (answering_index-1)
-        do  (matrix.(s_index).(new_i1) <- Not_in_hand (new_i1);
-           matrix.(w_index).(new_i1) <- Not_in_hand (new_i1);
-           matrix.(r_index).(new_i1) <- Not_in_hand (new_i1);) done;
+        do  (matrix.(s_index).(new_i1) <- Not_in_hand;
+           matrix.(w_index).(new_i1) <- Not_in_hand;
+           matrix.(r_index).(new_i1) <- Not_in_hand;) done;
         for new_i2 = (asking_index+1) to (y_len-1)
-        do  (matrix.(s_index).(new_i2) <- Not_in_hand (new_i2);
-           matrix.(w_index).(new_i2) <- Not_in_hand (new_i2);
-           matrix.(r_index).(new_i2) <- Not_in_hand (new_i2);) done);
+        do  (matrix.(s_index).(new_i2) <- Not_in_hand;
+           matrix.(w_index).(new_i2) <- Not_in_hand;
+           matrix.(r_index).(new_i2) <- Not_in_hand;) done);
   (* compile data *)
   (* if the entire row for a card is all filled up with Not_in_hand,
     it must be in the envelope *)
