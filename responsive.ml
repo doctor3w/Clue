@@ -53,30 +53,48 @@ let rec all_but_one_known matrix public (lst: card list) =
   if !counter = (List.length lst)-1
   then true else false
 
-(* Given a string [sus], a string [curr_player] and a string list [players],
-   return true if [sus] is adjacent to [curr_player] (either left or right)
-   PreC: curr_player and sus are in the players *)
-let is_adjacent (players: string list)(curr_player:string)(sus:string):bool =
-  let len = List.length players in
-  let index_curr = find curr_player players in
-  let index_sus = find sus players in
-  if (index_curr = len - 1) then (if index_sus = len - 2 || index_sus = 0
-                      then true else false)
-  else if (index_curr = 0) then (if index_sus = 1 || index_sus = len - 1
-                  then true else false)
-  else (if index_sus = index_curr - 1 || index_sus = index_curr + 1
-          then true else false)
+let check_farthest player public passage =
+  let Passage(n) = passage in
+  let room = match n.info with
+             |Space _-> failwith "not a room"
+             |Room_Rect (r,_) -> Room r in
+  let r_i = card_to_index public room in
+  let pl = suspect_to_index public player.suspect in
+  let farthest =
+      if pl=(List.length public.player_order) -1 then 0 else pl-1 in
+      if player.listen.(r_i).(farthest) = Known(farthest) then passage
+      else Roll
+
+(* [is_r_env_known] checks if player knows the room card in envelope *)
+let is_r_env_known player =
+  let s = CardMap.filter (fun _ data -> (data.card_info = Envelope)) player.sheet in
+  let b = CardMap.bindings s in
+  let r = List.filter (fun (c,i) -> match c with
+                                    | Room (n)-> true
+                                    | _->false) b in
+  not(r = [])
+
+(* [is_p_env] checks that if the passage room is in the envelope then ROLL
+  else it calls its helper [check_farthest] to further determine move*)
+let is_p_env player public passage_list =
+  let f p =
+    (let Passage n = p in
+      match n.info with
+      | Space _ -> false
+      | Room_Rect (r,_)-> match CardMap.find Room(r) player.sheet with
+                            | Envelope -> true
+                            | _ -> false) in
+  let env_lst = List.filter f passage_list in
+  if List.length env_lst > 0 then if check_p_farthest player public env_lst
+  else check_farthest player public env_lst
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
-let rec answer_move player public move_list : move =
-(*   match move_list with
-  | []->Roll
-  | h::t-> match h with
-          | Roll -> answer_move player public t
-          | Passage loc -> match loc.info with
-                          | *)
-                          failwith ""
+let answer_move player public move_list : move =
+  let passage = List.filter (fun a -> match a with
+                                      | Roll -> false
+                                      | Passage _-> true) move_list in
+    if passage  = [] then Roll else is_p_env player public passage
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
