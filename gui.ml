@@ -81,8 +81,12 @@ let is_in_rect pt grect =
 
 (* fills the rect with color [fl] then outlines in with color [ln] *)
 let draw_filled_rect x y w h ln fl =
-  if x < 0 || y < 0 || w < 2 || h < 2
-  then failwith "bad_rectangle to draw"
+  if x < 0 || y < 0 || w < 1 || h < 1
+  then let rcts = ("(" ^ Pervasives.string_of_int x ^ ", "
+                      ^ Pervasives.string_of_int y ^ ", "
+                      ^ Pervasives.string_of_int w ^ ", "
+                      ^ Pervasives.string_of_int h ^ ")" ) in
+    failwith ("bad_rectangle to draw: " ^ rcts)
   else
     Graphics.set_color fl;
     Graphics.fill_rect (x) (y) (w) (h);
@@ -347,20 +351,26 @@ let draw_sheet () =
   (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
   let card_counts = CardMap.cardinal window.sheet in
   let hght = if card_counts = 0 then 0 else sh/card_counts in
+  let spacer = (sh - (hght * card_counts))/2 in
   let n = ref 0 in
+  let spaces = ref 0 in
+  let space1 = ref 0 in
+  let space2 = ref 0 in
   let f card c_info =
     let (back_color, name) =
       match (card) with
       | Suspect s -> (suspect_color, s)
-      | Weapon s -> (weapon_color, s)
-      | Room s -> (room_sheet_color, s) in
+      | Weapon s -> (if !spaces = 0 then (space1 := !n; spaces := 1) else ());
+                    (weapon_color, s)
+      | Room s ->   (if !spaces = 1 then (space2 := !n; spaces := 2) else ());
+                    (room_sheet_color, s) in
     let marking =
       match (c_info.card_info) with
       | Mine lst -> MyCard (List.length lst)
       | ShownBy who -> SB (StringMap.find who window.player_colors)
       | Unknown -> Unk
       | Envelope -> Env in
-    let y' = sy + (card_counts - 1 - !n)*hght in
+    let y' = sy + (card_counts - 1 - !n)*hght + (2- !spaces)*spacer in
     n := !n + 1;
     let grect' = (sx, y', sw, hght) in
     let grect_text = (sx, y', sw - hght, hght) in
@@ -368,6 +378,12 @@ let draw_sheet () =
     (grect_curry draw_filled_rect grect') deck_border_color back_color;
     (grect_curry center_text_in_rect grect_text) name;
     make_mark grect_mark marking in
+  let ys1 = ((card_counts - 1 - !space1) * hght) in
+  let ys2 = ((card_counts - 1 - !space2) * hght) + spacer) in
+  (if (spacer != 0) then
+    (draw_filled_rect sx ys1 sw spacer Graphics.black Graphics.red;
+    draw_filled_rect sx ys2 sw spacer Graphics.black Graphics.black)
+  else ());
   if window.sheet_disp = "" then ()
   else CardMap.iter f window.sheet
 
