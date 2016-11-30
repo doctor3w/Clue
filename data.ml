@@ -111,9 +111,9 @@ type move = Roll | Passage of loc
 (* [listens] represents listening data for responsive AI *)
 type listen_choice = Pure_unknown
                     | Env
-                    | Not_in_hand of int
-                    | Maybe_in_hand of int
-                    | Known of int
+                    | Not_in_hand
+                    | Maybe_in_hand
+                    | Known
 type listens = listen_choice array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
