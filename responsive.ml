@@ -29,10 +29,10 @@ let rand_from_lst lst =
     List.nth lst n
 
 (* count how many [t] the array [a] has *)
-let count_listenchoice a t = 
+let count_listenchoice a t =
   let counter = ref 0 in
   let len = Array.length a in
-  for index = 0 to (len-1) 
+  for index = 0 to (len-1)
   do (if a.(index) = t
      then counter := !counter + 1
      else ()) done;
@@ -41,29 +41,36 @@ let count_listenchoice a t =
 (* check if the entire array [a] is all Not_in_hand*)
 let is_all_notinhand a =
   let count = count_listenchoice a Not_in_hand in
-  if Array.length a = count 
+  if Array.length a = count
   then true else false
 
+let rec helper matrix public (lst: card list) counter =
+  match lst with
+  | [] -> ()
+  | h::t ->
+            (let h_index = card_to_index public h in
+            (if count_listenchoice matrix.(h_index) Known = 1
+            then counter:= !counter +1
+            else ());
+            helper matrix public t counter)
+
 (* Given a card list, which contains either suspects, or weapons,
-  or rooms, check if all but one is known 
+  or rooms, check if all but one is known
   PreC: lst contains all cards for one type *)
 let rec all_but_one_known matrix public (lst: card list) =
-  let counter = ref 0 in 
+  let counter = ref 0 in
   helper matrix public lst counter;
   if !counter = (List.length lst)-1
   then true else false
 
-let check_farthest player public passage =
-  let Passage(n) = passage in
-  let room = match n.info with
-             |Space _-> failwith "not a room"
-             |Room_Rect (r,_) -> Room r in
-  let r_i = card_to_index public room in
-  let pl = suspect_to_index public player.suspect in
-  let farthest =
-      if pl=(List.length public.player_order) -1 then 0 else pl-1 in
-      if player.listen.(r_i).(farthest) = Known(farthest) then passage
-      else Roll
+(* turns a passage into a room card *)
+let p_to_room passage =
+  match passage with
+  | Roll -> failwith "not gonna happen"
+  | Passage n ->
+    match n.info with
+    | Room_Rect (r,_) -> Room r
+    | _ -> failwith "not a room card"
 
 (* [is_r_env_known] checks if player knows the room card in envelope *)
 let is_r_env_known player =
@@ -74,19 +81,68 @@ let is_r_env_known player =
                                     | _->false) b in
   not(r = [])
 
+(* [check_p_farthest] checks if the farthest player from me knows any of the
+ * passages *)
+let rec check_p_farthest player public new_p_lst =
+  match new_p_lst with
+  | []-> false
+  | h::t-> let r = p_to_room h in
+            let r_i = card_to_index public r in
+            let pi = suspect_to_index public player.suspect in
+            let farthest = if pi = (List.length public.player_order)-1 then 0
+                           else pi-1 in
+            (player.listen.(r_i).(farthest) = Known )
+            || check_p_farthest player public t
+
+(* returns a list of passages that are not Known in listens *)
+let rec check_p_known player public passage_list =
+  match passage_list with
+  | [] -> []
+  | h::t->let r = p_to_room h in
+          let r_i = card_to_index public r in
+          if Array.exists (fun x -> x = Known) player.listen.(r_i) then
+            check_p_known player public t
+          else h:: check_p_known player public t
+
+let my_max lst = match lst with
+  | [] -> failwith ""
+  | x::xs -> List.fold_left max x xs
+
+(* returns either Roll or Passage with most not_in_hand *)
+let rec p_most_not_in_hand player public passage_list =
+  let r_p_lst = List.map (fun p -> (p_to_room p,p)) passage_list in
+  let ri_p_lst = List.map (fun (r,p) -> (card_to_index public r,p)) r_p_lst in
+  let counted_p =
+    List.map (fun (ri,p)->
+             ((count_listenchoice player.listen.(ri) Not_in_hand),p)) ri_p_lst in
+  let c_lst = List.map (fun (c,p)-> c) counted_p in
+  let ci = my_max c_lst in
+    if ci = 0 then Roll else
+    List.assoc ci counted_p
+
 (* [is_p_env] checks that if the passage room is in the envelope then ROLL
   else it calls its helper [check_farthest] to further determine move*)
 let is_p_env player public passage_list =
-  let f p =
-    (let Passage n = p in
-      match n.info with
-      | Space _ -> false
-      | Room_Rect (r,_)-> match CardMap.find Room(r) player.sheet with
-                            | Envelope -> true
-                            | _ -> false) in
-  let env_lst = List.filter f passage_list in
-  if List.length env_lst > 0 then if check_p_farthest player public env_lst
-  else check_farthest player public env_lst
+  if is_r_env_known player then
+    let f p =
+            (let r = p_to_room p in
+            match (CardMap.find r player.sheet).card_info with
+            | Envelope -> true
+            | _ -> false )in
+    let env_lst = List.filter f passage_list in
+    let new_p_lst =
+        List.filter (fun x -> not (List.mem x env_lst)) passage_list in
+    if List.length env_lst > 0 then
+      if check_p_farthest player public new_p_lst then rand_from_lst new_p_lst
+      else Roll
+    else
+      if check_p_farthest player public passage_list then
+          rand_from_lst passage_list
+      else Roll
+  else
+    if check_p_known player public passage_list = [] then Roll
+    else Roll
+
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
@@ -94,7 +150,8 @@ let answer_move player public move_list : move =
   let passage = List.filter (fun a -> match a with
                                       | Roll -> false
                                       | Passage _-> true) move_list in
-    if passage  = [] then Roll else is_p_env player public passage
+  if passage  = [] then Roll else is_p_env player public passage
+
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
 let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
@@ -165,12 +222,12 @@ let listen_ans_update listen sus card player public =
   let pl_index = suspect_to_index public player.suspect in
   if pl_index < sus_index then
     for j = pl_index + 1 to (sus_index -1)
-    do (listen.(c_index).(j)<-Not_in_hand sus_index) done
+    do (listen.(c_index).(j)<-Not_in_hand) done
   else
     for j = sus_index - 1 downto 0
-    do (listen.(c_index).(j)<-Not_in_hand sus_index) done;
+    do (listen.(c_index).(j)<-Not_in_hand) done;
     for j = pl_index + 1 to List.length public.player_order -1
-    do (listen.(c_index).(j)<-Not_in_hand sus_index) done
+    do (listen.(c_index).(j)<-Not_in_hand) done
 
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
@@ -236,17 +293,6 @@ let get_answer (me:player) public guess : card option =
   | [] -> None
   | [(c, lst)] -> Some c
   | lst -> Some (pick_to_show lst cp)
-
-let helper a =
-  let len = Array.length a in
-  let default = ref true in
-  for index = 0 to (len - 1)
-    do (let case = (match a.(index) with
-      | (Not_in_hand i, f) -> true
-      | _ -> false) in
-       default:= (!default) && case ) done;
-  !default
-
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
@@ -352,17 +398,7 @@ let rewrite_env a =
   for index = 0 to (len-1)
   do a.(index) <- Env done
 
-let rec helper matrix public (lst: card list) counter = 
-  match lst with 
-  | [] -> ()
-  | h::t -> 
-            (let h_index = card_to_index public h in 
-            (if count_listenchoice matrix.(h_index) Known = 1
-            then counter:= !counter +1 
-            else ());
-            helper matrix public t counter)
-
-(* [take_notes] is only called 
+(* [take_notes] is only called
 
   when another player is showing a card to another player
   /no one could show a card to another player.
@@ -409,13 +445,13 @@ let take_notes player public guess str_option: player =
          do (matrix.(r_index).(i_r1) <- Not_in_hand) done;
          for i_r2 = (p_index+1) to (y_len-1)
          do (matrix.(r_index).(i_r2) <- Not_in_hand) done;)
-    | Not_in_hand, Maybe_in_hand, Not_in_hand 
+    | Not_in_hand, Maybe_in_hand, Not_in_hand
       -> (matrix.(w_index).(p_index) <- Known;
          for i_w1 = 0 to (p_index-1)
          do (matrix.(r_index).(i_w1) <- Not_in_hand) done;
          for i_w2 = (p_index+1) to (y_len-1)
          do (matrix.(r_index).(i_w2) <- Not_in_hand) done;)
-    | Maybe_in_hand, Not_in_hand, Not_in_hand 
+    | Maybe_in_hand, Not_in_hand, Not_in_hand
       -> matrix.(s_index).(p_index) <- Known;
          for i_s1 = 0 to (p_index-1)
          do (matrix.(r_index).(i_s1) <- Not_in_hand) done;
@@ -460,11 +496,3 @@ let take_notes player public guess str_option: player =
             let sheet' = CardMap.add h data' player.sheet in
             update_player {player with sheet = sheet'} (ref t)
     in update_player player l)
-
-  (* TODO: Right now take_notes only compares data - it does not process all
-  information such as Known/Not_in_hand and probability. This is essentially a
-  massive helper function that is needed for guess and movement (in both guess
-  and movement, take_note is not changed - in cases where they are called to access
- information and use it)
-  In other cases of processing others showing me card and others showing other
-player card, we need to update the matrix in take note*)
