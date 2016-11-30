@@ -359,6 +359,7 @@ let loc_to_card loc =
                | Room_Rect (s, _) -> (Room s)
                | _ -> failwith "trying to guess from not room"
 
+(* sorts out other listen_choice when there is no Not_in_Hand information *)
 let next_step (i,c) lst matrix public =
   if i = 0
   then
@@ -368,6 +369,7 @@ let next_step (i,c) lst matrix public =
     else c'))
   else c
 
+(* processes all situation when the envelope a type of card is unknown *)
   let false_helper lst matrix public =
   let no_known_list = get_notknwon_cards lst matrix public in
   let most_notinhand = most_type no_known_list matrix public Not_in_hand in
@@ -377,6 +379,7 @@ let triple_fst (a,b,c) = a
 let triple_snd (a,b,c) = b
 let triple_thd (a,b,c) = c
 
+(* [separate_hand] sorts out the three types of cards in player.hand *)
 let separate_hand player =
   let h = player.hand in
   let rec f triple lst =
@@ -393,7 +396,18 @@ let separate_hand player =
   in f ([],[],[]) h
 
 (* [get_guess] takes in a game sheet and the current location and returns
- * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
+ * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses.
+ * logic for [get_guess]
+ * 1. if we know both envelope of suspect and weapon then make random guess of
+ * except the two envelope cards
+ * 2. If one of the card is known to be in envelope then
+ * 2.1 the type of card known to be in envelope : guess my own card or envelope
+ * 2.2 the other card unknown: go through listens,
+ *    filter out what cards are known; count most not_in_hand and pick that one
+ *     if there is no not_in_hand, then pick most Pure_Unknown, else random from
+ *     the rest
+ * 3. if no envlope card for both types then follow same logic for each card in
+      2.2  *)
 let get_guess player public : guess =
   let (s_lst, w_lst, r_lst) = public.deck in
   let matrix = player.listen in
