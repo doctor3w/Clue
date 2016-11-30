@@ -348,7 +348,7 @@ let make_mark grect marking =
 let draw_sheet () =
   let grect = window.s_window in
   let (sx, sy, sw, sh) = grect in
-  (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+  (grect_curry draw_filled_rect grect) Graphics.black Graphics.black;
   let card_counts = CardMap.cardinal window.sheet in
   let hght = if card_counts = 0 then 0 else sh/card_counts in
   let spacer = (sh - (hght * card_counts))/2 in
@@ -378,14 +378,6 @@ let draw_sheet () =
     (grect_curry draw_filled_rect grect') deck_border_color back_color;
     (grect_curry center_text_in_rect grect_text) name;
     make_mark grect_mark marking in
-  let ys1 = sy + ((card_counts - 1 - !space1) * hght) + spacer in
-  let ys2 = sy + ((card_counts - 1 - !space2) * hght) in
-  (if (spacer != 0) then
-    (Pervasives.print_endline ("y1 = " ^ Pervasives.string_of_int ys1);
-    Pervasives.print_endline ("y2 = " ^ Pervasives.string_of_int ys2);
-    draw_filled_rect sx ys1 sw spacer Graphics.black Graphics.red;
-    draw_filled_rect sx ys2 sw spacer Graphics.black Graphics.black)
-  else ());
   if window.sheet_disp = "" then ()
   else CardMap.iter f window.sheet
 
