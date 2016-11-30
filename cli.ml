@@ -75,7 +75,7 @@ let prompt_movement move_ops acc_room =
 	read_line ()
 
 (* Displays the movement the agent took on its turn *)
-let display_movement (str, b) =
+let display_movement (l, (str, b)) =
 	let intro = "The player " in
 	let str =
 		if b then "entered the "^str^".\n"

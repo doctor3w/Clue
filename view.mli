@@ -24,9 +24,11 @@ val display_move : move -> unit
 val prompt_movement : (loc * (string * bool)) list -> string -> string
 
 (* Displays the movement the agent took on its turn *)
-val display_movement : (string * bool) -> unit
+val display_movement : loc * (string * bool) -> unit
 
-(* Displays the relocation of suspect [string] to the Room loc *)
+(* Displays the relocation of suspect [string] to the Room loc upon a guess.
+ * This method is not for moving a player after picking a location to go
+ * to themselves. *)
 val display_relocate : string -> loc -> unit
 
 (* Prompts the user for a guess.

@@ -1,12 +1,6 @@
-open View
-open Cli
-open Gui
-open Model
 open Data
-open Agent
 
-module Display = Cli
-module Display2 = Gui
+module Display = View
 
 (* Thrown when there are no players in a player list. *)
 exception No_players
@@ -39,7 +33,7 @@ let handle_move game curr_p m =
     let () = Display.display_dice_roll dice_roll in
     let movement_opt = Model.get_movement_options game dice_roll in
     let (l, (s, b)) = Agent.get_movement curr_p game.public movement_opt in
-    let () = Display.display_movement (s,b) in
+    let () = Display.display_movement (l, (s, b)) in
     l
   | Passage l -> l
 
@@ -119,7 +113,9 @@ let rec step game =
       step {game with public={game.public with curr_player=next_p.suspect}}
     else Display.display_message "Game over."
   else
+    let () = print_endline "Line 117" in
     let () = Display.display_turn game.public in
+    let () = print_endline "Line 119" in
     let move_ops = Model.get_move_options game in
     let move = Agent.answer_move curr_p game.public move_ops in
     let () = Display.display_move move in
@@ -206,14 +202,25 @@ and handle_end_turn curr_p next_p game =
 
 (* Called when starting a game. Loads the provided file if given. Takes a
  * string option. *)
-let start file_name =
+let start file_name g_or_c =
   let load_go fl =
-    try step (Model.import_board fl) with
+    try
+      let game = Model.import_board fl in
+      let () = Gui.init game in
+      step game
+    with
     | No_players -> Display.display_error "No players in game file"
     | Player_not_found -> Display.display_error "No player with suspect name"
     | Failure s ->
       Display.display_error ("Something went wrong, here's what's up: "^s)
-    | _ -> Display.display_error "Whoa, that's bad. Goodbye."
-  in match file_name with
+    | _ -> Display.display_error "Whoa, that's bad. Goodbye." in
+  let () =
+    if g_or_c = GUI then
+      let (w, h) = Gui.window.win_bounds in
+      let win_s = " "^(string_of_int w)^"x"^(string_of_int h) in
+      Graphics.open_graph win_s;
+      Data.view_type := g_or_c
+    else () in
+  match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s

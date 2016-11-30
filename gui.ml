@@ -21,13 +21,13 @@ type graphic_board = {
 }
 
 let window = {
-    win_bounds = (600, 450);
+    win_bounds = (720, 570);
     sheet_disp = "";
     sheet = CardMap.empty;
-    b_window = (10, 80, 360, 360);
-    s_window = (380, 80, 210, 360);
-    roll_window = (380, 10, 210, 60);
-    info_window = (10, 10, 360, 60);
+    b_window = (10, 80, 480, 480);
+    s_window = (500, 80, 210, 480);
+    roll_window = (500, 10, 210, 60);
+    info_window = (10, 10, 480, 60);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -412,7 +412,7 @@ let display_error (e_msg: string) : unit =
   set_info ("ERROR: " ^ e_msg)
 
 (* Displays a description of who's turn it is. *)
-let display_turn public : unit =
+let display_turn (public:Data.public) : unit =
   let this_turn = public.curr_player in
   window.curr_player <- this_turn;
   set_info ("It is " ^ window.curr_player ^ "'s turn.")
@@ -483,17 +483,14 @@ let prompt_movement_with_pm pathmap acc_room roll : loc =
     else loop () in
   loop ()
 
-(* Displays the movement the agent took on its turn *)
-let display_movement (end_move :(string * bool)) : unit =
-  failwith "Unimplemented gui.display_movement"
-
 (* Displays the relocation of suspect [string] to the Room loc *)
 let display_relocate (who:string) loc : unit =
   window.player_locs <- StringMap.add who loc window.player_locs;
   redraw ()
 
-let display_movement loc : unit =
-  display_relocate window.curr_player loc
+(* Displays the movement the agent took on its turn *)
+let display_movement (l, (s, b)) : unit =
+  display_relocate window.curr_player l
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -502,7 +499,7 @@ let display_movement loc : unit =
 let prompt_guess loc (is_acc: bool) : string =
   (if is_acc then set_info "Make your final accusation."
   else set_info "What is your guess?");
-  failwith "Unimplemented gui.prompt_guss"
+  failwith "Unimplemented gui.prompt_guess"
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
