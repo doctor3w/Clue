@@ -183,11 +183,6 @@ type public = {curr_player: string;
                acc_room: string;
                deck: deck;
                player_order: string list;
-
-               mutable current_guess: card option * card option * card option;
-               mutable current_response: card option
-               (* needs to be added in public initiation*)
-               (*listen_data: listens*)
                }
 
 (* [game] is the current state of the game. The players represent all agents
