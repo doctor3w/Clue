@@ -32,7 +32,8 @@ let handle_move game curr_p m =
     let dice_roll = (Random.int 11) + 2 in
     let () = Display.display_dice_roll dice_roll in
     let (movement_opt, pm) = Model.get_movement_options game dice_roll in
-    let (l, (s, b)) = Agent.get_movement curr_p game.public movement_opt in
+    let (l, (s, b)) =
+      Agent.get_movement curr_p game.public movement_opt dice_roll pm in
     let () = Display.display_movement (l, (s, b)) in
     l
   | Passage l -> l

@@ -27,7 +27,6 @@ let prompt_move moves =
 	| CLI -> Cli.prompt_move moves
 	| GUI -> Gui.prompt_move moves
 
-
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move (m:move) : unit =
 	match !view_type with

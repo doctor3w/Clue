@@ -1,11 +1,5 @@
 open Data
 
-module PathMap : sig
-
-  type t
-
-end
-
 (* [import_board] takes in a filename of a game configuration file and
  * converts the file into a usable game model for stepping through. *)
 val import_board : string -> game
