@@ -1,12 +1,6 @@
-open View
-open Cli
-open Gui
-open Model
 open Data
-open Agent
 
-module Display = Cli
-module Display2 = Gui
+module Display = View
 
 (* Thrown when there are no players in a player list. *)
 exception No_players
@@ -37,9 +31,10 @@ let handle_move game curr_p m =
   | Roll ->
     let dice_roll = (Random.int 11) + 2 in
     let () = Display.display_dice_roll dice_roll in
-    let movement_opt = Model.get_movement_options game dice_roll in
-    let (l, (s, b)) = Agent.get_movement curr_p game.public movement_opt in
-    let () = Display.display_movement (s,b) in
+    let (movement_opt, pm) = Model.get_movement_options game dice_roll in
+    let (l, (s, b)) =
+      Agent.get_movement curr_p game.public movement_opt dice_roll pm in
+    let () = Display.display_movement (l, (s, b)) in
     l
   | Passage l -> l
 
@@ -206,14 +201,28 @@ and handle_end_turn curr_p next_p game =
 
 (* Called when starting a game. Loads the provided file if given. Takes a
  * string option. *)
-let start file_name =
+let start file_name g_or_c =
   let load_go fl =
-    try step (Model.import_board fl) with
-    | No_players -> Display.display_error "No players in game file"
-    | Player_not_found -> Display.display_error "No player with suspect name"
+    try
+      let game = Model.import_board fl in
+      (match !view_type with
+      | CLI -> ()
+      | GUI -> Gui.init game);
+      step game
+    with
+    | No_players -> Display.display_error "\nNo players in game file"
+    | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
-      Display.display_error ("Something went wrong, here's what's up: "^s)
-    | _ -> Display.display_error "Whoa, that's bad. Goodbye."
-  in match file_name with
+      Display.display_error ("\nSomething went wrong, here's what's up: "^s)
+    | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in
+  let () =
+    if g_or_c = GUI then
+      let (w, h) = Gui.window.win_bounds in
+      let win_s = " "^(string_of_int w)^"x"^(string_of_int h) in
+      print_endline "GUI enabled";
+      Graphics.open_graph win_s;
+      Data.view_type := g_or_c
+    else Data.view_type := CLI in
+  match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s

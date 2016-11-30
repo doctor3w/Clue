@@ -17,17 +17,18 @@ type graphic_board = {
   mutable player_locs: loc StringMap.t;
   mutable player_colors: Graphics.color StringMap.t;
   mutable last_info: string;
+  mutable roll_text: string;
   mutable curr_player: string;
 }
 
 let window = {
-    win_bounds = (600, 450);
+    win_bounds = (720, 570);
     sheet_disp = "";
     sheet = CardMap.empty;
-    b_window = (10, 80, 360, 360);
-    s_window = (380, 80, 210, 360);
-    roll_window = (380, 10, 210, 60);
-    info_window = (10, 10, 360, 60);
+    b_window = (10, 80, 480, 480);
+    s_window = (500, 80, 210, 480);
+    roll_window = (500, 10, 210, 60);
+    info_window = (10, 10, 480, 60);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -37,6 +38,7 @@ let window = {
     player_colors = StringMap.empty;
     last_info = "CLUE";
     curr_player = "";
+    roll_text = "CONTINUE"
   }
 
 let player_border = Graphics.black
@@ -81,8 +83,12 @@ let is_in_rect pt grect =
 
 (* fills the rect with color [fl] then outlines in with color [ln] *)
 let draw_filled_rect x y w h ln fl =
-  if x < 0 || y < 0 || w < 2 || h < 2
-  then failwith "bad_rectangle to draw"
+  if x < 0 || y < 0 || w < 1 || h < 1
+  then let rcts = ("(" ^ Pervasives.string_of_int x ^ ", "
+                      ^ Pervasives.string_of_int y ^ ", "
+                      ^ Pervasives.string_of_int w ^ ", "
+                      ^ Pervasives.string_of_int h ^ ")" ) in
+    failwith ("bad_rectangle to draw: " ^ rcts)
   else
     Graphics.set_color fl;
     Graphics.fill_rect (x) (y) (w) (h);
@@ -312,13 +318,18 @@ let draw_players () =
 let draw_roll () =
   let grect = window.roll_window in
   (grect_curry draw_filled_rect grect) Graphics.black roll_color;
-  (grect_curry center_text_in_rect grect) "ROLL"
+  (grect_curry center_text_in_rect grect) window.roll_text
 
 (* draws the lower right button as a highlighted ROLL button *)
-let highlight_roll () =
+let highlight_roll text () =
   let grect = window.roll_window in
+  window.roll_text <- text;
   (grect_curry draw_filled_rect grect) Graphics.black highlight_color;
-  (grect_curry center_text_in_rect grect) "ROLL"
+  (grect_curry center_text_in_rect grect) window.roll_text
+
+let set_roll_text text =
+  window.roll_text <- text;
+  draw_roll ()
 
 type marking = MyCard of int | Env | Unk | SB of Graphics.color
 
@@ -344,23 +355,29 @@ let make_mark grect marking =
 let draw_sheet () =
   let grect = window.s_window in
   let (sx, sy, sw, sh) = grect in
-  (grect_curry draw_filled_rect grect) Graphics.black Graphics.white;
+  (grect_curry draw_filled_rect grect) Graphics.black Graphics.black;
   let card_counts = CardMap.cardinal window.sheet in
   let hght = if card_counts = 0 then 0 else sh/card_counts in
+  let spacer = (sh - (hght * card_counts))/2 in
   let n = ref 0 in
+  let spaces = ref 0 in
+  let space1 = ref 0 in
+  let space2 = ref 0 in
   let f card c_info =
     let (back_color, name) =
       match (card) with
       | Suspect s -> (suspect_color, s)
-      | Weapon s -> (weapon_color, s)
-      | Room s -> (room_sheet_color, s) in
+      | Weapon s -> (if !spaces = 0 then (space1 := !n; spaces := 1) else ());
+                    (weapon_color, s)
+      | Room s ->   (if !spaces = 1 then (space2 := !n; spaces := 2) else ());
+                    (room_sheet_color, s) in
     let marking =
       match (c_info.card_info) with
       | Mine lst -> MyCard (List.length lst)
       | ShownBy who -> SB (StringMap.find who window.player_colors)
       | Unknown -> Unk
       | Envelope -> Env in
-    let y' = sy + (card_counts - 1 - !n)*hght in
+    let y' = sy + (card_counts - 1 - !n)*hght + (2- !spaces)*spacer in
     n := !n + 1;
     let grect' = (sx, y', sw, hght) in
     let grect_text = (sx, y', sw - hght, hght) in
@@ -390,6 +407,11 @@ let redraw () =
   draw_info ();
   ()
 
+(* Displays the relocation of suspect [string] to the Room loc *)
+let display_relocate (who:string) loc : unit =
+  window.player_locs <- StringMap.add who loc window.player_locs;
+  redraw ()
+
 (* highlights a location on the board *)
 let highlight_loc transform loc =
   match loc.info with
@@ -412,7 +434,7 @@ let display_error (e_msg: string) : unit =
   set_info ("ERROR: " ^ e_msg)
 
 (* Displays a description of who's turn it is. *)
-let display_turn public : unit =
+let display_turn (public:Data.public) : unit =
   let this_turn = public.curr_player in
   window.curr_player <- this_turn;
   set_info ("It is " ^ window.curr_player ^ "'s turn.")
@@ -422,15 +444,12 @@ let prompt_filename () : string =
   failwith "Unimplemented gui.prompt_filename"
 
 (* Prompts the user for whether he rolls dice or not. *)
-let prompt_move (movelst: move list) : string =
-  failwith "Unimplemented gui.prompt_move"
-
 let prompt_move_gui (movelst: move list) : move =
   let transform = get_b_transform () in
   let f acc move =
     match move with
     | Passage loc -> highlight_loc transform loc; loc::acc
-    | Roll -> highlight_roll (); acc in
+    | Roll -> highlight_roll "ROLL" (); acc in
   let loclst = List.fold_left f [] movelst in
   let rectlst = [("board", window.b_window); ("roll", window.roll_window)] in
   let rec loop () =
@@ -440,8 +459,17 @@ let prompt_move_gui (movelst: move list) : move =
                        if List.mem loc loclst then Passage loc else loop ()
     | ("roll", _) -> draw_roll (); Roll
     | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
+  (if List.length loclst = 0 then set_info "ROLL THE DICE"
+  else set_info "SELECT A PASSAGE or ROLL THE DICE");
   loop ()
 
+let prompt_move (movelst: move list) : string =
+  let loc_name loc = match loc.info with
+  | Room_Rect (s, _) -> s
+  | _ -> failwith ("can't have passage to space: " ^ Pervasives.__LOC__) in
+  match prompt_move_gui movelst with
+  | Roll -> "roll"
+  | Passage loc -> loc_name loc
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
@@ -456,16 +484,13 @@ let display_move move : unit =
   in match move with
   | Passage loc ->
     let s = window.curr_player ^ " has taken the passage to " ^ (f loc) in
-    set_info s
+    set_info s; display_relocate window.curr_player loc
   | Roll -> set_info (window.curr_player ^ " rolled the dice.")
 
 (* Prompts the user for the room they would like to go to.
  * [loc * (string * bool)] the location and whether or not room [string] is
  * accessible. The second string parameter is the acc_room name. *)
-let prompt_movement (movelst : (loc * (string * bool)) list) (acc_room:string) : string =
-  failwith "Unimplemented gui.prompt_movement"
-
-let prompt_movement_with_pm pathmap acc_room roll : loc =
+let prompt_movement pathmap acc_room roll : loc =
   let pm = PathMap.filter (fun (x, y) (n, (x', y')) -> n <= roll) pathmap in
   let highlight_coords = PathMap.keys pm in
   let (xb, yb, wb, hb) = window.b_window in
@@ -481,28 +506,21 @@ let prompt_movement_with_pm pathmap acc_room roll : loc =
     if List.mem click_coord highlight_coords
     then CoordMap.find click_coord window.board.loc_map
     else loop () in
+  set_info "SELECT A PLACE TO MOVE TO";
   loop ()
 
 (* Displays the movement the agent took on its turn *)
-let display_movement (end_move :(string * bool)) : unit =
-  failwith "Unimplemented gui.display_movement"
-
-(* Displays the relocation of suspect [string] to the Room loc *)
-let display_relocate (who:string) loc : unit =
-  window.player_locs <- StringMap.add who loc window.player_locs;
-  redraw ()
-
-let display_movement loc : unit =
-  display_relocate window.curr_player loc
+let display_movement (l, (s, b)) : unit =
+  display_relocate window.curr_player l
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
  * a bool which says whether or not it is the final accusation.
  * returns a string of the user's response. *)
 let prompt_guess loc (is_acc: bool) : string =
-  (if is_acc then set_info "Make your final accusation."
-  else set_info "What is your guess?");
-  failwith "Unimplemented gui.prompt_guss"
+  (if is_acc then set_info "MAKE YOUR FINAL ACCUSATION"
+  else set_info "MAKE YOUR GUESS");
+  failwith "Unimplemented gui.prompt_guess"
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
@@ -578,7 +596,18 @@ let init game =
   redraw ()
 
 let show_sheet sheet : unit =
-  ()
+  window.sheet <- sheet;
+  draw_sheet ()
 
 let show_hand hand : unit =
   ()
+
+let prompt_continue () : unit =
+  let cont_rect = window.roll_window in
+  let rects = [("continue", cont_rect)] in
+  let loop () =
+    match get_next_click_in_rects rects () with
+    | ("continue", _) -> ();
+    | _ -> failwith "not a defines rectangle" in
+  highlight_roll "CONTINUE" ();
+  loop ()

@@ -363,7 +363,7 @@ let get_movement_options (g: game) (steps: int) =
     match loc.info with
     | Room_Rect (s', _) when s' = s -> (loc, (s, true))
     | _ -> (loc, (s, false)) in
-  List.map f room_lst
+  (List.map f room_lst, full_paths)
 
 
   (*let b = g.public.board in

@@ -1,3 +1,5 @@
+open Data
+
 (**
  * This is a modified version of the ANSITerminal package.
  * It is used for printing out strings one character a time but still with
@@ -84,7 +86,7 @@ let sleep sec = ignore (Unix.select [] [] [] sec)
 let print_chars (cs: style list) s =
   let print_char cs c =
     print_string cs (String.make 1 c);
-    Thread.delay char_delay;
+    if !view_type = CLI then Thread.delay char_delay else ();
     flush stdout
   in String.iter (print_char cs) s
 

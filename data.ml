@@ -1,7 +1,3 @@
-(* open Agent *)
-
-
-
 (**
  * [loc] respresents a location on the board, holding the name of the room
  * or the coordinates of the space. The list represents all the locations
@@ -29,6 +25,10 @@ module OrderedCard = struct
 end
 
 module CardMap = Map.Make(OrderedCard)
+
+type view = CLI | GUI
+
+let view_type = ref CLI
 
 (* The hand is just a card list *)
 type hand = card list

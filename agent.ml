@@ -1,9 +1,6 @@
 open Data
-(* open DumbAI *)
-(* open SmartAI *)
-(* open Human *)
 
-module Display = Cli
+module Display = View
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
@@ -15,10 +12,10 @@ let answer_move pl pub moves = match pl.agent with
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement pl pub move_ops : movement = match pl.agent with
+let get_movement pl pub move_ops roll pm : movement = match pl.agent with
   | DumbAI_t -> DumbAI.get_movement pl pub move_ops
   | SmartAI_t -> SmartAI.get_movement pl pub move_ops
-  | Human_t -> Human.get_movement pl pub move_ops
+  | Human_t -> Human.get_movement pl pub move_ops roll pm
   | _ -> DumbAI.get_movement pl pub move_ops
 
 (* [get_geuss] takes in a game sheet and the current location and returns
