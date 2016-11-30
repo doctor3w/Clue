@@ -27,6 +27,54 @@ let rand_from_lst lst =
   if len = 0 then failwith "no lst"
   else let n = Random.int len in
     List.nth lst n
+(* return the max number in the list *)
+let my_max = 
+  function
+    | [] -> failwith "empty list"
+    | x::xs -> List.fold_left max x xs
+
+(* true if card [c] is marked as Envelope in [me].sheet *)
+let is_env_card me c =
+  match (CardMap.find c me.sheet).card_info with
+  | Envelope -> true
+  | _ -> false
+
+(* return a list that contains all of the envelope cards 
+  [me] knows so far *)
+let current_deck_to_env public me = 
+  let (s_lst, w_lst, r_lst) = public.deck in
+  let deck' = s_lst@w_lst@r_lst in
+  let rec f lst =
+    match lst with
+    | [] -> [] 
+    | h::t -> if is_env_card me h 
+              then h::(f t)
+              else f t in
+  f deck'
+
+let rec find_final_suspect lst = 
+  match lst with
+  | [] -> None
+  | h::t -> 
+    match h with
+    | Suspect s -> Some h
+    | _ -> find_final_suspect t
+
+let rec find_final_weapon lst =
+  match lst with
+  | [] -> None
+  | h::t -> 
+    match h with
+    | Weapon s -> Some h
+    | _ -> find_final_suspect t
+
+let rec find_final_room lst = 
+  match lst with
+  | [] -> None
+  | h::t -> 
+    match h with
+    | Room s -> Some h
+    | _ -> find_final_suspect t
 
 (* count how many [t] the array [a] has *)
 let count_listenchoice a t =
@@ -172,13 +220,121 @@ let is_acc_room public (_, (s, _)) = s = public.acc_room
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement player (public move_option_list:(loc * (string * bool)): loc=
-  if is_acc_room then
+let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
+
+(* return true if there is one card in a card list [lst] is in Env *)
+let is_env_in_list matrix (lst:card list) public =
+  let f ele = card_to_index public ele in
+  let index_list = List.map f lst in
+  let rec g counter index_lst = 
+    (match index_lst with
+    | [] -> counter 
+    | h::t -> 
+      (if matrix.(h).(0) = Env 
+      then g (counter+1) t
+      else g counter t)) in
+  let final = g 0 index_list in
+  if final = 1 then true else false 
+
+let no_env sheet card = (CardMap.find card sheet).card_info <> Envelope
+
+let loc_to_card loc = 
+  match loc.info with
+               | Room_Rect (s, _) -> (Room s)
+               | _ -> failwith "trying to guess from not room"
+
+(* return a card list where all cards in [card_lst] are filtered off 
+    if they have known in [matrix] *)
+let get_notknwon_cards card_lst matrix public = 
+  let card_array_list = 
+    List.map (fun x -> (x, matrix.(card_to_index public x))) card_lst in
+  let rec f c_a_list = 
+    match c_a_list with
+    | [] -> []
+    | h::t -> if Array.exists (fun e -> e = Known) (snd h) 
+              then f t
+              else h::(f t) in
+  let new_lst = f card_array_list in
+  List.map (fun y -> fst y) new_lst
+
+
+let most_type card_lst (matrix: listen_choice array array) public t = 
+  let array_card_list = 
+    List.map (fun x -> (matrix.(card_to_index public x), x)) card_lst in
+  let count_card_list = 
+    List.map (fun x -> (count_listenchoice (fst x) t, snd x)) 
+      array_card_list in
+  let count_list = List.map (fun x -> fst x) count_card_list in
+  let max_num = my_max count_list in
+  (max_num, List.assoc max_num count_card_list)
+
+let next_step (i,c) lst matrix public = 
+  if i = 0
+  then 
+    (let (i',c') = most_type lst matrix public Pure_unknown in
+    (if i' = 0 
+    then snd (most_type lst matrix public Maybe_in_hand) 
+    else c'))
+  else c
+
+let false_helper lst matrix public = 
+  let no_known_list = get_notknwon_cards lst matrix public in
+  let most_notinhand = most_type no_known_list matrix public Not_in_hand in
+  next_step most_notinhand no_known_list matrix public
+
+let triple_fst (a,b,c) = a
+let triple_snd (a,b,c) = b
+let triple_thd (a,b,c) = c
+
+let separate_hand player = 
+  let h = player.hand in
+  let rec f triple lst = 
+    match lst with
+    | [] -> triple
+    | h::t -> 
+      match h with 
+      | Suspect s -> 
+        f (h::triple_fst triple, triple_snd triple, triple_thd triple) t
+      | Weapon s ->
+        f (triple_fst triple, h::triple_snd triple, triple_thd triple) t
+      | Room s -> 
+        f (triple_fst triple, triple_snd triple, h::triple_thd triple) t
+  in f ([],[],[]) h
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
-let get_guess player public :guess= failwith "responsiveai get_guess"
-
+let get_guess player public : guess = 
+  let (s_lst, w_lst, r_lst) = public.deck in
+  let matrix = player.listen in
+  let sheet = player.sheet in
+  match (is_env_in_list matrix s_lst public), 
+        (is_env_in_list matrix w_lst public) with
+  | true, true -> 
+    let s = rand_from_lst (List.filter (no_env sheet) s_lst) in
+    let w = rand_from_lst (List.filter (no_env sheet) w_lst) in
+    (s,w,(loc_to_card player.curr_loc))
+  | true, false ->
+    let w = false_helper w_lst matrix public in
+    let s = 
+      if triple_fst (separate_hand player) <> [] 
+      then rand_from_lst (triple_fst (separate_hand player))
+      else (match find_final_suspect (current_deck_to_env public player) with
+        | Some c -> c
+        | None -> failwith "It can't be None") in
+    (s,w,(loc_to_card player.curr_loc))
+  | false, true ->
+    let s = false_helper s_lst matrix public in
+    let w = 
+      if triple_snd (separate_hand player) <> []
+      then rand_from_lst (triple_snd (separate_hand player))
+      else (match find_final_weapon (current_deck_to_env public player) with
+        | Some c -> c
+        | None ->failwith "It can't be None") in
+    (s,w,(loc_to_card player.curr_loc))
+  | false, false ->
+    let s = false_helper s_lst matrix public in
+    let w = false_helper w_lst matrix public in
+    (s,w,(loc_to_card player.curr_loc))
 
 (* Turns card data from unknown to envelope in sheet. Only if unknown is
  * the data changed. *)
@@ -420,8 +576,7 @@ let column_helper matrix j i_len player =
        else ()) done
   else ()
 
-(* [take_notes] is only called
-
+(* [take_notes] is only called 
   when another player is showing a card to another player
   /no one could show a card to another player.
 
