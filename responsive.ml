@@ -28,7 +28,7 @@ let rand_from_lst lst =
   else let n = Random.int len in
     List.nth lst n
 (* return the max number in the list *)
-let my_max = 
+let my_max =
   function
     | [] -> failwith "empty list"
     | x::xs -> List.fold_left max x xs
@@ -39,23 +39,23 @@ let is_env_card me c =
   | Envelope -> true
   | _ -> false
 
-(* return a list that contains all of the envelope cards 
+(* return a list that contains all of the envelope cards
   [me] knows so far *)
-let current_deck_to_env public me = 
+let current_deck_to_env public me =
   let (s_lst, w_lst, r_lst) = public.deck in
   let deck' = s_lst@w_lst@r_lst in
   let rec f lst =
     match lst with
-    | [] -> [] 
-    | h::t -> if is_env_card me h 
+    | [] -> []
+    | h::t -> if is_env_card me h
               then h::(f t)
               else f t in
   f deck'
 
-let rec find_final_suspect lst = 
+let rec find_final_suspect lst =
   match lst with
   | [] -> None
-  | h::t -> 
+  | h::t ->
     match h with
     | Suspect s -> Some h
     | _ -> find_final_suspect t
@@ -63,18 +63,18 @@ let rec find_final_suspect lst =
 let rec find_final_weapon lst =
   match lst with
   | [] -> None
-  | h::t -> 
+  | h::t ->
     match h with
     | Weapon s -> Some h
-    | _ -> find_final_suspect t
+    | _ -> find_final_weapon t
 
-let rec find_final_room lst = 
+let rec find_final_room lst =
   match lst with
   | [] -> None
-  | h::t -> 
+  | h::t ->
     match h with
     | Room s -> Some h
-    | _ -> find_final_suspect t
+    | _ -> find_final_room t
 
 (* count how many [t] the array [a] has *)
 let count_listenchoice a t =
@@ -126,10 +126,31 @@ let p_to_room passage =
 
 (* [is_r_env_known] checks if player knows the room card in envelope *)
 let is_r_env_known player =
-  let s = CardMap.filter (fun _ data -> (data.card_info = Envelope)) player.sheet in
+  let s =
+    CardMap.filter (fun _ data -> (data.card_info = Envelope)) player.sheet in
   let b = CardMap.bindings s in
   let r = List.filter (fun (c,i) -> match c with
                                     | Room (n)-> true
+                                    | _->false) b in
+  not(r = [])
+
+(* [is_w_env_known] checks if player knows the room card in envelope *)
+let is_w_env_known player =
+  let s =
+    CardMap.filter (fun _ data -> (data.card_info = Envelope)) player.sheet in
+  let b = CardMap.bindings s in
+  let r = List.filter (fun (c,i) -> match c with
+                                    | Weapon (n)-> true
+                                    | _->false) b in
+  not(r = [])
+
+  (* [is_s_env_known] checks if player knows the room card in envelope *)
+let is_s_env_known player =
+  let s =
+    CardMap.filter (fun _ data -> (data.card_info = Envelope)) player.sheet in
+  let b = CardMap.bindings s in
+  let r = List.filter (fun (c,i) -> match c with
+                                    | Suspect (n)-> true
                                     | _->false) b in
   not(r = [])
 
@@ -204,8 +225,7 @@ let is_p_env player public passage_list =
       else Roll
   else
     if check_p_known player public passage_list = [] then Roll
-    else Roll
-
+    else p_most_not_in_hand player public passage_list
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
@@ -218,66 +238,137 @@ let answer_move player public move_list : move =
 (* true if s is the acc_room, takes in an element from [movelst] below *)
 let is_acc_room public (_, (s, _)) = s = public.acc_room
 
-(* [get_movement] passes in a list of locations that could be moved to,
- * and returns the agent's choice of movement *)
-let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
+(* turns movement list to room list *)
+let m_to_r move_option_list =
+  List.map (fun (l,(s,b)) -> (Room s, (l,(s,b)))) move_option_list
 
-(* return true if there is one card in a card list [lst] is in Env *)
-let is_env_in_list matrix (lst:card list) public =
-  let f ele = card_to_index public ele in
-  let index_list = List.map f lst in
-  let rec g counter index_lst = 
-    (match index_lst with
-    | [] -> counter 
-    | h::t -> 
-      (if matrix.(h).(0) = Env 
-      then g (counter+1) t
-      else g counter t)) in
-  let final = g 0 index_list in
-  if final = 1 then true else false 
+(* check if I have a card in move list *)
+let check_hand_rooms pl card_move_list=
+  let rs = List.map (fun (a,b)->a) card_move_list in
+  List.filter (fun x -> List.mem x rs) pl.hand
 
-let no_env sheet card = (CardMap.find card sheet).card_info <> Envelope
+(* check if room env is in move_option_list *)
+let check_env_in_move r move_option_list =
+  let lst = List.filter (fun (l,(s,b))-> Room s = r) move_option_list in
+    not (lst = [])
 
-let loc_to_card loc = 
-  match loc.info with
-               | Room_Rect (s, _) -> (Room s)
-               | _ -> failwith "trying to guess from not room"
-
-(* return a card list where all cards in [card_lst] are filtered off 
+(* return a card list where all cards in [card_lst] are filtered off
     if they have known in [matrix] *)
-let get_notknwon_cards card_lst matrix public = 
-  let card_array_list = 
+let get_notknwon_cards card_lst matrix public =
+  let card_array_list =
     List.map (fun x -> (x, matrix.(card_to_index public x))) card_lst in
-  let rec f c_a_list = 
+  let rec f c_a_list =
     match c_a_list with
     | [] -> []
-    | h::t -> if Array.exists (fun e -> e = Known) (snd h) 
+    | h::t -> if Array.exists (fun e -> e = Known) (snd h)
               then f t
               else h::(f t) in
   let new_lst = f card_array_list in
   List.map (fun y -> fst y) new_lst
 
-
-let most_type card_lst (matrix: listen_choice array array) public t = 
-  let array_card_list = 
+let most_type card_lst (matrix: listen_choice array array) public t =
+  let array_card_list =
     List.map (fun x -> (matrix.(card_to_index public x), x)) card_lst in
-  let count_card_list = 
-    List.map (fun x -> (count_listenchoice (fst x) t, snd x)) 
+  let count_card_list =
+    List.map (fun x -> (count_listenchoice (fst x) t, snd x))
       array_card_list in
   let count_list = List.map (fun x -> fst x) count_card_list in
   let max_num = my_max count_list in
   (max_num, List.assoc max_num count_card_list)
 
-let next_step (i,c) lst matrix public = 
+(* logic for [r_env_not_known]:
+ * filter away any room cards that are known,
+ * if all cards in accessible is known then do the same logic with not accessible,
+ * else
+ *  count most not not_in_hand and go to that room ,
+ *  if not_in_hand count is 0 then go to room with most pure_unknown
+ *  else randomly pick maybe_in_hand *)
+let r_env_not_known pl public card_m_lst =
+  let c_lst = List.map (fun (c,move)-> c) card_m_lst in
+  let c_not_known_lst = get_notknwon_cards c_lst pl.listen public in
+  let (i,c) = most_type c_not_known_lst pl.listen public Not_in_hand in
+    if i > 0 then List.assoc c card_m_lst
+    else
+      let (i',c') = most_type c_not_known_lst pl.listen public Pure_unknown in
+      if i' > 0 then List.assoc c' card_m_lst
+      else
+        snd (rand_from_lst card_m_lst)
+
+(* [get_movement] passes in a list of locations that could be moved to,
+ * and returns the agent's choice of movement
+ * logic for get_movement:
+ * 1.if you know all three cards, go to accusation room :accessible or not
+ * 2.else: make two lists one accessible the other not
+ * 2.1 if you know room envelope, check my cards first
+ *   if i have rooms in my hand else just go to room envelope
+ *   if there is no where to go, pick a room randomly
+ * 2.2 if you do not know room envelope, calls [r_env_not_known] twice with
+ * accessible movement and not accessible movement *)
+let get_movement pl public movelst: movement =
+if is_r_env_known pl && is_w_env_known pl && is_s_env_known pl
+then
+  match List.filter (is_acc_room public) movelst with
+  | [(l, (s, b))] -> (l, (s, b))
+  | _ -> failwith "can't find accusation room"
+else
+  let b = (fun x -> not (is_acc_room public x)) in
+  let movelst' = List.filter b movelst in
+  let access = List.filter (fun (l,(s,b))-> b ) movelst' in
+  let not_access = List.filter (fun (l,(s,b))-> not b) movelst' in
+  let c_access = m_to_r access in
+  let my_card = check_hand_rooms pl c_access in
+  let c_not_access = m_to_r not_access in
+  let env_lst = current_deck_to_env public pl in
+    if is_r_env_known pl then
+      if List.length c_access >0 then
+        if List.length my_card > 0 then
+          let i = Random.int (List.length my_card-1) in
+          List.assoc (List.nth my_card i) c_access
+        else
+          let env = find_final_room env_lst in
+              let r = match env with
+                      | None -> failwith "player knows room in env, still None"
+                      | Some n -> n in
+            if check_env_in_move r access then
+              List.assoc r c_access
+            else snd (rand_from_lst c_access)
+      else snd (rand_from_lst c_not_access)
+    else
+      if List.length access > 0 then r_env_not_known pl public c_access
+      else r_env_not_known pl public c_not_access
+
+
+(* return true if there is one card in a card list [lst] is in Env *)
+let is_env_in_list matrix (lst:card list) public =
+  let f ele = card_to_index public ele in
+  let index_list = List.map f lst in
+  let rec g counter index_lst =
+    (match index_lst with
+    | [] -> counter
+    | h::t ->
+      (if matrix.(h).(0) = Env
+      then g (counter+1) t
+      else g counter t)) in
+  let final = g 0 index_list in
+  if final = 1 then true else false
+
+let no_env sheet card = (CardMap.find card sheet).card_info <> Envelope
+
+let loc_to_card loc =
+  match loc.info with
+               | Room_Rect (s, _) -> (Room s)
+               | _ -> failwith "trying to guess from not room"
+
+let next_step (i,c) lst matrix public =
   if i = 0
-  then 
+  then
     (let (i',c') = most_type lst matrix public Pure_unknown in
-    (if i' = 0 
-    then snd (most_type lst matrix public Maybe_in_hand) 
+    (if i' = 0
+    then snd (most_type lst matrix public Maybe_in_hand)
     else c'))
   else c
 
-let false_helper lst matrix public = 
+  let false_helper lst matrix public =
   let no_known_list = get_notknwon_cards lst matrix public in
   let most_notinhand = most_type no_known_list matrix public Not_in_hand in
   next_step most_notinhand no_known_list matrix public
@@ -286,37 +377,37 @@ let triple_fst (a,b,c) = a
 let triple_snd (a,b,c) = b
 let triple_thd (a,b,c) = c
 
-let separate_hand player = 
+let separate_hand player =
   let h = player.hand in
-  let rec f triple lst = 
+  let rec f triple lst =
     match lst with
     | [] -> triple
-    | h::t -> 
-      match h with 
-      | Suspect s -> 
+    | h::t ->
+      match h with
+      | Suspect s ->
         f (h::triple_fst triple, triple_snd triple, triple_thd triple) t
       | Weapon s ->
         f (triple_fst triple, h::triple_snd triple, triple_thd triple) t
-      | Room s -> 
+      | Room s ->
         f (triple_fst triple, triple_snd triple, h::triple_thd triple) t
   in f ([],[],[]) h
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
-let get_guess player public : guess = 
+let get_guess player public : guess =
   let (s_lst, w_lst, r_lst) = public.deck in
   let matrix = player.listen in
   let sheet = player.sheet in
-  match (is_env_in_list matrix s_lst public), 
+  match (is_env_in_list matrix s_lst public),
         (is_env_in_list matrix w_lst public) with
-  | true, true -> 
+  | true, true ->
     let s = rand_from_lst (List.filter (no_env sheet) s_lst) in
     let w = rand_from_lst (List.filter (no_env sheet) w_lst) in
     (s,w,(loc_to_card player.curr_loc))
   | true, false ->
     let w = false_helper w_lst matrix public in
-    let s = 
-      if triple_fst (separate_hand player) <> [] 
+    let s =
+      if triple_fst (separate_hand player) <> []
       then rand_from_lst (triple_fst (separate_hand player))
       else (match find_final_suspect (current_deck_to_env public player) with
         | Some c -> c
@@ -324,7 +415,7 @@ let get_guess player public : guess =
     (s,w,(loc_to_card player.curr_loc))
   | false, true ->
     let s = false_helper s_lst matrix public in
-    let w = 
+    let w =
       if triple_snd (separate_hand player) <> []
       then rand_from_lst (triple_snd (separate_hand player))
       else (match find_final_weapon (current_deck_to_env public player) with
@@ -576,7 +667,7 @@ let column_helper matrix j i_len player =
        else ()) done
   else ()
 
-(* [take_notes] is only called 
+(* [take_notes] is only called
   when another player is showing a card to another player
   /no one could show a card to another player.
 
