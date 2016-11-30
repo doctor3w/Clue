@@ -738,6 +738,7 @@ let first_take_note public player: player =
  (* !!!!!!!!!!!!! need to update the note when responsive AI gets the hand.
     However, take_note is not called at that time *)
 let take_notes player public guess str_option: player =
+  let l = ref [] in
   let (s_lst, w_lst, r_lst) = public.deck in
   let deck' = s_lst@w_lst@r_lst in
   let x_len = List.length deck' in
