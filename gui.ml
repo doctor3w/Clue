@@ -17,6 +17,7 @@ type graphic_board = {
   mutable player_locs: loc StringMap.t;
   mutable player_colors: Graphics.color StringMap.t;
   mutable last_info: string;
+  mutable roll_text: string;
   mutable curr_player: string;
 }
 
@@ -37,6 +38,7 @@ let window = {
     player_colors = StringMap.empty;
     last_info = "CLUE";
     curr_player = "";
+    roll_text = "CONTINUE"
   }
 
 let player_border = Graphics.black
@@ -316,13 +318,18 @@ let draw_players () =
 let draw_roll () =
   let grect = window.roll_window in
   (grect_curry draw_filled_rect grect) Graphics.black roll_color;
-  (grect_curry center_text_in_rect grect) "ROLL"
+  (grect_curry center_text_in_rect grect) window.roll_text
 
 (* draws the lower right button as a highlighted ROLL button *)
-let highlight_roll () =
+let highlight_roll text () =
   let grect = window.roll_window in
+  window.roll_text <- text;
   (grect_curry draw_filled_rect grect) Graphics.black highlight_color;
-  (grect_curry center_text_in_rect grect) "ROLL"
+  (grect_curry center_text_in_rect grect) window.roll_text
+
+let set_roll_text text =
+  window.roll_text <- text;
+  draw_roll ()
 
 type marking = MyCard of int | Env | Unk | SB of Graphics.color
 
@@ -442,7 +449,7 @@ let prompt_move_gui (movelst: move list) : move =
   let f acc move =
     match move with
     | Passage loc -> highlight_loc transform loc; loc::acc
-    | Roll -> highlight_roll (); acc in
+    | Roll -> highlight_roll "ROLL" (); acc in
   let loclst = List.fold_left f [] movelst in
   let rectlst = [("board", window.b_window); ("roll", window.roll_window)] in
   let rec loop () =
@@ -452,6 +459,8 @@ let prompt_move_gui (movelst: move list) : move =
                        if List.mem loc loclst then Passage loc else loop ()
     | ("roll", _) -> draw_roll (); Roll
     | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
+  (if List.length loclst = 0 then set_info "ROLL THE DICE"
+  else set_info "SELECT A PASSAGE or ROLL THE DICE");
   loop ()
 
 let prompt_move (movelst: move list) : string =
@@ -497,6 +506,7 @@ let prompt_movement pathmap acc_room roll : loc =
     if List.mem click_coord highlight_coords
     then CoordMap.find click_coord window.board.loc_map
     else loop () in
+  set_info "SELECT A PLACE TO MOVE TO";
   loop ()
 
 (* Displays the movement the agent took on its turn *)
@@ -508,8 +518,8 @@ let display_movement (l, (s, b)) : unit =
  * a bool which says whether or not it is the final accusation.
  * returns a string of the user's response. *)
 let prompt_guess loc (is_acc: bool) : string =
-  (if is_acc then set_info "Make your final accusation."
-  else set_info "What is your guess?");
+  (if is_acc then set_info "MAKE YOUR FINAL ACCUSATION"
+  else set_info "MAKE YOUR GUESS");
   failwith "Unimplemented gui.prompt_guess"
 
 (* Displays a guess (by the user or AI). *)
@@ -586,7 +596,18 @@ let init game =
   redraw ()
 
 let show_sheet sheet : unit =
-  ()
+  window.sheet <- sheet;
+  draw_sheet ()
 
 let show_hand hand : unit =
   ()
+
+let prompt_continue () : unit =
+  let cont_rect = window.roll_window in
+  let rects = [("continue", cont_rect)] in
+  let loop () =
+    match get_next_click_in_rects rects () with
+    | ("continue", _) -> ();
+    | _ -> failwith "not a defines rectangle" in
+  highlight_roll "CONTINUE" ();
+  loop ()

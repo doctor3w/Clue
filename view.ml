@@ -67,7 +67,7 @@ let prompt_guess loc b =
 let display_guess g =
 	match !view_type with
 	| CLI -> Cli.display_guess g
-	| GUI -> Gui.display_guess g
+	| GUI -> Cli.display_guess g; Gui.display_guess g
 
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.
@@ -113,4 +113,5 @@ let show_hand hand =
 
 let prompt_continue () : unit =
 	match !view_type with
-	| CLI | GUI -> Cli.prompt_continue ()
+	| CLI -> Cli.prompt_continue ()
+	| GUI -> Gui.prompt_continue ()
