@@ -124,8 +124,19 @@ let rec p_most_not_in_hand player public passage_list =
     if ci = 0 then Roll else
     List.assoc ci counted_p
 
-(* [is_p_env] checks that if the passage room is in the envelope then ROLL
-  else it calls its helper [check_farthest] to further determine move*)
+
+(* [is_p_env]
+ * 1. if player knows room env and room env is passage
+ * - check the rest of passages with farthest player,
+ * if one or both of the passage are known, we go to passage else ROLL
+ * 2. if player knows room env and room env is not passage
+ * - check the farther player if he has one or more of the passage,
+ * if yes take one of the passage, if not ROLL
+ * 3. if player does not know room env
+ * - check how many of the passages are Known, filter away those are known,
+ * if there is nothing left, ROLL,
+ * if there are passages left, count not_in_hand
+ * and go to passage with the most not_in_hand else ROLL *)
 let is_p_env player public passage_list =
   if is_r_env_known player then
     let f p =
@@ -156,10 +167,13 @@ let answer_move player public move_list : move =
                                       | Passage _-> true) move_list in
   if passage  = [] then Roll else is_p_env player public passage
 
+(* true if s is the acc_room, takes in an element from [movelst] below *)
+let is_acc_room public (_, (s, _)) = s = public.acc_room
+
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement player public move_option_list: loc= failwith "responsiveai get_movement"
-
+let get_movement player (public move_option_list:(loc * (string * bool)): loc=
+  if is_acc_room then
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
