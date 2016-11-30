@@ -319,7 +319,38 @@ let rewrite_env a =
   for index = 0 to (len-1)
   do a.(index) <- Env done
 
-(* [take_notes] is only called
+(* count how many Known the array [a] has *)
+let count_known a = 
+  let counter = ref 0 in
+  let len = Array.length a in
+  for index = 0 to (len-1) 
+  do (if a.(index) = Known index 
+     then counter := !counter + 1
+     else ()) done;
+  !counter
+
+let rec helper matrix public (lst: card list) counter = 
+  match lst with 
+  | [] -> ()
+  | h::t -> 
+            (let h_index = card_to_index public h in 
+            (if count_known matrix.(h_index) = 1
+            then counter:= !counter +1 
+            else ());
+            helper matrix public t)
+
+(* Given a card list, which contains either suspects, or weapons,
+  or rooms, check if all but one is known 
+  PreC: lst contains all cards for one type *)
+let rec all_but_one_known matrix public (lst: card list) =
+  let counter = ref 0 in 
+  helper matrix public lst counter;
+  if !counter = (List.length lst)-1
+  then true else false
+
+
+(* [take_notes] is only called 
+
   when another player is showing a card to another player
   /no one could show a card to another player.
 
