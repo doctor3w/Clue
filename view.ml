@@ -24,7 +24,8 @@ let prompt_filename () : string =
 	possible moves the player could take. All of the option are in color peach *)
 let prompt_move moves =
 	match !view_type with
-	| CLI | GUI -> Cli.prompt_move moves
+	| CLI -> Cli.prompt_move moves
+	| GUI -> Gui.prompt_move moves
 
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
