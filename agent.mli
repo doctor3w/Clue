@@ -31,6 +31,8 @@ val show_card : player -> public -> (string * card) option -> guess -> player
 (* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
 val show_person : player -> card -> string -> player
 
+val first_take_note : player -> public -> player
+
 (* [take_notes pl pu current_guess suspect_option] updates the ResponsiveAIs
  * listen structure and sheet. The guess is the current guess during the game
  * and the suspect_option a string option where if someone shows a card the name

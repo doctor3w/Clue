@@ -115,6 +115,15 @@ let rec all_take_notes pls pub cur guess who_op =
       helper (pl'::pls) t
   in List.rev (helper [] pls)
 
+let rec first_take_notes pls pub =
+  let rec helper pls' tl =
+    match tl with
+    | [] -> pls
+    | pl::t ->
+      let pl' = Agent.first_take_note pl pub in
+      helper (pl'::pls) t
+  in List.rev (helper [] pls)
+
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -217,10 +226,12 @@ let start file_name g_or_c =
   let load_go fl =
     try
       let game = Model.import_board fl in
+      let game' =
+        {game with players=(first_take_notes game.players game.public)} in
       (match !view_type with
       | CLI -> ()
-      | GUI -> Gui.init game);
-      step game
+      | GUI -> Gui.init game');
+      step game'
     with
     | No_players -> Display.display_error "\nNo players in game file"
     | Player_not_found -> Display.display_error "\nNo player with suspect name"

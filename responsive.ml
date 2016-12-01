@@ -706,7 +706,7 @@ let compile_notinhand matrix public x_len ref_l =
     else ()) done
 
 (* update player.listen when responsiveAI first gets the hand *)
-let first_take_note public player: player =
+let first_take_note player public: player =
   let matrix = player.listen in
   let hand = player.hand in
   let y_len = List.length public.player_order in
