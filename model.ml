@@ -216,6 +216,7 @@ let import_board (file_name: string) : game =
                      | _ -> failwith "no suspects found");
       acc_room = acc_id;
       deck = deck;
+      player_order = sus_id_lst
     }
   } in
   let board' = fill_board dim room_temp_lst in
