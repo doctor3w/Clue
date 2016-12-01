@@ -112,6 +112,7 @@ let show_hand hand =
 	| CLI | GUI -> Cli.show_hand hand
 
 let prompt_continue () : unit =
+	if !testing then () else
 	match !view_type with
 	| CLI -> Cli.prompt_continue ()
 	| GUI -> Gui.prompt_continue ()
