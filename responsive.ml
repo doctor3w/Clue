@@ -178,7 +178,7 @@ let rec check_p_known player public passage_list =
           else h:: check_p_known player public t
 
 let my_max lst = match lst with
-  | [] -> failwith ""
+  | [] -> failwith ("my max has an empty list" ^ Pervasives.__LOC__)
   | x::xs -> List.fold_left max x xs
 
 (* returns either Roll or Passage with most not_in_hand *)
@@ -682,23 +682,23 @@ let column_helper matrix j i_len player =
   else ()
 
 (* Find the index in [matrix] where the entire array (i.e. matrix.(index)
-  doesn't include any Knwon. Then put the card into ref_l; rewrite the 
-  entire array to Env 
+  doesn't include any Knwon. Then put the card into ref_l; rewrite the
+  entire array to Env
    PreC: [all_but_one_known] for lst is true *)
-let compile_known matrix public lst ref_l = 
+let compile_known matrix public lst ref_l =
   let counter = ref None in
   let index_lst = List.map (fun x -> card_to_index public x) lst in
   let len = List.length index_lst in
-  for i = (List.nth index_lst 0) to List.nth index_lst (len-1) 
+  for i = (List.nth index_lst 0) to List.nth index_lst (len-1)
      do (if (Array.exists (fun x -> x = Known) matrix.(i)) = false
-       then (counter := Some i; 
+       then (counter := Some i;
            ref_l := (index_to_card public i) :: !ref_l;
            rewrite_env matrix.(i))
        else ()) done
 
 (* if the entire row for a card is all filled up with Not_in_hand,
   it must be in the envelope *)
-let compile_notinhand matrix public x_len ref_l = 
+let compile_notinhand matrix public x_len ref_l =
   for index = 0 to (x_len-1)
   do (if is_all_notinhand matrix.(index)
     then (ref_l := (index_to_card public index) :: !ref_l;
@@ -706,13 +706,13 @@ let compile_notinhand matrix public x_len ref_l =
     else ()) done
 
 (* update player.listen when responsiveAI first gets the hand *)
-let first_take_note public player: player = 
+let first_take_note public player: player =
   let matrix = player.listen in
   let hand = player.hand in
   let y_len = List.length public.player_order in
   (match hand with
-  | [] -> () 
-  | h::t -> 
+  | [] -> ()
+  | h::t ->
     (let c_index = card_to_index public h in
     let p_index = suspect_to_index public player.suspect in
     matrix.(c_index).(p_index) <- Known;
@@ -814,10 +814,10 @@ let take_notes player public guess str_option: player =
     then compile_known matrix public r_lst l
     else ());
     compile_notinhand matrix public x_len l;
-    let rec update_player player l = 
+    let rec update_player player l =
       match !l with
       | [] -> player
-      | h::t -> 
+      | h::t ->
         let data = CardMap.find h player.sheet in
         let data' = {data with card_info = Envelope} in
         let sheet' = CardMap.add h data' player.sheet in
