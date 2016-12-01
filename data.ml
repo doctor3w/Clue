@@ -183,6 +183,8 @@ type public = {curr_player: string;
                acc_room: string;
                deck: deck;
                player_order: string list;
+               current_guess: guess;
+               current_response: string option;
                }
 
 (* [game] is the current state of the game. The players represent all agents
@@ -211,7 +213,7 @@ let game_init = {
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty;
     };
-    current_guess = (None,None,None); (* every time we have a new guess, we need to update game.current_guess *)
+    current_guess = (Suspect "", Weapon "", Room ""); (* every time we have a new guess, we need to update game.current_guess *)
     current_response = None;
     deck = ([],[],[]);
     player_order = []

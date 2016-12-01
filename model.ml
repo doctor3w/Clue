@@ -167,6 +167,8 @@ let default_sheet full_deck =
 let add_player game full_deck player_temp agent_lst =
   let loc = try (CoordMap.find player_temp.start game.public.board.loc_map)
             with _ -> failwith "can't find start coord" in
+  let dcount = (List.length full_deck) in
+  let pcount = (List.length agent_lst) in
   let p = {
     suspect = player_temp.p_id;
     hand = [];
@@ -174,6 +176,7 @@ let add_player game full_deck player_temp agent_lst =
     is_out = false;
     agent = List.assoc player_temp.p_id agent_lst;
     curr_loc = loc;
+    listen = Array.make_matrix dcount pcount Pure_unknown;
   } in {game with players = p::game.players}
 
 (* [import_board] takes in a filename of a game configuration file and

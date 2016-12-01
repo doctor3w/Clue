@@ -409,7 +409,7 @@ let redraw () =
 
 (* Displays the relocation of suspect [string] to the Room loc *)
 let display_relocate (who:string) loc : unit =
-  window.player_locs <- StringMap.add who loc window.player_locs;
+  window.player_locs <- (StringMap.add who loc window.player_locs);
   redraw ()
 
 (* highlights a location on the board *)
@@ -422,7 +422,8 @@ let highlight_loc transform loc =
   | Room_Rect (s, rect) -> let (gx, gy, gw, gh) = transform (rect_to_grect rect) in
                     let grect' = (gx+1, gy+1, gw-2, gh-2) in
                     Graphics.set_color highlight_color;
-                    (grect_curry Graphics.draw_rect grect')
+                    (grect_curry Graphics.draw_rect grect');
+                    draw_exits transform loc
 
 (* uses [highlight_loc] to highlight the location that corresponds to [coord] *)
 let highlight_coord transform coord =
@@ -491,8 +492,13 @@ let display_move move : unit =
  * [loc * (string * bool)] the location and whether or not room [string] is
  * accessible. The second string parameter is the acc_room name. *)
 let prompt_movement pathmap acc_room roll : loc =
-  let pm = PathMap.filter (fun (x, y) (n, (x', y')) -> n <= roll) pathmap in
-  let highlight_coords = PathMap.keys pm in
+  let guard = (fun (x, y) (n, (x', y')) -> n <= roll && n > 0) in
+  let pm = PathMap.filter guard pathmap in
+  let hc' = PathMap.keys pm in
+  let start_loc = StringMap.find window.curr_player window.player_locs in
+  let coord = match start_loc.info with
+              | Space (x, y) | Room_Rect (_,(x,_,y,_)) -> (x,y) in
+  let highlight_coords = List.filter (fun l -> not (l = coord)) hc' in
   let (xb, yb, wb, hb) = window.b_window in
   let (x_mult, y_mult) = get_mults () in
   let transform x = x |> scale_grect (x_mult, y_mult)
@@ -593,6 +599,7 @@ let init game =
     (window.sheet_disp <- p.suspect; window.sheet <- p.sheet)
   else ();
   Graphics.open_graph "";
+  Graphics.set_window_title "CLUE";
   redraw ()
 
 let show_sheet sheet : unit =
