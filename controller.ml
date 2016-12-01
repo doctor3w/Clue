@@ -104,6 +104,15 @@ let pl_eq (s:card) (pl:player) =
   | Suspect name -> pl.suspect = name
   | _ -> false
 
+let rec all_take_notes pls pub cur guess who_op =
+  let rec helper pls' tl =
+    match tl with
+    | [] -> pls
+    | pl::t ->
+      let pl' = Agent.take_notes pl pub guess who_op in
+      helper (pl'::pls) t
+  in List.rev (helper [] pls)
+
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
  * Requires: game has at least one player. *)
@@ -176,19 +185,20 @@ and handle_guess curr_p next_p game =
   | None -> (* No card could be shown *)
     let curr_p' = Agent.show_card curr_p game.public None guess in
     let pls' = replace_player curr_p' players' in
+    let pls'' = all_take_notes pls' game.public curr_p.suspect guess None in
     let pub = {game.public with curr_player=next_p.suspect} in
-    (* Add take notes here *)
     let () = Display.prompt_continue () in
-    step {game with players = pls'; public = pub}
+    step {game with players = pls''; public = pub}
   | Some (pl, card) -> (* A card was shown by pl *)
     let answer = Some (pl.suspect, card) in
     let curr_p' = Agent.show_card curr_p game.public answer guess in
     let pl' = Agent.show_person pl card curr_p'.suspect in
     let pls' = replace_player curr_p' players' |> replace_player pl' in
+    let who = Some pl'.suspect in
+    let pls'' = all_take_notes pls' game.public curr_p.suspect guess who in
     let pub = {game.public with curr_player=next_p.suspect} in
-    (* Add take notes here *)
     let () = Display.prompt_continue () in
-    step {game with players = pls'; public = pub}
+    step {game with players = pls''; public = pub}
 
 (* [handle_end_turn curr_p next_p game] is called when the current player
  * lands on a space and the turn essentially ends. The game model is updated

@@ -8,6 +8,7 @@ let answer_move pl pub moves = match pl.agent with
   | DumbAI_t -> DumbAI.answer_move pl pub moves
   | SmartAI_t -> SmartAI.answer_move pl pub moves
   | Human_t -> Human.answer_move pl pub moves
+  | ResponsiveAI_t -> Responsive.answer_move pl pub moves
   | _ -> DumbAI.answer_move pl pub moves
 
 (* [get_movement] passes in a list of locations that could be moved to,
@@ -16,6 +17,7 @@ let get_movement pl pub move_ops roll pm : movement = match pl.agent with
   | DumbAI_t -> DumbAI.get_movement pl pub move_ops
   | SmartAI_t -> SmartAI.get_movement pl pub move_ops
   | Human_t -> Human.get_movement pl pub move_ops roll pm
+  | ResponsiveAI_t -> Responsive.get_movement pl pub move_ops
   | _ -> DumbAI.get_movement pl pub move_ops
 
 (* [get_geuss] takes in a game sheet and the current location and returns
@@ -24,6 +26,7 @@ let get_guess pl pub = match pl.agent with
   | DumbAI_t -> DumbAI.get_guess pl pub
   | SmartAI_t -> SmartAI.get_guess pl pub
   | Human_t -> Human.get_guess pl pub
+  | ResponsiveAI_t -> Responsive.get_guess pl pub
   | _ -> DumbAI.get_guess pl pub
 
 (* [get_accusation] takes in a game sheet and the current location and returns
@@ -33,6 +36,7 @@ let get_accusation pl pub = match pl.agent with
   | DumbAI_t -> DumbAI.get_accusation pl pub
   | SmartAI_t -> SmartAI.get_accusation pl pub
   | Human_t -> Human.get_accusation pl pub
+  | ResponsiveAI_t -> Responsive.get_accusation pl pub
   | _ -> DumbAI.get_accusation pl pub
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
@@ -42,6 +46,7 @@ let get_answer pl pub guess = match pl.agent with
   | DumbAI_t -> DumbAI.get_answer pl pub guess
   | SmartAI_t -> SmartAI.get_answer pl pub guess
   | Human_t -> Human.get_answer pl pub guess
+  | ResponsiveAI_t -> Responsive.get_answer pl pub guess
   | _ -> DumbAI.get_answer pl pub guess
 
 (* Turns card data from unknown to envelope in sheet. Only if unknown is
@@ -90,9 +95,9 @@ let process_of_elimination sheet pub pl_typ =
  * guess and needs to be updated accordingly. Also needs to use process of
  * elimination for certain AIs *)
 let show_card pl pub answer (s, w, r) =
-  match pl.agent with
-  | ResponsiveAI_t -> Responsive.show_card pl pub answer (s,w,r)
-  | _ ->
+  if pl.agent = ResponsiveAI_t then
+    Responsive.show_card pl pub answer (s,w,r)
+  else
     match answer with
     | None ->
       let () = Display.display_answer None "" (pl.agent = Human_t) in
@@ -118,9 +123,10 @@ let show_person pl card sus =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes pl pub current_guess suspect_option= match pl.agent with
+let take_notes pl pub current_guess suspect_option = match pl.agent with
   | DumbAI_t -> DumbAI.take_notes pl pub current_guess suspect_option
   | SmartAI_t -> SmartAI.take_notes pl pub current_guess suspect_option
   | Human_t -> Human.take_notes pl pub current_guess suspect_option
-  | _ -> Responsive.take_notes pl pub current_guess suspect_option
+  | ResponsiveAI_t -> Responsive.take_notes pl pub current_guess suspect_option
+  | _ -> DumbAI.take_notes pl pub current_guess suspect_option
 
