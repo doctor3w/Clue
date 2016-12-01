@@ -109,7 +109,6 @@ let rec all_take_notes pls pub cur guess who_op =
     match tl with
     | [] -> pls
     | pl::t ->
-      let () = print_endline pl.suspect in
       let pl' =
         if pl.suspect = cur then pl
         else Agent.take_notes pl pub guess who_op in
