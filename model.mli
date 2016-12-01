@@ -12,4 +12,4 @@ val get_move_options : game -> move list
  * player can move to within the dice roll int. These options come with
  * the room name [string] that is headed for and a [bool] to tell whether
  * that room can be entered. *)
-val get_movement_options : game -> int -> (loc * (string * bool)) list
+val get_movement_options : game -> int -> ((loc * (string * bool)) list * PathMap.t)

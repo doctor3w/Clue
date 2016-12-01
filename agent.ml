@@ -1,9 +1,6 @@
 open Data
-open DumbAI
-(* open SmartAI *)
-open Human
 
-module Display = Cli
+module Display = View
 
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
@@ -15,10 +12,10 @@ let answer_move pl pub moves = match pl.agent with
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let get_movement pl pub move_ops : loc = match pl.agent with
+let get_movement pl pub move_ops roll pm : movement = match pl.agent with
   | DumbAI_t -> DumbAI.get_movement pl pub move_ops
   | SmartAI_t -> SmartAI.get_movement pl pub move_ops
-  | Human_t -> Human.get_movement pl pub move_ops
+  | Human_t -> Human.get_movement pl pub move_ops roll pm
   | _ -> DumbAI.get_movement pl pub move_ops
 
 (* [get_geuss] takes in a game sheet and the current location and returns
@@ -93,18 +90,21 @@ let process_of_elimination sheet pub pl_typ =
  * guess and needs to be updated accordingly. Also needs to use process of
  * elimination for certain AIs *)
 let show_card pl pub answer (s, w, r) =
-  match answer with
-  | None ->
-    let () = Display.display_answer None "" (pl.agent = Human_t) in
-    let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
-    {pl with sheet = sheet'}
-  | Some(sus, card) ->
-    let () = Display.display_answer (Some card) sus (pl.agent = Human_t) in
-    let data = CardMap.find card pl.sheet in
-    let data' = {data with card_info= ShownBy(sus)} in
-    let sheet' = CardMap.add card data' pl.sheet in
-    (* In non-DumbAI modules use process elim here to update rest of sheet. *)
-    {pl with sheet = (process_of_elimination sheet' pub pl.agent)}
+  match pl.agent with
+  | ResponsiveAI_t -> Responsive.show_card pl pub answer (s,w,r)
+  | _ ->
+    match answer with
+    | None ->
+      let () = Display.display_answer None "" (pl.agent = Human_t) in
+      let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
+      {pl with sheet = sheet'}
+    | Some(sus, card) ->
+      let () = Display.display_answer (Some card) sus (pl.agent = Human_t) in
+      let data = CardMap.find card pl.sheet in
+      let data' = {data with card_info= ShownBy(sus)} in
+      let sheet' = CardMap.add card data' pl.sheet in
+      (* In non-DumbAI modules use process elim here to update rest of sheet. *)
+      {pl with sheet = (process_of_elimination sheet' pub pl.agent)}
 
 (* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
 let show_person pl card sus =
@@ -118,9 +118,9 @@ let show_person pl card sus =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes pl pub = match pl.agent with
-  | DumbAI_t -> DumbAI.take_notes pl pub
-  | SmartAI_t -> SmartAI.take_notes pl pub
-  | Human_t -> Human.take_notes pl pub
-  | _ -> DumbAI.take_notes pl pub
+let take_notes pl pub current_guess suspect_option= match pl.agent with
+  | DumbAI_t -> DumbAI.take_notes pl pub current_guess suspect_option
+  | SmartAI_t -> SmartAI.take_notes pl pub current_guess suspect_option
+  | Human_t -> Human.take_notes pl pub current_guess suspect_option
+  | _ -> Responsive.take_notes pl pub current_guess suspect_option
 

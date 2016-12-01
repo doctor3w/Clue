@@ -1,6 +1,6 @@
 open Data
 
-module Display = Cli
+module Display = View
 
 exception Bad_input
 exception Wrong_room
@@ -16,7 +16,7 @@ let contains_xs s xs =
   let cat = if List.length xs = 1 then List.hd xs
             else List.fold_left (fun acc el -> match acc with
                                                | "" -> el
-                                               | a -> a^"\|"^el) "" xs in
+                                               | a -> a^"\\|"^el) "" xs in
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
@@ -62,19 +62,25 @@ let parse_movement str move_ops =
   let rooms = List.map (fun (_, (s, _)) -> normalize s) move_ops in
   if contains_xs norm rooms then
     let selected = Str.matched_string norm in
-    let norm_moves = List.map (fun (l, (s, b)) -> (normalize s, l)) move_ops in
+    let norm_moves =
+      List.map (fun (l, (s, b)) -> (normalize s, (l, (s, b)))) move_ops in
     try List.assoc selected norm_moves with Not_found -> raise Bad_input
   else raise Bad_input
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement *)
-let rec get_movement pl pub move_ops =
-  let text = Display.prompt_movement move_ops pub.acc_room in
-  try parse_movement text move_ops with
-  | Bad_input ->
-    if check_sheet_or_hand text pl then ()
-    else Display.display_error "Please enter a valid location to move to.";
-    get_movement pl pub move_ops
+let rec get_movement pl pub move_ops roll pm =
+  if !view_type = GUI then
+    let l = Gui.prompt_movement pm pub.acc_room roll in
+    let (s, b) = try List.assoc l move_ops with | _ -> ("nowhere", false)
+    in (l, (s, b))
+  else
+    let text = Display.prompt_movement move_ops pub.acc_room in
+    try parse_movement text move_ops with
+    | Bad_input ->
+      if check_sheet_or_hand text pl then ()
+      else Display.display_error "Please enter a valid location to move to.";
+      get_movement pl pub move_ops roll pm
 
 (* [card_norm_map card] takes a list of cards and normalizes the card names
  * and returns a map of the normalized cards to the original card. *)
@@ -163,4 +169,4 @@ let rec get_answer pl pub guess =
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
-let take_notes pl pub = pl
+let take_notes pl pub current_guess suspect_option = pl

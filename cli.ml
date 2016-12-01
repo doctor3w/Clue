@@ -1,5 +1,5 @@
 open Data
-open ANSITerminal
+open ANSI
 
 (* Displays the provided error message stored in [e] in color red. *)
 let display_error (e:string): unit = print_string [red] (e ^ "\n")
@@ -8,20 +8,21 @@ let display_error (e:string): unit = print_string [red] (e ^ "\n")
    The format of print statment is "This is [player]'s turn",
    where the information about the [player] is stored in [pub] *)
 let display_turn (pub:public): unit =
-	let () = print_string [] "\n-----------------------------------\n\nThis is " in
-	let () = print_string [cyan] pub.curr_player in
-	print_endline "'s turn."
+	let () = print_string [] "\n---------------------------------------\n" in
+	let () = print_chars [] "\nThis is " in
+	let () = print_chars [cyan] pub.curr_player in
+	print_chars [] "'s turn.\n"
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
-	print_string [red]
+	print_chars [red]
 		"Please enter the name of the game file you want to load.\n\n";
 	print_string [red] "> ";
 	read_line ()
 
 (* Prompts the user for whether he rolls dice or not.
 	[prompt_move] takes [l], which is a move list and prints out all the
-	possible moves the player could take. All of the option are in color green *)
+	possible moves the player could take. All of the option are in color peach *)
 let prompt_move moves =
 	let intro =
 		"Would you like to roll the dice or take a passage? Choose from:\n" in
@@ -34,7 +35,7 @@ let prompt_move moves =
 		| Roll -> acc^"Roll dice; \n"
 		| Passage loc -> acc^(disp_loc loc) in
 	let print_st = List.fold_left fold "" moves in
-	print_string [Bold] intro;
+	print_chars [Bold] intro;
 	print_string [magenta] print_st;
 	print_string [green] "\n>>> ";
 	read_line ()
@@ -45,15 +46,15 @@ let display_move (m:move) : unit =
 	let disp_loc l =
 		match l.info with
 		| Room_Rect (s,_) ->
-			print_endline ("The player elected to take the Passage to " ^ s)
+			print_chars [] ("The player elected to take the Passage to " ^ s ^"\n")
 		| _ -> failwith "A space is not displayed here"
 	in match m with
-	| Roll -> print_string [] "The player elected to Roll "
+	| Roll -> print_chars [] "The player elected to Roll "
 	| Passage loc -> disp_loc loc
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll i =
-	print_endline ("and "^(string_of_int i)^" was rolled.")
+	print_chars [] ("and "^(string_of_int i)^" was rolled.\n")
 
 (* Prompts the user for his. *)
 let string_of_int_tuple (a,b) =
@@ -68,18 +69,18 @@ let prompt_movement move_ops acc_room =
 			else "Head towards "^str^is_acc^";\n" in
 		acc^comb in
 	let str_list = List.fold_left helper "" move_ops in
-	print_string [Bold] intro;
+	print_chars [Bold] intro;
 	print_string [blue] str_list;
 	print_string [green] "\n>>> ";
 	read_line ()
 
 (* Displays the movement the agent took on its turn *)
-let display_movement (str, b) =
+let display_movement (l, (str, b)) =
 	let intro = "The player " in
 	let str =
 		if b then "entered the "^str^".\n"
 		else "headed towards the "^str^".\n" in
-	print_string [] (intro^str)
+	print_chars [] (intro^str)
 
 (* Displays the relocation of suspect [string] to the Room loc *)
 let display_relocate who loc =
@@ -88,7 +89,7 @@ let display_relocate who loc =
 									| Room_Rect (s, _) -> s
 									| _ -> failwith ("must be a room: " ^ Pervasives.__LOC__) in
 	let str = who ^ " was relocated to the " ^ room_name ^ ".\n" in
-	print_string [] (intro^str)
+	print_chars [] (intro^str)
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -98,9 +99,9 @@ let prompt_guess loc b =
 	match loc.info with
 	| Room_Rect (s,_) ->
 		(if not b then
-			print_string [Bold] ("You are in the "^s^". What is your guess?\n")
+			print_chars [Bold] ("You are in the "^s^". What is your guess?\n")
 		else
-			print_string [Bold]
+			print_chars [Bold]
 				"You are in the accusation room. What is your final accusation?\n");
 		print_string [green] "\n>>> ";
 		read_line ()
@@ -112,13 +113,13 @@ let prompt_guess loc b =
 let display_guess g =
 	match g with
 	| (Suspect s1, Weapon s2, Room s3) ->
-		let () = print_string [] "\nThe player thinks: \n    " in
-		let () = print_string [green] s1 in
-		let () = print_string [] " is the suspect, \n    " in
-		let () = print_string [yellow] s2 in
-		let () = print_string [] " is the weapon, and \n    " in
-		let () = print_string [blue] s3 in
-		print_string [] " is the room.\n"
+		let () = print_chars [] "\nThe player thinks: \n    " in
+		let () = print_chars [green] s1 in
+		let () = print_chars [] " is the suspect, \n    " in
+		let () = print_chars [yellow] s2 in
+		let () = print_chars [] " is the weapon, and \n    " in
+		let () = print_chars [blue] s3 in
+		print_chars [] " is the room.\n"
 	| (_,_,_) -> failwith "A guess has to follow the order Suspect * Weapon * Room"
 
 (* Prompts the user for a card to show.
@@ -130,22 +131,23 @@ let showable hand (s, w, r) =
 
 let prompt_answer hand guess =
 	let cards_showable = showable hand guess in
-	let intro = "\nYou can show a card, which one will you show? " in
+	let intro = "\nYou can show a card, which one will you show?\n" in
 	let f acc c =
 		match c with
 		| Suspect s -> acc^s^"; \n"
 		| Weapon s -> acc^s^"; \n"
 		| Room s -> acc^s^"; \n" in
 	let str = List.fold_left f "" cards_showable in
-	print_string [] intro;
+	print_chars [Bold] intro;
 	print_string [blue] str;
 	print_string [green] "\n>>> ";
 	read_line ()
 
+(* Displays when a person cannot show a card from their hand *)
 let display_no_answer name =
 	print_string [] "\n";
-	print_string [magenta] name;
-	print_string [] " could not show a card from their hand."
+	print_chars [magenta] name;
+	print_chars [] " could not show a card from their hand."
 
 (* Displays the card shown to the human agent and by whom.
  * If None, no card could be shown. If false, the user is not shown the
@@ -153,10 +155,10 @@ let display_no_answer name =
 let display_answer (card_opt:card option) str b : unit =
 	let () = print_string [] "\n" in
 	let print_card s =
-		print_string [magenta] str;
-		print_string [] " shows you ";
-		print_string [yellow] s;
-		print_string [] " from their hand.\n" in
+		print_chars [magenta] str;
+		print_chars [] " shows you ";
+		print_chars [yellow] s;
+		print_chars [] " from their hand.\n" in
 	if b then
 		match card_opt with
 		| Some (Suspect s) -> print_card s;
@@ -166,23 +168,20 @@ let display_answer (card_opt:card option) str b : unit =
 	else
 		match card_opt with
 		| Some _ ->
-			print_string [magenta] str;
-			print_string [] " showed a card from their hand.\n"
-		| None -> print_string [] "No one has a card to show. "
-
-(* let display_no_answer name =
-	print_string [] "\n";
-	print_string [magenta] name;
-	print_string [] " could not show a card from their hand." *)
+			print_chars [magenta] str;
+			print_chars [] " showed a card from their hand.\n"
+		| None -> print_chars [] "No one has a card to show. "
 
 (* Displays end game victory text. *)
 let display_victory pl_name =
-	print_string [yellow] "\nCongratulations!!!\n";
-	print_string [magenta] pl_name;
-	print_string [] " just won the game!\n\n"
+	print_chars [yellow] "\nCongratulations!!!\n";
+	print_chars [magenta] pl_name;
+	print_chars [] " just won the game!\n\n"
 
-let display_message s = print_endline s
+(* Displays any message *)
+let display_message s = print_chars [] (s^"\n")
 
+(* Methods for displaying the sheet *)
 let print_card c = match c with
   | Suspect s -> print_string [green] (s)
   | Weapon s -> print_string [yellow] (s)
@@ -209,3 +208,9 @@ let show_hand hand =
 		print_string [] ", " in
 	ignore (List.mapi print hand);
 	print_string [] "\n\n"
+
+let prompt_continue () : unit =
+	let intro = "\nPress [Enter] to continue." in
+	let i = print_chars [Bold] intro; read_line () in
+	let s = String.lowercase_ascii (String.trim i) in
+	if s = "sheet" then () else ()
