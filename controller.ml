@@ -109,7 +109,18 @@ let rec all_take_notes pls pub cur guess who_op =
     match tl with
     | [] -> pls
     | pl::t ->
-      let pl' = Agent.take_notes pl pub guess who_op in
+      let pl' =
+        if pl.suspect = cur then pl
+        else Agent.take_notes pl pub guess who_op in
+      helper (pl'::pls) t
+  in List.rev (helper [] pls)
+
+let rec first_take_notes pls pub =
+  let rec helper pls' tl =
+    match tl with
+    | [] -> pls
+    | pl::t ->
+      let pl' = Agent.first_take_note pl pub in
       helper (pl'::pls) t
   in List.rev (helper [] pls)
 
@@ -215,16 +226,18 @@ let start file_name g_or_c =
   let load_go fl =
     try
       let game = Model.import_board fl in
+      let game' =
+        {game with players=(first_take_notes game.players game.public)} in
       (match !view_type with
       | CLI -> ()
-      | GUI -> Gui.init game);
-      step game
+      | GUI -> Gui.init game');
+      step game'
     with
     | No_players -> Display.display_error "\nNo players in game file"
     | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
       Display.display_error ("\nSomething went wrong, here's what's up: "^s)
-    | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in
+    (* | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in *)in
   let () =
     if g_or_c = GUI then
       let (w, h) = Gui.window.win_bounds in

@@ -121,6 +121,11 @@ let show_person pl card sus =
   let sheet' = CardMap.add card data' pl.sheet in
   {pl with sheet = sheet'}
 
+
+let first_take_note pl pub = match pl.agent with
+  | ResponsiveAI_t -> Responsive.first_take_note pl pub
+  | _ -> pl
+
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
 let take_notes pl pub current_guess suspect_option = match pl.agent with
