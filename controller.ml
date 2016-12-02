@@ -237,7 +237,7 @@ let start file_name g_or_c =
     | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
       Display.display_error ("\nSomething went wrong, here's what's up: "^s)
-    | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in
+    (* | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in *)in
   let () =
     if g_or_c = GUI then
       let (w, h) = Gui.window.win_bounds in

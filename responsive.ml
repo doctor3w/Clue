@@ -1,6 +1,8 @@
 open Data
 
-module Display = Cli
+module Display = View
+
+exception No_place_to_go
 
 let rec find x lst =
     match lst with
@@ -286,13 +288,16 @@ let most_type card_lst (matrix: listen_choice array array) public t =
 let r_env_not_known pl public card_m_lst =
   let c_lst = List.map (fun (c,move)-> c) card_m_lst in
   let c_not_known_lst = get_notknwon_cards c_lst pl.listen public in
-  let (i,c) = most_type c_not_known_lst pl.listen public Not_in_hand in
-    if i > 0 then List.assoc c card_m_lst
-    else
-      let (i',c') = most_type c_not_known_lst pl.listen public Pure_unknown in
-      if i' > 0 then List.assoc c' card_m_lst
+  if List.length c_not_known_lst = 0 then raise No_place_to_go
+  else
+    let (i,c) = most_type c_not_known_lst pl.listen public Not_in_hand in
+      if i > 0 then List.assoc c card_m_lst
       else
-        snd (rand_from_lst card_m_lst)
+        let (i',c') =
+          most_type c_not_known_lst pl.listen public Pure_unknown in
+        if i' > 0 then List.assoc c' card_m_lst
+        else
+          snd (rand_from_lst card_m_lst)
 
 (* [get_movement] passes in a list of locations that could be moved to,
  * and returns the agent's choice of movement
@@ -334,7 +339,9 @@ else
             else snd (rand_from_lst c_access)
       else snd (rand_from_lst c_not_access)
     else
-      if List.length access > 0 then r_env_not_known pl public c_access
+      if List.length access > 0 then
+        try r_env_not_known pl public c_access with
+        | No_place_to_go -> r_env_not_known pl public c_not_access
       else r_env_not_known pl public c_not_access
 
 
@@ -525,14 +532,16 @@ let listen_ans_update listen sus card player public =
 let show_card pl public answer (s,w,r) :player =
   match answer with
   | None ->
-      let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
-      listen_unk_to_env pl.listen pl public (s,w,r);{pl with sheet = sheet'}
+    let () = Display.display_answer None "" false in
+    let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
+    listen_unk_to_env pl.listen pl public (s,w,r);{pl with sheet = sheet'}
   | Some (sus, card) ->
-      let data = CardMap.find card pl.sheet in
-      let data' = {data with card_info= ShownBy(sus)} in
-      let sheet' = CardMap.add card data' pl.sheet in
-      listen_ans_update pl.listen sus card pl public;
-      {pl with sheet = (process_of_elimination sheet' public)}
+    let () = Display.display_answer (Some card) sus false in
+    let data = CardMap.find card pl.sheet in
+    let data' = {data with card_info= ShownBy(sus)} in
+    let sheet' = CardMap.add card data' pl.sheet in
+    listen_ans_update pl.listen sus card pl public;
+    {pl with sheet = (process_of_elimination sheet' public)}
 
 
 (* [get_accusation] takes in a game sheet and the current location and returns
