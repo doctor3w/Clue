@@ -232,10 +232,13 @@ let is_p_env player public passage_list =
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move player public move_list : move =
-  let passage = List.filter (fun a -> match a with
-                                      | Roll -> false
-                                      | Passage _-> true) move_list in
-  if passage  = [] then Roll else is_p_env player public passage
+  if is_r_env_known player && is_w_env_known player && is_s_env_known player
+  then Roll
+  else
+    let passage = List.filter (fun a -> match a with
+                                        | Roll -> false
+                                        | Passage _-> true) move_list in
+    if passage  = [] then Roll else is_p_env player public passage
 
 (* true if s is the acc_room, takes in an element from [movelst] below *)
 let is_acc_room public (_, (s, _)) = s = public.acc_room
