@@ -76,9 +76,7 @@ let display_guess g =
 let prompt_answer hand guess =
 	match !view_type with
 	| CLI -> Cli.prompt_answer hand guess
-	| GUI -> let ans = Gui.prompt_answer hand guess in
-					 let ans2 = Cli.prompt_answer hand guess in
-					 ans
+	| GUI -> Gui.prompt_answer hand guess
 
 (* Displays when a person cannot show a card from their hand *)
 let display_no_answer name =
