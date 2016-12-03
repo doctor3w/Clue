@@ -1,4 +1,5 @@
 open Data
+open Str
 open Graphics
 
 (* (x, y, w, h) *)
@@ -120,10 +121,19 @@ let draw_ell_in_rect x y w h ln fl =
   draw_filled_ellipse (x+rx) (y+ry) rx ry ln fl
 
 let center_text_in_rect x y w h s =
-  let (w', h') = Graphics.text_size s in
-  let (buffer_w, buffer_h) = ((w - w')/2, (h - h')/2) in
-  Graphics.moveto (x+buffer_w) (y+buffer_h);
-  Graphics.draw_string s
+  let lst = Str.split (regexp "[\n]+") s in
+  let count = List.length lst in
+  let rec loop n lst =
+    match lst with
+    | [] -> ()
+    | s'::t ->
+      let (w', h') = Graphics.text_size s in
+      let h'' = h'*count in
+      let (buffer_w, buffer_h) = ((w - w')/2, (h - h'')/2) in
+      Graphics.moveto (x+buffer_w) (y+buffer_h+(count - 1 - n)*h');
+      Graphics.draw_string s';
+      loop (n+1) t in
+  loop 0 lst
 
 (* returns the (x, y) of the next mouse click relative to the window,
  * doesn't terminate until the mouse is clicked in the window *)
@@ -628,16 +638,71 @@ let display_guess guess : unit =
   match guess with
   | (Suspect who, Weapon what, Room where) ->
     let s1 = guesser ^ " thinks it was " ^ who in
-    let s2 = " with the " ^ what in
-    let s3 = " in the " ^ where ^ "." in
+    let s2 = "\nwith the " ^ what in
+    let s3 = "\nin the " ^ where ^ "." in
     set_info (s1 ^ s2 ^ s3)
   | _ -> failwith ("bad guess order: " ^ Pervasives.__LOC__)
+
+
+let make_rects lst =
+  let (bx, by, bw, bh) = window.b_window in
+  let (w, h) = (bw/4, (bw*3)/8) in
+  let count = List.length lst in
+  let rec loop n acc lst =
+    match lst with
+    | [] -> acc
+    | (Suspect s)::t -> let x =
+                          if count = 1
+                            then  bx + (bw - w)/2
+                          else if count = 2
+                            then  bx + ((n+1)*bw)/6 + w*n
+                          else    bx + ((n+1)*bw)/16 + w*n in
+                        let grect = (x, by+(bh-h)/2, w, h) in
+                        let r = (grect_curry draw_filled_rect grect) in
+                        r Graphics.black suspect_color;
+                        (grect_curry center_text_in_rect grect s);
+                        loop (n+1) (("suspect", grect)::acc) t
+    | (Weapon s)::t ->  let x =
+                          if count = 1
+                            then  bx + (bw - w)/2
+                          else if count = 2
+                            then  bx + ((n+1)*bw)/6 + w*n
+                          else    bx + ((n+1)*bw)/16 + w*n in
+                        let grect = (x, by+(bh-h)/2, w, h) in
+                        let r = (grect_curry draw_filled_rect grect) in
+                        r Graphics.black weapon_color;
+                        (grect_curry center_text_in_rect grect s);
+                        loop (n+1) (("weapon", grect)::acc) t
+    | (Room s)::t ->    let x =
+                          if count = 1
+                            then  bx + (bw - w)/2
+                          else if count = 2
+                            then  bx + ((n+1)*bw)/6 + w*n
+                          else    bx + ((n+1)*bw)/16 + w*n in
+                        let grect = (x, by+(bh-h)/2, w, h) in
+                        let r = (grect_curry draw_filled_rect grect) in
+                        r Graphics.black room_sheet_color;
+                        (grect_curry center_text_in_rect grect s);
+                        loop (n+1) (("room", grect)::acc) t in
+  loop 0 [] lst
 
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.
  * Can be none if there is no card to show. *)
 let prompt_answer hand guess : string =
-  failwith "Unimplemented gui.prompt_answer"
+  set_info "PICK A CARD TO SHOW";
+  let (sus, weap, room) = guess in
+  let can_show = if List.mem sus hand then [sus] else [] in
+  let can_show = if List.mem weap hand then weap::can_show else can_show in
+  let can_show = if List.mem room hand then room::can_show else can_show in
+  let rects = make_rects can_show in
+  let click = get_next_click_in_rects rects () in
+  let extract_card_text c = match c with | Suspect s | Weapon s | Room s -> s in
+  draw_board (); draw_players ();
+  match click with
+  | ("suspect", _) -> extract_card_text sus
+  | ("weapon", _) -> extract_card_text weap
+  | ("room", _) -> extract_card_text room
 
 (* Displays the card shown to the human agent and by whom.
  * If None, no card could be shown. If false, the user is not shown the
