@@ -19,6 +19,9 @@ type graphic_board = {
   mutable last_info: string;
   mutable roll_text: string;
   mutable curr_player: string;
+  mutable sus_count: int;
+  mutable weap_count: int;
+  mutable room_count: int;
 }
 
 let window = {
@@ -38,7 +41,10 @@ let window = {
     player_colors = StringMap.empty;
     last_info = "CLUE";
     curr_player = "";
-    roll_text = "CONTINUE"
+    roll_text = "CONTINUE";
+    sus_count = 1;
+    weap_count = 1;
+    room_count = 1
   }
 
 let player_border = Graphics.black
@@ -181,9 +187,15 @@ let adjust_coord_if_room coord =
 let translate_to_card pt =
   let (sx, sy, sw, sh) = window.s_window in
   let count = CardMap.cardinal window.sheet in
-  let hght = if sh = 0 then sh else count / sh in
+  let hght = if sh = 0 then 1 else sh / count in
+  let space = (sh - (hght * count))/2 in
+  let space1 = window.room_count * hght in
+  let space2 = space1 + space + (window.weap_count * hght) in
   let (x', y') = pt in
-  let index = (sh - y') / hght in
+  let index =
+    if      y' < space1 then (sh - y' - space*2) / hght
+    else if y' < space2 then (sh - y' - space) / hght
+    else                     (sh - y') / hght in
   let bind = CardMap.bindings window.sheet in
   (index, fst (List.nth bind index))
 
@@ -524,9 +536,37 @@ let display_movement (l, (s, b)) : unit =
  * a bool which says whether or not it is the final accusation.
  * returns a string of the user's response. *)
 let prompt_guess loc (is_acc: bool) : string =
+  let has_room = ref (not is_acc) in
+  let has_weap = ref false in
+  let has_sus = ref false in
+  let r = ref
+    (match (is_acc, loc.info) with
+    | (true, _) -> (Room "")
+    | (false, Room_Rect (s, _)) -> (Room s)
+    | _ -> failwith ("guess must be from room: " ^ Pervasives.__LOC__)) in
+  let w = ref (Weapon "") in
+  let s = ref (Suspect "") in
   (if is_acc then set_info "MAKE YOUR FINAL ACCUSATION"
   else set_info "MAKE YOUR GUESS");
-  failwith "Unimplemented gui.prompt_guess"
+  let rec loop () =
+    let rects = if (!has_sus && !has_weap && !has_room)
+      then (highlight_roll "GUESS" ();
+        [("guess", window.roll_window); ("sheet", window.s_window)])
+      else [("sheet", window.s_window)] in
+    match get_next_click_in_rects rects () with
+    | ("guess", _) -> draw_roll (); (!s, !w, !r)
+    | ("sheet", pt) -> set_card (translate_to_card pt); loop ()
+  and set_card (n, card) =
+    match (n, card) with
+    | (i, Suspect _) -> s := card; has_sus := true
+    | (i, Weapon _) -> w := card; has_weap := true
+    | (i, Room _) -> has_room := true;
+                if is_acc then r := card else () in
+  set_roll_text "GUESS";
+  let (csus, cweap, croom) = loop () in
+  match csus, cweap, croom with
+  | Suspect sus, Weapon weap, Room room -> (sus ^ ", " ^ weap ^ ", " ^ room)
+  | _ -> failwith ("guess in wrong order: " ^ Pervasives.__LOC__)
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
@@ -579,6 +619,10 @@ let init game =
   window.board <- game.public.board;
   window.player_locs <- StringMap.empty;
   window.player_colors <- StringMap.empty;
+  let (s, w, r) = game.public.deck in
+  window.sus_count <- List.length s;
+  window.weap_count <- List.length w;
+  window.weap_count <- List.length r;
   let p_count = List.length game.players in
   let colors = pick_n_colors p_count in
   let count = ref 0 in
@@ -599,6 +643,8 @@ let init game =
     (window.sheet_disp <- p.suspect; window.sheet <- p.sheet)
   else ();
   Graphics.open_graph "";
+  let (gx, gy) = window.win_bounds in
+  Graphics.resize_window gx gy;
   Graphics.set_window_title "CLUE";
   redraw ()
 

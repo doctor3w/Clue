@@ -61,7 +61,8 @@ let display_relocate who loc =
  * returns a string of the user's response. *)
 let prompt_guess loc b =
 	match !view_type with
-	| CLI | GUI -> Cli.prompt_guess loc b
+	| CLI -> Cli.prompt_guess loc b
+	| GUI -> Gui.prompt_guess loc b
 
 (* Displays a guess (by the user or AI). *)
 let display_guess g =
