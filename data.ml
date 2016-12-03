@@ -30,7 +30,7 @@ type view = CLI | GUI
 
 let view_type = ref CLI
 
-let testing = ref false
+let testing = ref true
 
 (* The hand is just a card list *)
 type hand = card list

@@ -331,7 +331,7 @@ else
     if is_r_env_known pl then
       if List.length c_access >0 then
         if List.length my_card > 0 then
-          let i = Random.int (List.length my_card-1) in
+          let i = Random.int (List.length my_card) in
           List.assoc (List.nth my_card i) c_access
         else
           let env = find_final_room env_lst in
