@@ -5,6 +5,7 @@ open Model
 let rand_from_lst lst =
   let len = List.length lst in
   if len = 0 then failwith "no lst"
+  else if len = 1 then List.hd lst
   else List.nth lst (Random.int len)
 
 (* true if the player [me] knows the suspect *)
