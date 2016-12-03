@@ -98,7 +98,7 @@ let move_player pls sus loc =
     | None -> pls in
   match sus with
   | Suspect s -> extr_pl (find_pl s pls)
-  | _ -> failwith "not a suspect"
+  | _ -> failwith ("not a suspect: "^Pervasives.__LOC__)
 
 let pl_eq (s:card) (pl:player) =
   match s with

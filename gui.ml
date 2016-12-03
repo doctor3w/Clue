@@ -87,7 +87,7 @@ let shift_grect (x_shift, y_shift) grect =
 let is_in_rect pt grect =
   let (x, y, w, h) = grect in
   let (x', y') = pt in
-  if (w < 0 || h < 0) then failwith "bad_rect"
+  if (w < 0 || h < 0) then failwith ("bad_rect: "^Pervasives.__LOC__)
   else (x' >= x && x' <= (x+w) && y' >= y && y' <= (y+h))
 
 (* fills the rect with color [fl] then outlines in with color [ln] *)
@@ -532,7 +532,8 @@ let prompt_move_gui (movelst: move list) : move =
                        let loc = CoordMap.find coord window.board.loc_map in
                        if List.mem loc loclst then Passage loc else loop ()
     | ("roll", _) -> draw_roll (); Roll
-    | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
+    | (s, _) -> failwith ("not an included string " ^ s ^ ": "
+                          ^ Pervasives.__LOC__) in
   (if List.length loclst = 0 then set_info "ROLL THE DICE"
   else set_info "SELECT A PASSAGE or ROLL THE DICE");
   loop ()
@@ -554,7 +555,8 @@ let display_dice_roll (roll: int) : unit =
 let display_move move : unit =
   let f loc = match loc.info with
   | Room_Rect (s,_) -> s
-  | Space _ -> failwith ("can't take a passage to a space: " ^ Pervasives.__LOC__)
+  | Space _ -> failwith ("can't take a passage to a space: "
+                          ^ Pervasives.__LOC__)
   in match move with
   | Passage loc ->
     let s = window.curr_player ^ " has taken the passage to " ^ (f loc) in
@@ -782,7 +784,8 @@ let prompt_continue () : unit =
   let loop () =
     match get_next_click_in_rects rects () with
     | ("continue", _) -> ();
-    | _ -> failwith "not a defines rectangle" in
+    | _ -> failwith ("not a defined rectangle: "
+                     ^ Pervasives.__LOC__)  in
   highlight_roll "CONTINUE" ();
   loop ()
 
@@ -792,6 +795,7 @@ let prompt_end_game () : unit =
   let loop () =
     match get_next_click_in_rects rects () with
     | ("quit", _) -> ();
-    | _ -> failwith "not a defines rectangle" in
+    | _ -> failwith ("not a defined rectangle"
+                      ^ Pervasives.__LOC__) in
   highlight_roll "QUIT" ();
   loop ()
