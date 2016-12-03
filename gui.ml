@@ -59,6 +59,7 @@ let weapon_color = Graphics.rgb 244 224 141
 let room_sheet_color = Graphics.rgb 141 225 244
 let deck_border_color = Graphics.black
 let lock_color = Graphics.rgb 63 63 63
+let answer_back = Graphics.rgb 31 31 31
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -691,6 +692,7 @@ let make_rects lst =
  * Can be none if there is no card to show. *)
 let prompt_answer hand guess : string =
   set_info "PICK A CARD TO SHOW";
+  grect_curry draw_filled_rect window.b_window Graphics.black answer_back;
   let (sus, weap, room) = guess in
   let can_show = if List.mem sus hand then [sus] else [] in
   let can_show = if List.mem weap hand then weap::can_show else can_show in
