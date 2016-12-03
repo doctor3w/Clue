@@ -90,6 +90,11 @@ let process_of_elimination sheet pub pl_typ =
     let r_unks = poe_finder rs [] sheet in
     poe_update s_unks sheet |> poe_update w_unks |> poe_update r_unks
 
+let show_sheet sheet agent =
+  if agent = Human_t && !view_type = GUI then
+    Gui.show_sheet sheet
+  else ()
+
 (* [show_card pl pu c g] updates the players sheet based on the new card seen
  * and the guess. If card is None, then that means no one had cards in the
  * guess and needs to be updated accordingly. Also needs to use process of
@@ -102,14 +107,16 @@ let show_card pl pub answer (s, w, r) =
     | None ->
       let () = Display.display_answer None "" (pl.agent = Human_t) in
       let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
+      show_sheet sheet' pl.agent;
       {pl with sheet = sheet'}
     | Some(sus, card) ->
       let () = Display.display_answer (Some card) sus (pl.agent = Human_t) in
       let data = CardMap.find card pl.sheet in
       let data' = {data with card_info= ShownBy(sus)} in
       let sheet' = CardMap.add card data' pl.sheet in
-      (* In non-DumbAI modules use process elim here to update rest of sheet. *)
-      {pl with sheet = (process_of_elimination sheet' pub pl.agent)}
+      let sheet'' = process_of_elimination sheet' pub pl.agent in
+      show_sheet sheet'' pl.agent;
+      {pl with sheet = sheet''}
 
 (* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
 let show_person pl card sus =
@@ -119,6 +126,7 @@ let show_person pl card sus =
     | x -> x in
   let data' = {data with card_info=card_info} in
   let sheet' = CardMap.add card data' pl.sheet in
+  show_sheet sheet' pl.agent;
   {pl with sheet = sheet'}
 
 

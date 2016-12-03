@@ -120,3 +120,8 @@ let prompt_continue () : unit =
 	match !view_type with
 	| CLI -> Cli.prompt_continue ()
 	| GUI -> Gui.prompt_continue ()
+
+let prompt_end_game () : unit =
+	match !view_type with
+	| CLI -> Cli.prompt_end_game ()
+	| GUI -> Gui.prompt_end_game ()

@@ -214,3 +214,7 @@ let prompt_continue () : unit =
 	let i = print_chars [Bold] intro; read_line () in
 	let s = String.lowercase_ascii (String.trim i) in
 	if s = "sheet" then () else ()
+
+let prompt_end_game () : unit =
+	let intro = "\nPress [Enter] to exit." in
+	print_chars [Bold] intro; ignore (read_line ())

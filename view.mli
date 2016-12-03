@@ -65,3 +65,5 @@ val show_sheet : sheet -> unit
 val show_hand : hand -> unit
 
 val prompt_continue : unit -> unit
+
+val prompt_end_game : unit -> unit

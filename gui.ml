@@ -783,3 +783,13 @@ let prompt_continue () : unit =
     | _ -> failwith "not a defines rectangle" in
   highlight_roll "CONTINUE" ();
   loop ()
+
+let prompt_end_game () : unit =
+  let cont_rect = window.roll_window in
+  let rects = [("quit", cont_rect)] in
+  let loop () =
+    match get_next_click_in_rects rects () with
+    | ("quit", _) -> ();
+    | _ -> failwith "not a defines rectangle" in
+  highlight_roll "QUIT" ();
+  loop ()
