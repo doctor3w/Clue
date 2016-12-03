@@ -213,7 +213,7 @@ let import_board (file_name: string) : game =
     public = { game_init.public with
       curr_player = (match sus_id_lst with
                      | h::t -> h
-                     | _ -> failwith "no suspects found");
+                     | _ -> failwith("no suspects found: "^Pervasives.__LOC__));
       acc_room = acc_id;
       deck = deck;
       player_order = sus_id_lst
@@ -233,7 +233,7 @@ in let game = {game with ai_only = all_ai} in
 
 let get_curr_player (game: game) : player =
   let rec loop = function
-  | [] -> failwith "can't find current player"
+  | [] -> failwith ("can't find current player: "^Pervasives.__LOC__)
   | h::t -> if h.suspect = game.public.curr_player then h else loop t
 in loop game.players
 
@@ -261,7 +261,8 @@ let get_move_options (g : game) : move list =
     | Room_Rect (s, _) -> Passage(loc)::pass)
     with _ -> failwith ("couldn't find coord ("
       ^ Pervasives.string_of_int x ^ ", "
-      ^ Pervasives.string_of_int y ^ ")") in
+      ^ Pervasives.string_of_int y ^ "): "
+      ^ Pervasives.__LOC__) in
   match start_loc.info with
   | Space _ -> [Roll]
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
@@ -282,7 +283,7 @@ module PathMap = struct
 
   let put (k:coord) ((s':int), (bp':coord)) (map: t) : t =
     if CoordMap.mem k map
-    then let (s, bp) = try (CoordMap.find k map) with _ -> failwith "line 277" in
+    then let (s, bp) = try (CoordMap.find k map) with _ -> failwith "line 286" in
       if (s' < s) then CoordMap.add k (s', bp') map
       else map
     else CoordMap.add k (s', bp') map
