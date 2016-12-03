@@ -19,6 +19,9 @@ type graphic_board = {
   mutable last_info: string;
   mutable roll_text: string;
   mutable curr_player: string;
+  mutable sus_count: int;
+  mutable weap_count: int;
+  mutable room_count: int;
 }
 
 let window = {
@@ -38,7 +41,10 @@ let window = {
     player_colors = StringMap.empty;
     last_info = "CLUE";
     curr_player = "";
-    roll_text = "CONTINUE"
+    roll_text = "CONTINUE";
+    sus_count = 1;
+    weap_count = 1;
+    room_count = 1
   }
 
 let player_border = Graphics.black
@@ -51,6 +57,7 @@ let suspect_color = Graphics.rgb 186 244 141
 let weapon_color = Graphics.rgb 244 224 141
 let room_sheet_color = Graphics.rgb 141 225 244
 let deck_border_color = Graphics.black
+let lock_color = Graphics.rgb 63 63 63
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -181,11 +188,30 @@ let adjust_coord_if_room coord =
 let translate_to_card pt =
   let (sx, sy, sw, sh) = window.s_window in
   let count = CardMap.cardinal window.sheet in
-  let hght = if sh = 0 then sh else count / sh in
+  let hght = if count = 0 then 1 else sh / count in
+  let space = (sh - (hght * count))/2 in
+  let sus_top = sy+sh in
+  let sus_bot = sus_top - (window.sus_count*hght) in
+  let weap_top = sus_bot - space in
+  let weap_bot = weap_top - (window.weap_count*hght) in
+  let room_top = weap_bot - space in
+  let room_bot = sy in
+
   let (x', y') = pt in
-  let index = (sh - y') / hght in
+  let index =
+    if      y' <= room_top then ((sh - y' - space*2) / hght)
+    else if y' <= weap_top then ((sh - y' - space) / hght)
+    else                     ((sh - y') / hght) in
   let bind = CardMap.bindings window.sheet in
   (index, fst (List.nth bind index))
+
+let card_to_index c =
+  let bindings = CardMap.bindings window.sheet in
+  let rec loop n lst =
+    match lst with
+    | (card, _)::t -> if c = card then n else loop (n+1) t
+    | _ -> failwith ("card not found: " ^ Pervasives.__LOC__) in
+  loop 0 bindings
 
 (* converts an HSV color to a Graphics.color.
  * Equations from www.rapidtables.com/convert/colors/hsv-to-rgb.htm *)
@@ -388,6 +414,42 @@ let draw_sheet () =
   if window.sheet_disp = "" then ()
   else CardMap.iter f window.sheet
 
+let draw_lock grect =
+  let (x, y, w, h) = grect in
+  let grect_box = (x + w/5, y + h/6, (w*3)/5, h/3) in
+  let (xa, ya, rx, ry, a1, a2) = (x + (w/2), y + h/2, w/5, h/5, 0, 180) in
+  (grect_curry draw_filled_rect grect_box) Graphics.black lock_color;
+  Graphics.set_color Graphics.black;
+  Graphics.set_line_width 3;
+  Graphics.draw_arc xa ya rx ry a1 a2;
+  Graphics.set_line_width 1
+
+let draw_picked grect lock =
+  if lock then draw_lock grect
+  else
+    let (x, y, w, h) = grect in
+    let grect' = (x + w/6, y + h/6, (2*w)/3, (2*h)/3) in
+    grect_curry draw_filled_rect grect' Graphics.black lock_color
+
+let mark_sheet_guess (c_list: (card * bool) list) =
+  draw_sheet ();
+  let count = CardMap.cardinal window.sheet in
+  let (sx, sy, sw, sh) = window.s_window in
+  let hght = if count = 0 then 1 else sh/count in
+  let space = (sh - (count * hght)) / 2 in
+  let rec loop lst =
+    match lst with
+    | [] -> ()
+    | (c, b)::t -> let i = card_to_index c in
+                   let y = if      i < window.sus_count
+                          then  sy + sh - ((i + 1) * hght)
+                        else if i < window.sus_count + window.weap_count
+                          then  sy + sh - ((i + 1) * hght) - space
+                        else    sy + sh - ((i + 1) * hght) - 2*space in
+                let grect = (sx, y, hght, hght) in
+                draw_picked grect b; loop t in
+  loop c_list
+
 (* draws the info box with the most recent info message *)
 let draw_info () =
   let grect = window.info_window in
@@ -524,16 +586,48 @@ let display_movement (l, (s, b)) : unit =
  * a bool which says whether or not it is the final accusation.
  * returns a string of the user's response. *)
 let prompt_guess loc (is_acc: bool) : string =
+  let has_room = ref (not is_acc) in
+  let has_weap = ref false in
+  let has_sus = ref false in
+  let r = ref
+    (match (is_acc, loc.info) with
+    | (true, _) -> (Room "")
+    | (false, Room_Rect (s, _)) -> (Room s)
+    | _ -> failwith ("guess must be from room: " ^ Pervasives.__LOC__)) in
+  let w = ref (Weapon "") in
+  let s = ref (Suspect "") in
   (if is_acc then set_info "MAKE YOUR FINAL ACCUSATION"
   else set_info "MAKE YOUR GUESS");
-  failwith "Unimplemented gui.prompt_guess"
+  let rec loop () =
+    let marks = if !has_room then [((!r), (not is_acc))] else [] in
+    let marks = if !has_weap then  ((!w), false)::marks  else marks in
+    let marks = if !has_sus  then  ((!s), false)::marks  else marks in
+    mark_sheet_guess marks;
+    let rects = if (!has_sus && !has_weap && !has_room)
+      then (highlight_roll "GUESS" ();
+        [("guess", window.roll_window); ("sheet", window.s_window)])
+      else [("sheet", window.s_window)] in
+    match get_next_click_in_rects rects () with
+    | ("guess", _) -> draw_roll (); (!s, !w, !r)
+    | ("sheet", pt) -> set_card (translate_to_card pt); loop ()
+  and set_card (n, card) =
+    match (n, card) with
+    | (i, Suspect _) -> s := card; has_sus := true
+    | (i, Weapon _) -> w := card; has_weap := true
+    | (i, Room _) -> has_room := true;
+                if is_acc then r := card else () in
+  set_roll_text "GUESS";
+  let (csus, cweap, croom) = loop () in
+  match csus, cweap, croom with
+  | Suspect sus, Weapon weap, Room room -> (sus ^ ", " ^ weap ^ ", " ^ room)
+  | _ -> failwith ("guess in wrong order: " ^ Pervasives.__LOC__)
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
   let guesser = window.curr_player in
   match guess with
   | (Suspect who, Weapon what, Room where) ->
-    let s1 = guesser ^ "thinks it was " ^ who in
+    let s1 = guesser ^ " thinks it was " ^ who in
     let s2 = " with the " ^ what in
     let s3 = " in the " ^ where ^ "." in
     set_info (s1 ^ s2 ^ s3)
@@ -579,6 +673,10 @@ let init game =
   window.board <- game.public.board;
   window.player_locs <- StringMap.empty;
   window.player_colors <- StringMap.empty;
+  let (s, w, r) = game.public.deck in
+  window.sus_count <- List.length s;
+  window.weap_count <- List.length w;
+  window.weap_count <- List.length r;
   let p_count = List.length game.players in
   let colors = pick_n_colors p_count in
   let count = ref 0 in
@@ -599,6 +697,8 @@ let init game =
     (window.sheet_disp <- p.suspect; window.sheet <- p.sheet)
   else ();
   Graphics.open_graph "";
+  let (gx, gy) = window.win_bounds in
+  Graphics.resize_window gx gy;
   Graphics.set_window_title "CLUE";
   redraw ()
 
