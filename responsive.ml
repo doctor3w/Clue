@@ -436,7 +436,7 @@ let get_guess player public : guess =
       then rand_from_lst (triple_fst (separate_hand player))
       else (match find_final_suspect (current_deck_to_env public player) with
         | Some c -> c
-        | None -> failwith "It can't be None") in
+        | None -> failwith ("It can't be None: " ^ Pervasives.__LOC__)) in
     (s,w,(loc_to_card player.curr_loc))
   | false, true ->
     let s = false_helper s_lst matrix public in
@@ -445,7 +445,7 @@ let get_guess player public : guess =
       then rand_from_lst (triple_snd (separate_hand player))
       else (match find_final_weapon (current_deck_to_env public player) with
         | Some c -> c
-        | None ->failwith "It can't be None") in
+        | None ->failwith ("It can't be None: " ^ Pervasives.__LOC__)) in
     (s,w,(loc_to_card player.curr_loc))
   | false, false ->
     let s = false_helper s_lst matrix public in
