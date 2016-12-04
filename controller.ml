@@ -1,5 +1,7 @@
 open Data
 
+(* This is how we were swapping out view types. We no longer do this
+ * We now just use view.ml to handle that. *)
 module Display = View
 
 (* Thrown when there are no players in a player list. *)
@@ -82,6 +84,7 @@ let reorder_pls pl plrs =
     | h::t' -> helper (h::ps) t'
   in helper [] plrs
 
+(* Checks whether or not a card in the hand is in the guess. *)
 let can_show hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.exists p hand
@@ -100,11 +103,15 @@ let move_player pls sus loc =
   | Suspect s -> extr_pl (find_pl s pls)
   | _ -> failwith "not a suspect"
 
+(* Checks if a suspect card is equal to a player object. This is checked
+ * by the suspect name *)
 let pl_eq (s:card) (pl:player) =
   match s with
   | Suspect name -> pl.suspect = name
   | _ -> false
 
+(* Tells all the agents except the current agent to take notes on the past
+ * guess. This is mainly for responsiveAI. *)
 let rec all_take_notes pls pub cur guess who_op =
   let rec helper pls' tl =
     match tl with
@@ -116,6 +123,8 @@ let rec all_take_notes pls pub cur guess who_op =
       helper (pl'::pls') t
   in List.rev (helper [] pls)
 
+(* This is the same as all take notes but it happens at the very beginning
+ * and then never again. *)
 let rec first_take_notes pls pub =
   let rec helper pls' tl =
     match tl with

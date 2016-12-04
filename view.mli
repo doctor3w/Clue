@@ -60,10 +60,16 @@ val display_victory : string -> unit
 (* Displays arbitrary text. *)
 val display_message : string -> unit
 
+(* Displays the sheet passed in *)
 val show_sheet : sheet -> unit
 
+(* Displays the hand passed in *)
 val show_hand : hand -> unit
 
+(* Prompts the user to continue the game. Allows a period for the
+ * user to think. *)
 val prompt_continue : unit -> unit
 
+(* Prompts the user at the end of the game to exit. Mainly for GUI so it
+ * doesn't quit as soon as the game ends. *)
 val prompt_end_game : unit -> unit

@@ -3,8 +3,10 @@
  *)
 open Data
 
+(* Raised when input arguments are invalid. *)
 exception Not_an_option
 
+(* Prints the usage of the program *)
 let print_usage () =
   print_endline "USAGE:";
   print_endline "";
@@ -16,6 +18,7 @@ let print_usage () =
   print_endline "file_name : optional filename to load on run";
   print_endline ""
 
+(* Parses the arguments passed in when program is launched *)
 let parse_args () =
   if Array.length Sys.argv > 2 then
     let g_or_c =

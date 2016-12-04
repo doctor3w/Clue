@@ -56,10 +56,6 @@ let display_move (m:move) : unit =
 let display_dice_roll i =
 	print_chars [] ("and "^(string_of_int i)^" was rolled.\n")
 
-(* Prompts the user for his. *)
-let string_of_int_tuple (a,b) =
-	"(" ^ (string_of_int a) ^ "," ^ (string_of_int b) ^")"
-
 let prompt_movement move_ops acc_room =
 	let intro = "After rolling, these are the possble options for moving:\n" in
 	let helper acc (_, (str, b)) =
@@ -122,13 +118,14 @@ let display_guess g =
 		print_chars [] " is the room.\n"
 	| (_,_,_) -> failwith "A guess has to follow the order Suspect * Weapon * Room"
 
-(* Prompts the user for a card to show.
- * Can be any card from the provided hand, and must be in the guess.
- * Cannot be none, only call when a card they have a card in the guess. *)
+(* Filters the cards in the hand that are in the guess. *)
 let showable hand (s, w, r) =
   let p c = (s = c || w = c || r = c) in
   List.filter p hand
 
+(* Prompts the user for a card to show.
+ * Can be any card from the provided hand, and must be in the guess.
+ * Cannot be none, only call when a card they have a card in the guess. *)
 let prompt_answer hand guess =
 	let cards_showable = showable hand guess in
 	let intro = "\nYou can show a card, which one will you show?\n" in

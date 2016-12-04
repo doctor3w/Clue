@@ -11,6 +11,8 @@
  *)
 type card = Suspect of string | Weapon of string | Room of string
 
+(* OrderedCard is a module with type card that adds a compare function so that
+ * we can make a Map. *)
 module OrderedCard = struct
   type t = card
   let compare c1 c2 =
@@ -24,12 +26,17 @@ module OrderedCard = struct
     | Suspect(s1), Suspect(s2) -> Pervasives.compare s1 s2
 end
 
+(* A Map with type card as the key *)
 module CardMap = Map.Make(OrderedCard)
 
+(* The type of view that can be displayed. *)
 type view = CLI | GUI
 
+(* Which view we are currently using, can be updated in the program. *)
 let view_type = ref CLI
 
+(* Our testing flag. Making it true will turn off printing delays and
+ * prompt_continues. *)
 let testing = ref true
 
 (* The hand is just a card list *)
@@ -38,28 +45,33 @@ type hand = card list
 (* A guess is three cards, one of each type.
  * They must be in the order Suspect * Weapon * Room *)
 type guess = card * card * card
+
+(* Deck is three card lists of the entire deck. In the order of:
+ * Suspects * Weapons * Rooms *)
 type deck = card list * card list * card list
 
 (* Info represents what we know of a specific card *)
 type card_info = Mine of string list | ShownBy of string | Unknown | Envelope
+
+(* Notes that can be used by the ResponsiveAI for keeping track of who has
+ * what cards *)
 type note = No_Note
           | HumanNote of string
           | NotInHand of string list
           | MaybeInHand of string list
 
+(* A record holding notes and card_info to store in the sheet *)
 type sheet_data = {
   card_info: card_info;
   note: note
 }
+
 (* [sheet] is a map from a [card] to [sheet_data] *)
 type sheet = sheet_data CardMap.t
 
 (* [agent] is a type representing what type of agent, specifically which
  * module should be used to call the prompts on *)
 type agent = Human_t | DumbAI_t | SmartAI_t | ResponsiveAI_t
-
-(* [move] is a type of move that you choose to do at the beginning
- * of a turn. *)
 
 type coord = int*int
 
@@ -157,6 +169,8 @@ module PathMap = struct
 
 end
 
+(* [move] is a type of move that you choose to do at the beginning
+ * of a turn. *)
 type move = Roll | Passage of loc
 
 (* Represents the movement of a player *)
@@ -168,6 +182,8 @@ type listen_choice = Pure_unknown
                     | Not_in_hand
                     | Maybe_in_hand
                     | Known
+
+(* Matrix of listen_choices: COLUMNS x ROWS info here please TODO! *)
 type listens = listen_choice array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
@@ -180,6 +196,9 @@ type player = {suspect: string;
                is_out: bool;
                listen: listens}      (* need to update model *)
 
+(* Public information everyone should know, such as the current player name,
+ * the board setup, the accusation room, the full deck, and the
+ * player_order. *)
 type public = {curr_player: string;
                board: board;
                acc_room: string;
@@ -189,21 +208,19 @@ type public = {curr_player: string;
                current_response: string option;
                }
 
-(* [game] is the current state of the game. The players represent all agents
- * of the game, curr_player is the current players turn, board is a
- * representation of the game board used for drawing, envelope is the winning
- * guess. *)
+(**
+ * [game] is the current state of the game. The players represent all agents
+ * of the game, the public is the game's public information, envelope is the
+ * 3 cards in the envelope (the correct guess) and ai_only is a flag for
+ * continuing the game after all humans have lost (true = plays without
+ * humans.
+ **)
 type game = {players: player list;
              public: public;
              envelope: guess;
              ai_only: bool}
-(* type game = {players: player list;
-             curr_player: string;
-             board: loc;
-             envelope: guess;
-             acc_room: string;
-             listen_data: listens} *)
 
+(* A test game init. Fails in step because no players. *)
 let game_init = {
   players = [];
   envelope = (Suspect "", Weapon "", Room "");

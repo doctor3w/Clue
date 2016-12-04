@@ -2,7 +2,11 @@ open Data
 
 module Display = View
 
+(* Bad_input is raised when human input cannot be parsed. *)
 exception Bad_input
+
+(* Wrong_room is raised when the human guesses a room that they are not
+ * currently in. *)
 exception Wrong_room
 
 (* Normalizes a string *)
@@ -13,13 +17,18 @@ let eq_str s1 s2 = (normalize s1) = (normalize s2)
 
 (* [contains_xs s xs] checks if any xs appear in the string s *)
 let contains_xs s xs =
-  let cat = if List.length xs = 1 then List.hd xs
-            else List.fold_left (fun acc el -> match acc with
-                                               | "" -> el
-                                               | a -> a^"\\|"^el) "" xs in
+  let f_or acc el =
+    match acc with
+    | "" -> el
+    | a -> a^"\\|"^el in
+  let cat =
+    if List.length xs = 1 then List.hd xs
+    else List.fold_left f_or "" xs in
   let r = Str.regexp cat in
   try ignore (Str.search_forward r s 0); true with Not_found -> false
 
+(* check_sheet_or_hand parses the human text and prints the sheet or hand if
+ * the string matches "sheet" or "hand" respectively. *)
 let check_sheet_or_hand text pl =
   if contains_xs (normalize text) ["sheet"] then
     (Display.show_sheet pl.sheet; true)
