@@ -31,7 +31,7 @@ let parse_args () =
   else
     let g_or_c =
       try
-        if Sys.argv.(1) = "-gui" then GUI else raise Not_an_option
+        if Sys.argv.(1) = "-gui" then GUI else CLI
       with
       | Invalid_argument _ -> CLI in
     let file_name =

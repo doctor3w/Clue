@@ -4,6 +4,8 @@ module Display = View
 
 exception No_place_to_go
 
+let p_mod i n = ((i mod n)+n) mod n
+
 let rec find x lst =
     match lst with
     | [] -> failwith ("Not Found: " ^ Pervasives.__LOC__)
@@ -160,14 +162,14 @@ let is_s_env_known player =
  * passages *)
 let rec check_p_farthest player public new_p_lst =
   match new_p_lst with
-  | []-> false
-  | h::t-> let r = p_to_room h in
+  | [] -> false
+  | h::t -> let r = p_to_room h in
             let r_i = card_to_index public r in
             let pi = suspect_to_index public player.suspect in
-            let farthest = if pi = (List.length public.player_order)-1 then 0
-                           else pi-1 in
-            (player.listen.(r_i).(farthest) = Known )
-            || check_p_farthest player public t
+            let farthest = p_mod (pi-1) (List.length public.player_order) in
+            let b = (player.listen.(r_i).(farthest) = Known ) in
+            let b2 = check_p_farthest player public t in
+            b || b2
 
 (* returns a list of passages that are not Known in listens *)
 let rec check_p_known player public passage_list =
@@ -234,7 +236,8 @@ let is_p_env player public passage_list =
 let answer_move player public move_list : move =
   let () = Display.show_sheet player.sheet in
   if is_r_env_known player && is_w_env_known player && is_s_env_known player
-  then Roll
+  then
+    Roll
   else
     let passage = List.filter (fun a -> match a with
                                         | Roll -> false
