@@ -196,7 +196,7 @@
     [
       {
         "suspect": "Red",
-        "agent_type": "SmartAI"
+        "agent_type": "DumbAI"
       }, {
         "suspect": "Yellow",
         "agent_type": "SmartAI"

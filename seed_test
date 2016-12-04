@@ -7,4 +7,9 @@ for i in `seq 1000 2000`; do
   ./main.byte "tests/game.json" $i | grep 'won' >> ./winners.txt
 done
 
-grep -c $1 ./winners.txt && printf "/" && grep -c "" ./winners.txt
+for var in "$@"
+do
+    printf "$var : " && grep -c $var ./winners.txt
+done
+
+printf "Total : " && grep -c "" ./winners.txt

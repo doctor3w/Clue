@@ -334,7 +334,7 @@ let draw_board highlights () =
     |> rect_to_grect
     |> (scale_grect (x_mult, y_mult))
     |> (shift_grect (xb, yb)) in
-    let (gx, gy, gh, gw) = grect in
+    (* let (gx, gy, gh, gw) = grect in *)
     let dr = (grect_curry draw_filled_rect grect) in
       (if is_highlight && not (List.mem coord highlights)
         then dr Graphics.black dark_room_color
