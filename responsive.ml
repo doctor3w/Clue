@@ -718,21 +718,25 @@ let compile_notinhand matrix public x_len ref_l =
        rewrite_env matrix.(index))
     else ()) done
 
+
 (* update player.listen when responsiveAI first gets the hand *)
 let first_take_note player public: player =
   let matrix = player.listen in
   let hand = player.hand in
   let y_len = List.length public.player_order in
-  (match hand with
-  | [] -> ()
-  | h::t ->
-    (let c_index = card_to_index public h in
-    let p_index = suspect_to_index public player.suspect in
-    matrix.(c_index).(p_index) <- Known;
-    for i1 = 0 to (p_index-1)
-    do (matrix.(c_index).(i1) <- Not_in_hand) done;
-    for i2 = (p_index+1) to (y_len-1)
-    do (matrix.(c_index).(i2) <- Not_in_hand) done));
+  let rec help ha player =
+    (match ha with
+    | [] -> ()
+    | h::t ->
+      (let c_index = card_to_index public h in
+      let p_index = suspect_to_index public player.suspect in
+      matrix.(c_index).(p_index) <- Known;
+      for i1 = 0 to (p_index-1)
+      do (matrix.(c_index).(i1) <- Not_in_hand) done;
+      for i2 = (p_index+1) to (y_len-1)
+      do (matrix.(c_index).(i2) <- Not_in_hand) done;
+      help t player)) in
+  help hand player;
   player
 
 (* [take_notes] is only called
