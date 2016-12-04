@@ -710,7 +710,7 @@ let compile_notinhand matrix public x_len ref_l =
     else ()) done
 
 (* update player.listen when responsiveAI first gets the hand *)
-let first_take_note public player: player = 
+let first_take_note player public: player =
   let matrix = player.listen in
   let p_index = suspect_to_index public player.suspect in
   let hand = player.hand in
@@ -718,12 +718,12 @@ let first_take_note public player: player =
   let (s_lst, w_lst, r_lst) = public.deck in
   let deck' = s_lst@w_lst@r_lst in
   let x_len = List.length deck' in
-  for i = 0 to (x_len-1) 
+  for i = 0 to (x_len-1)
   do matrix.(i).(p_index) <- Not_in_hand done;
-  let rec help ha public = 
+  let rec help ha public =
     (match ha with
-    | [] -> () 
-    | h::t -> 
+    | [] -> ()
+    | h::t ->
       (let c_index = card_to_index public h in
       matrix.(c_index).(p_index) <- Known;
       for i1 = 0 to (p_index-1)
@@ -733,14 +733,26 @@ let first_take_note public player: player =
       help t public)) in help hand public;
   player
 
-let rec update_player player l = 
+let rec update_player player l =
       match !l with
       | [] -> player
-      | h::t -> 
+      | h::t ->
         let data = CardMap.find h player.sheet in
         let data' = {data with card_info = Envelope} in
         let sheet' = CardMap.add h data' player.sheet in
             update_player {player with sheet = sheet'} (ref t)
+
+let compile_known matrix public lst ref_l =
+  let counter = ref None in
+  let index_lst = List.map (fun x -> card_to_index public x) lst in
+  let len = List.length index_lst in
+  for i = (List.nth index_lst 0) to List.nth index_lst (len-1)
+     do (if (Array.exists (fun x -> x = Known) matrix.(i)) = false
+       then (counter := Some i;
+           ref_l := (index_to_card public i) :: !ref_l;
+           rewrite_env matrix.(i))
+       else ()) done
+
 
 (* [take_notes] is only called
   when another player is showing a card to another player
