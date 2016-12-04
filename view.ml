@@ -69,7 +69,7 @@ let display_relocate who loc =
 let prompt_guess loc b =
 	match !view_type with
 	| CLI -> Cli.prompt_guess loc b
-	| GUI -> after_delay (fun () -> Gui.prompt_guess loc b) 1.0
+	| GUI -> Gui.prompt_guess loc b
 
 (* Displays a guess (by the user or AI). *)
 let display_guess g =

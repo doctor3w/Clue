@@ -340,7 +340,7 @@ let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
     let frnt'' = add_next k (n+1) frnt' stld' in
     loop frnt'' stld'
   in match loc.info with
-  | Space _ -> loop (add_next start_loc 0 frontier settled) settled
+  | Space _ -> loop (add_next start_loc 1 frontier settled) settled
   | Room_Rect _ -> let no_pass = List.filter is_space loc.edges in
                    loop (List.fold_left g frontier no_pass) settled
 
