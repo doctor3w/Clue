@@ -498,11 +498,11 @@ let listen_unk_to_env listen player public (s,w,r) :unit=
   let s_index = card_to_index public s in
   let w_index = card_to_index public w in
   let r_index = card_to_index public r in
-  let me = suspect_to_index public player.suspect in
+  (* let me = suspect_to_index public player.suspect in *)
   for j = 0 to List.length public.player_order -1
     do (
-      if j = me then ()
-      else
+     (*  if j = me then ()
+      else *)
       listen.(s_index).(j)<- Env;
       listen.(w_index).(j)<-Env;
       listen.(r_index).(j)<-Env) done
