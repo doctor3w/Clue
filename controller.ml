@@ -168,7 +168,7 @@ and handle_accusation curr_p next_p game =
   let () = Display.display_guess guess in
   if guess = game.envelope then
     let () = Display.display_victory curr_p.suspect in
-    Display.prompt_end_game ()
+    if not !testing then Display.prompt_end_game () else ()
   else (* Lose, out *)
     let message =
       ("\n"^curr_p.suspect^" guessed incorrectly, and is out of the game.") in
@@ -182,7 +182,7 @@ and handle_accusation curr_p next_p game =
       step {game with players = pls'; public = pub}
     else
       Display.display_message "\n\nGame over.";
-      Display.prompt_end_game ()
+      if not !testing then Display.prompt_end_game () else ()
 
 (* [handle_guess curr_p next_p game] takes in the current player, the next
  * player and the game state and performs actions for getting a guess from

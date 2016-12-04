@@ -85,9 +85,11 @@ let sleep sec = ignore (Unix.select [] [] [] sec)
 let print_chars (cs: style list) s =
   let print_char cs c =
     print_string cs (String.make 1 c);
-    if !view_type = CLI then Thread.delay char_delay else ();
-    flush stdout
-  in String.iter (print_char cs) s
+    Thread.delay char_delay;
+    flush stdout in
+  if !view_type = CLI && not !testing then
+    String.iter (print_char cs) s
+  else print_string cs s
 
 let print_lines (cs) s =
   let ss = Str.split (Str.regexp "[\n\r]+") s in
