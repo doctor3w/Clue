@@ -6,7 +6,7 @@ exception No_place_to_go
 
 let rec find x lst =
     match lst with
-    | [] -> failwith "Not Found"
+    | [] -> failwith ("Not Found: " ^ Pervasives.__LOC__)
     | h :: t -> if x = h then 0 else 1 + find x t
 
 let suspect_to_index public (sus:string) : int =
@@ -26,13 +26,13 @@ let index_to_card public i : card =
 
 let rand_from_lst lst =
   let len = List.length lst in
-  if len = 0 then failwith "no lst"
+  if len = 0 then failwith ("no lst: " ^ Pervasives.__LOC__)
   else let n = Random.int len in
     List.nth lst n
 (* return the max number in the list *)
 let my_max =
   function
-    | [] -> failwith "empty list"
+    | [] -> failwith ("empty list: " ^ Pervasives.__LOC__)
     | x::xs -> List.fold_left max x xs
 
 (* true if card [c] is marked as Envelope in [me].sheet *)
@@ -120,11 +120,11 @@ let rewrite_env a =
 (* turns a passage into a room card *)
 let p_to_room passage =
   match passage with
-  | Roll -> failwith "not gonna happen"
+  | Roll -> failwith ("not gonna happen: " ^ Pervasives.__LOC__)
   | Passage n ->
     match n.info with
     | Room_Rect (r,_) -> Room r
-    | _ -> failwith "not a room card"
+    | _ -> failwith ("not a room card: " ^ Pervasives.__LOC__)
 
 (* [is_r_env_known] checks if player knows the room card in envelope *)
 let is_r_env_known player =
@@ -318,7 +318,7 @@ if is_r_env_known pl && is_w_env_known pl && is_s_env_known pl
 then
   match List.filter (is_acc_room public) movelst with
   | [(l, (s, b))] -> (l, (s, b))
-  | _ -> failwith "can't find accusation room"
+  | _ -> failwith ("can't find accusation room: " ^ Pervasives.__LOC__)
 else
   let b = (fun x -> not (is_acc_room public x)) in
   let movelst' = List.filter b movelst in
@@ -331,12 +331,13 @@ else
     if is_r_env_known pl then
       if List.length c_access >0 then
         if List.length my_card > 0 then
-          let i = Random.int (List.length my_card-1) in
+          let i = Random.int (List.length my_card) in
           List.assoc (List.nth my_card i) c_access
         else
           let env = find_final_room env_lst in
               let r = match env with
-                      | None -> failwith "player knows room in env, still None"
+                      | None -> failwith ("player knows room in env, still None"
+                                          ^ Pervasives.__LOC__)
                       | Some n -> n in
             if check_env_in_move r access then
               List.assoc r c_access
@@ -368,7 +369,8 @@ let no_env sheet card = (CardMap.find card sheet).card_info <> Envelope
 let loc_to_card loc =
   match loc.info with
                | Room_Rect (s, _) -> (Room s)
-               | _ -> failwith "trying to guess from not room"
+               | _ -> failwith ("trying to guess from not room: "
+                                 ^ Pervasives.__LOC__)
 
 (* sorts out other listen_choice when there is no Not_in_Hand information *)
 let next_step (i,c) lst matrix public =
@@ -496,11 +498,11 @@ let listen_unk_to_env listen player public (s,w,r) :unit=
   let s_index = card_to_index public s in
   let w_index = card_to_index public w in
   let r_index = card_to_index public r in
-  let me = suspect_to_index public player.suspect in
+  (* let me = suspect_to_index public player.suspect in *)
   for j = 0 to List.length public.player_order -1
     do (
-      if j = me then ()
-      else
+     (*  if j = me then ()
+      else *)
       listen.(s_index).(j)<- Env;
       listen.(w_index).(j)<-Env;
       listen.(r_index).(j)<-Env) done
@@ -698,6 +700,48 @@ let column_helper matrix j i_len player =
   doesn't include any Knwon. Then put the card into ref_l; rewrite the
   entire array to Env
    PreC: [all_but_one_known] for lst is true *)
+(* if the entire row for a card is all filled up with Not_in_hand,
+  it must be in the envelope *)
+let compile_notinhand matrix public x_len ref_l =
+  for index = 0 to (x_len-1)
+  do (if is_all_notinhand matrix.(index)
+    then ((ref_l := (index_to_card public index) :: !ref_l);
+       rewrite_env matrix.(index))
+    else ()) done
+
+(* update player.listen when responsiveAI first gets the hand *)
+let first_take_note player public: player =
+  let matrix = player.listen in
+  let p_index = suspect_to_index public player.suspect in
+  let hand = player.hand in
+  let y_len = List.length public.player_order in
+  let (s_lst, w_lst, r_lst) = public.deck in
+  let deck' = s_lst@w_lst@r_lst in
+  let x_len = List.length deck' in
+  for i = 0 to (x_len-1)
+  do matrix.(i).(p_index) <- Not_in_hand done;
+  let rec help ha public =
+    (match ha with
+    | [] -> ()
+    | h::t ->
+      (let c_index = card_to_index public h in
+      matrix.(c_index).(p_index) <- Known;
+      for i1 = 0 to (p_index-1)
+      do (matrix.(c_index).(i1) <- Not_in_hand) done;
+      for i2 = (p_index+1) to (y_len-1)
+      do (matrix.(c_index).(i2) <- Not_in_hand) done;
+      help t public)) in help hand public;
+  player
+
+let rec update_player player l =
+      match !l with
+      | [] -> player
+      | h::t ->
+        let data = CardMap.find h player.sheet in
+        let data' = {data with card_info = Envelope} in
+        let sheet' = CardMap.add h data' player.sheet in
+            update_player {player with sheet = sheet'} (ref t)
+
 let compile_known matrix public lst ref_l =
   let counter = ref None in
   let index_lst = List.map (fun x -> card_to_index public x) lst in
@@ -709,41 +753,14 @@ let compile_known matrix public lst ref_l =
            rewrite_env matrix.(i))
        else ()) done
 
-(* if the entire row for a card is all filled up with Not_in_hand,
-  it must be in the envelope *)
-let compile_notinhand matrix public x_len ref_l =
-  for index = 0 to (x_len-1)
-  do (if is_all_notinhand matrix.(index)
-    then (ref_l := (index_to_card public index) :: !ref_l;
-       rewrite_env matrix.(index))
-    else ()) done
-
-(* update player.listen when responsiveAI first gets the hand *)
-let first_take_note player public: player =
-  let matrix = player.listen in
-  let hand = player.hand in
-  let y_len = List.length public.player_order in
-  (match hand with
-  | [] -> ()
-  | h::t ->
-    (let c_index = card_to_index public h in
-    let p_index = suspect_to_index public player.suspect in
-    matrix.(c_index).(p_index) <- Known;
-    for i1 = 0 to (p_index-1)
-    do (matrix.(c_index).(i1) <- Not_in_hand) done;
-    for i2 = (p_index+1) to (y_len-1)
-    do (matrix.(c_index).(i2) <- Not_in_hand) done));
-  player
 
 (* [take_notes] is only called
   when another player is showing a card to another player
   /no one could show a card to another player.
-
   It takes four inputs:  player, public, current_guess and string_option,
   where player is responsive AI itself, public is just the type public,
   guess is the current guess by some other player and
   string_option is if there is a player having any card to show him.
-
   It returns a new player as the output
   where we mainly change the player.listen and possibly player.sheet.
  *)
@@ -764,7 +781,17 @@ let take_notes player public guess str_option: player =
   match str_option with
   (* None should be find *)
   | None -> (none_helper matrix public s_index w_index r_index;
-         player)
+            (if all_but_one_known matrix public s_lst
+             then compile_known matrix public s_lst l
+             else ());
+             (if all_but_one_known matrix public w_lst
+             then compile_known matrix public w_lst l
+             else ());
+             (if all_but_one_known matrix public r_lst
+             then compile_known matrix public r_lst l
+             else ());
+             (compile_notinhand matrix public x_len l);
+             update_player player l)
   | Some str ->
   (* update all the Pure_unknown to Maybe_in_hand *)
     (let p_index = suspect_to_index public str in
@@ -801,7 +828,7 @@ let take_notes player public guess str_option: player =
   (* might need to do more to compile the data *)
   (* update not_in_hand if the player answering the guess is not adjacent
     to the player asking*)
-    let asking_index = suspect_to_index public player.suspect in
+    let asking_index = suspect_to_index public public.curr_player in
     let answering_index = suspect_to_index public str in
     if (asking_index < answering_index)
     then (for new_i = (asking_index+1) to (answering_index-1)
@@ -815,7 +842,7 @@ let take_notes player public guess str_option: player =
         for new_i2 = (asking_index+1) to (y_len-1)
         do  (matrix.(s_index).(new_i2) <- Not_in_hand;
            matrix.(w_index).(new_i2) <- Not_in_hand;
-           matrix.(r_index).(new_i2) <- Not_in_hand;) done);
+           matrix.(r_index).(new_i2) <- Not_in_hand;) done));
   (* compile data *)
     (if all_but_one_known matrix public s_lst
     then compile_known matrix public s_lst l
@@ -826,13 +853,5 @@ let take_notes player public guess str_option: player =
     (if all_but_one_known matrix public r_lst
     then compile_known matrix public r_lst l
     else ());
-    compile_notinhand matrix public x_len l;
-    let rec update_player player l =
-      match !l with
-      | [] -> player
-      | h::t ->
-        let data = CardMap.find h player.sheet in
-        let data' = {data with card_info = Envelope} in
-        let sheet' = CardMap.add h data' player.sheet in
-            update_player {player with sheet = sheet'} (ref t)
-    in update_player player l)
+    (compile_notinhand matrix public x_len l);
+    update_player player l

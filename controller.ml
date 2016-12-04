@@ -31,7 +31,8 @@ let get_movement_dir l ops =
 let handle_move game curr_p m =
   match m with
   | Roll ->
-    let dice_roll = (Random.int 11) + 2 in
+    let (d1, d2) = ((Random.int 6) + 1, (Random.int 6) + 1) in
+    let dice_roll = d1 + d2 in
     let () = Display.display_dice_roll dice_roll in
     let (movement_opt, pm) = Model.get_movement_options game dice_roll in
     let (l, (s, b)) =
@@ -101,7 +102,7 @@ let move_player pls sus loc =
     | None -> pls in
   match sus with
   | Suspect s -> extr_pl (find_pl s pls)
-  | _ -> failwith "not a suspect"
+  | _ -> failwith ("not a suspect: "^Pervasives.__LOC__)
 
 (* Checks if a suspect card is equal to a player object. This is checked
  * by the suspect name *)

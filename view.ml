@@ -1,5 +1,12 @@
 open Data
 
+(* returns f () after a delay of [secs] seconds. No delay if testing *)
+let after_delay (f: unit -> 'a) (secs:float) : 'a =
+	let b = if !testing then true else (Thread.delay secs; true) in
+	match b with
+	| true -> f ()
+	| false -> failwith ("Can never be false: " ^ Pervasives.__LOC__)
+
 (* Displays the provided error message stored in [e] in color red. *)
 let display_error (e:string): unit =
 	match !view_type with

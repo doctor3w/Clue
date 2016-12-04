@@ -15,6 +15,8 @@ type graphic_board = {
   mutable s_window: grect;
   mutable roll_window: grect;
   mutable info_window: grect;
+  mutable log_window: grect;
+  mutable po_window: grect;
   mutable player_locs: loc StringMap.t;
   mutable player_colors: Graphics.color StringMap.t;
   mutable last_info: string;
@@ -23,16 +25,19 @@ type graphic_board = {
   mutable sus_count: int;
   mutable weap_count: int;
   mutable room_count: int;
+  mutable log: (string * Graphics.color) list;
 }
 
 let window = {
-    win_bounds = (720, 570);
+    win_bounds = (960, 720);
     sheet_disp = "";
     sheet = CardMap.empty;
     b_window = (10, 80, 480, 480);
-    s_window = (500, 80, 210, 480);
+    s_window = (500, 80, 210, 630);
     roll_window = (500, 10, 210, 60);
     info_window = (10, 10, 480, 60);
+    log_window = (720, 10, 230, 700);
+    po_window = (10, 570, 480, 140);
     board = {
       dim = (-1,-1);
       loc_map = CoordMap.empty;
@@ -45,7 +50,8 @@ let window = {
     roll_text = "CONTINUE";
     sus_count = 1;
     weap_count = 1;
-    room_count = 1
+    room_count = 1;
+    log = [("Welcome to CLUE.", Graphics.black)]
   }
 
 let player_border = Graphics.black
@@ -60,6 +66,32 @@ let room_sheet_color = Graphics.rgb 141 225 244
 let deck_border_color = Graphics.black
 let lock_color = Graphics.rgb 63 63 63
 let answer_back = Graphics.rgb 31 31 31
+let dark_space_color = Graphics.rgb 127 127 127
+let dark_room_color = Graphics.rgb 63 63 63
+
+
+(* Delays for [secs] seconds
+ * figured out after looking at this post from StackOverflow:
+ * Unix.Unix_error(Unix.EINTR, "select", "") *)
+let gui_delay (secs:float) =
+  let start_time = Unix.gettimeofday () in
+  let rec loop () =
+    let dur = start_time +. secs -. Unix.gettimeofday () in
+    if dur > 0.0 then
+      try Thread.delay dur
+      with Unix.Unix_error(Unix.EINTR, _, _) -> loop ()
+  in if !testing then () else loop ()
+
+(* returns f () after a delay of [secs] seconds. No delay if testing *)
+let after_delay (f: unit -> 'a) (secs:float) : 'a =
+  let b = if !testing then true else (Thread.delay secs; true) in
+  match b with
+  | true -> f ()
+  | false -> failwith ("Can never be false: " ^ Pervasives.__LOC__)
+
+(* true iff the current player is the player whose sheet is displayed *)
+let is_my_turn =
+  window.curr_player = window.sheet_disp
 
 (* partially applies the [rect] as four arguments to f *)
 let grect_curry f rect =
@@ -87,7 +119,7 @@ let shift_grect (x_shift, y_shift) grect =
 let is_in_rect pt grect =
   let (x, y, w, h) = grect in
   let (x', y') = pt in
-  if (w < 0 || h < 0) then failwith "bad_rect"
+  if (w < 0 || h < 0) then failwith ("bad_rect: "^Pervasives.__LOC__)
   else (x' >= x && x' <= (x+w) && y' >= y && y' <= (y+h))
 
 (* fills the rect with color [fl] then outlines in with color [ln] *)
@@ -124,11 +156,15 @@ let draw_ell_in_rect x y w h ln fl =
 let center_text_in_rect x y w h s =
   let lst = Str.split (regexp "[\n]+") s in
   let count = List.length lst in
+  let longer (aw, ah) el =
+    let (w', h') = Graphics.text_size el in
+    if (w' > aw) then (w', h') else (aw, ah) in
+  let biggest_size = List.fold_left longer (0, 0) lst in
   let rec loop n lst =
     match lst with
     | [] -> ()
     | s'::t ->
-      let (w', h') = Graphics.text_size s in
+      let (w', h') = biggest_size in
       let h'' = h'*count in
       let (buffer_w, buffer_h) = ((w - w')/2, (h - h'')/2) in
       Graphics.moveto (x+buffer_w) (y+buffer_h+(count - 1 - n)*h');
@@ -246,7 +282,8 @@ let hsv_to_rgb (h, s, v) =
     else if 300. <= h && h < 360. then (c,  0., x)
     else (0., 0., 0.) in
   let (r, g, b) = ((r'+.m)*.255., (g'+.m)*.255., (b'+.m)*.255.) in
-  Graphics.rgb (truncate r) (truncate g) (truncate b)
+  let trunc = Pervasives.truncate in
+  Graphics.rgb (trunc r) (trunc g) (trunc b)
 
 (* picks n equally spaced colors using evenly spaced HSVs and converting them
  * to RGBs *)
@@ -280,8 +317,9 @@ let draw_exits transform loc =
   List.iter draw_exit loc.edges; Graphics.set_line_width 1
 
 (* clears the window and draws the board *)
-let draw_board () =
+let draw_board highlights () =
   (grect_curry draw_filled_rect window.b_window) Graphics.black Graphics.white;
+  let is_highlight = List.length highlights <> 0 in
   let room_bind = StringMap.bindings window.board.room_coords in
   let (xb, yb, wb, hb) = window.b_window in
   let (x_mult, y_mult) = get_mults () in
@@ -297,7 +335,10 @@ let draw_board () =
     |> (scale_grect (x_mult, y_mult))
     |> (shift_grect (xb, yb)) in
     let (gx, gy, gh, gw) = grect in
-    (grect_curry draw_filled_rect grect) Graphics.black room_color;
+    let dr = (grect_curry draw_filled_rect grect) in
+      (if is_highlight && not (List.mem coord highlights)
+        then dr Graphics.black dark_room_color
+        else dr Graphics.black room_color);
     (grect_curry center_text_in_rect grect) s;
     draw_exits transform loc in
   let g (coord, loc) =
@@ -305,7 +346,10 @@ let draw_board () =
     | Space (x, y) -> let grect = (x, y, 1, 1)
                       |> (scale_grect (x_mult, y_mult))
                       |> (shift_grect (xb, yb)) in
-            (grect_curry draw_filled_rect grect) Graphics.black space_color
+                      let dr = (grect_curry draw_filled_rect grect) in
+                      if is_highlight && not (List.mem coord highlights)
+                        then dr Graphics.black dark_space_color
+                        else dr Graphics.black space_color
     | _ -> () in
   let coord_binds = CoordMap.bindings window.board.loc_map in
   List.iter g coord_binds;
@@ -471,13 +515,68 @@ let draw_info () =
 let set_info s =
   window.last_info <- s; draw_info ()
 
+let split_long_string w s =
+  let lst = Str.split (regexp_string " ") s in
+  let rec loop acc s lst =
+    match lst with
+    | [] -> acc @ [s]
+    | h::t -> let s' = if s <> "" then s ^ " " ^ h else h in
+              let (w', h') = Graphics.text_size s' in
+              if (w' > w) then loop (acc @ [s]) ("  " ^ h) t
+              else loop acc s' t in
+  loop [] "" lst
+
+let draw_log () =
+  grect_curry draw_filled_rect window.log_window Graphics.black Graphics.white;
+  let (x', y', w', h') = window.log_window in
+  let top = y' + h' - 3 in
+  Graphics.moveto (x'+3) (y'+3);
+  (* prints the log from the bottom up *)
+  let rec loop lst (x, y) (acc: (string*Graphics.color) list) =
+    match lst with
+    | [] -> (Graphics.set_color Graphics.black; acc)
+    | (s', col')::t'' -> let (w, h) = Graphics.text_size s' in
+                       let (w, s, col, t) = if w > (w' - 6) then
+                       let lst' = split_long_string (w' - 6) s' in
+                       let lst' = List.map (fun s -> (s, col')) lst' in
+                       let ((sh, scol), t') = match List.rev lst' with
+                          | (sh', scol')::tt -> ((sh', scol'), tt)
+                          | _ -> failwith ("can't be empty: "
+                                          ^ Pervasives.__LOC__) in
+                       let (w'', _) = Graphics.text_size sh in
+                       (w'', sh, scol, (List.rev (t'))@t'')
+                      else (w, s', col', t'') in
+                     if (Graphics.current_y () >= top - h) then acc
+                     else
+                      (Graphics.set_color col;
+                      Graphics.draw_string s;
+                      Graphics.rmoveto (-1*w) (h+1);
+                      loop t (x-h, y-w) ((s, col)::acc)) in
+
+  let acc = loop (List.rev window.log) (x', y') [] in
+  window.log <- acc
+
+let add_to_log lst =
+  let rec loop lst acc =
+    match lst with
+    | [] -> acc
+    | h::t -> loop t (List.rev (h::(List.rev acc))) in
+  window.log <- loop lst window.log;
+  draw_log ()
+
+let draw_po () =
+  grect_curry draw_filled_rect window.po_window Graphics.black Graphics.white;
+  ()
+
 (* redraws the entire window *)
 let redraw () =
-  draw_board ();
+  draw_board [] ();
   draw_players ();
   draw_roll ();
   draw_sheet ();
   draw_info ();
+  draw_log ();
+  draw_po();
   ()
 
 (* Displays the relocation of suspect [string] to the Room loc *)
@@ -511,7 +610,9 @@ let display_error (e_msg: string) : unit =
 let display_turn (public:Data.public) : unit =
   let this_turn = public.curr_player in
   window.curr_player <- this_turn;
-  set_info ("It is " ^ window.curr_player ^ "'s turn.")
+  let s = ("It is " ^ window.curr_player ^ "'s turn.") in
+  set_info s;
+  add_to_log [(s, StringMap.find this_turn window.player_colors)]
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
@@ -532,7 +633,8 @@ let prompt_move_gui (movelst: move list) : move =
                        let loc = CoordMap.find coord window.board.loc_map in
                        if List.mem loc loclst then Passage loc else loop ()
     | ("roll", _) -> draw_roll (); Roll
-    | (s, _) -> failwith ("not an included string " ^ s ^ ": " ^ Pervasives.__LOC__) in
+    | (s, _) -> failwith ("not an included string " ^ s ^ ": "
+                          ^ Pervasives.__LOC__) in
   (if List.length loclst = 0 then set_info "ROLL THE DICE"
   else set_info "SELECT A PASSAGE or ROLL THE DICE");
   loop ()
@@ -547,19 +649,26 @@ let prompt_move (movelst: move list) : string =
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
+  let _ = if (not is_my_turn) then gui_delay 1.0 else () in
   let s = (" has rolled a " ^ (Pervasives.string_of_int roll) ^ ".") in
-  set_info (window.curr_player ^ s)
+  set_info (window.curr_player ^ s);
+  add_to_log [((window.curr_player ^ s), Graphics.black)]
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move move : unit =
+  let _ = if (not is_my_turn) then gui_delay 1.0 else () in
   let f loc = match loc.info with
   | Room_Rect (s,_) -> s
-  | Space _ -> failwith ("can't take a passage to a space: " ^ Pervasives.__LOC__)
+  | Space _ -> failwith ("can't take a passage to a space: "
+                          ^ Pervasives.__LOC__)
   in match move with
   | Passage loc ->
     let s = window.curr_player ^ " has taken the passage to " ^ (f loc) in
-    set_info s; display_relocate window.curr_player loc
-  | Roll -> set_info (window.curr_player ^ " rolled the dice.")
+    set_info s; add_to_log [(s, Graphics.black)];
+    display_relocate window.curr_player loc
+  | Roll ->
+    let s = window.curr_player ^ " rolled the dice." in
+    set_info s; add_to_log [(s, Graphics.black)]
 
 (* Prompts the user for the room they would like to go to.
  * [loc * (string * bool)] the location and whether or not room [string] is
@@ -572,11 +681,12 @@ let prompt_movement pathmap acc_room roll : loc =
   let coord = match start_loc.info with
               | Space (x, y) | Room_Rect (_,(x,_,y,_)) -> (x,y) in
   let highlight_coords = List.filter (fun l -> not (l = coord)) hc' in
-  let (xb, yb, wb, hb) = window.b_window in
+  (*let (xb, yb, wb, hb) = window.b_window in
   let (x_mult, y_mult) = get_mults () in
   let transform x = x |> scale_grect (x_mult, y_mult)
                       |> shift_grect (xb, yb) in
-  List.iter (highlight_coord transform) highlight_coords;
+  List.iter (highlight_coord transform) highlight_coords;*)
+  draw_board highlight_coords ();
   draw_players ();
   let rec loop () =
     let f = grect_curry get_next_click_in_rect window.b_window in
@@ -585,11 +695,12 @@ let prompt_movement pathmap acc_room roll : loc =
     if List.mem click_coord highlight_coords
     then CoordMap.find click_coord window.board.loc_map
     else loop () in
-  set_info "SELECT A PLACE TO MOVE TO";
+  set_info (window.last_info ^ "\nSELECT A PLACE TO MOVE TO");
   loop ()
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (l, (s, b)) : unit =
+  let _ = if (not is_my_turn) then gui_delay 2.0 else () in
   display_relocate window.curr_player l
 
 (* Prompts the user for a guess.
@@ -633,15 +744,23 @@ let prompt_guess loc (is_acc: bool) : string =
   | Suspect sus, Weapon weap, Room room -> (sus ^ ", " ^ weap ^ ", " ^ room)
   | _ -> failwith ("guess in wrong order: " ^ Pervasives.__LOC__)
 
+
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
+  let _ = if (not is_my_turn) then gui_delay 2.0 else () in
   let guesser = window.curr_player in
   match guess with
   | (Suspect who, Weapon what, Room where) ->
-    let s1 = guesser ^ " thinks it was " ^ who in
-    let s2 = "\nwith the " ^ what in
-    let s3 = "\nin the " ^ where ^ "." in
-    set_info (s1 ^ s2 ^ s3)
+    let s0 = guesser ^ " thinks " in
+    let s1 = "it was " ^ who in
+    let s2 = "with the " ^ what in
+    let s3 = "in the " ^ where ^ "." in
+    set_info (s0 ^ s1 ^ "\n" ^ s2 ^ "\n" ^ s3);
+    add_to_log [(s0, StringMap.find guesser window.player_colors);
+                ("    "^s1, Graphics.black);
+                ("    "^s2, Graphics.black);
+                ("    "^s3, Graphics.black)]
+
   | _ -> failwith ("bad guess order: " ^ Pervasives.__LOC__)
 
 
@@ -691,7 +810,7 @@ let make_rects lst =
  * Can be any card from the provided hand, and must be in the guess.
  * Can be none if there is no card to show. *)
 let prompt_answer hand guess : string =
-  set_info "PICK A CARD TO SHOW";
+  set_info (window.last_info^"\nPICK A CARD TO SHOW");
   grect_curry draw_filled_rect window.b_window Graphics.black answer_back;
   let (sus, weap, room) = guess in
   let can_show = if List.mem sus hand then [sus] else [] in
@@ -700,7 +819,7 @@ let prompt_answer hand guess : string =
   let rects = make_rects can_show in
   let click = get_next_click_in_rects rects () in
   let extract_card_text c = match c with | Suspect s | Weapon s | Room s -> s in
-  draw_board (); draw_players ();
+  draw_board [] (); draw_players ();
   match click with
   | ("suspect", _) -> extract_card_text sus
   | ("weapon", _) -> extract_card_text weap
@@ -710,6 +829,7 @@ let prompt_answer hand guess : string =
  * If None, no card could be shown. If false, the user is not shown the
  * details of the card. *)
 let display_answer (c:card option) (who: string) (detail: bool) : unit =
+  let _ = if (who <> window.sheet_disp) then gui_delay 2.0 else () in
   let card_detail c =
     match c with
     | Suspect s -> "a Suspect: " ^ s
@@ -721,15 +841,18 @@ let display_answer (c:card option) (who: string) (detail: bool) : unit =
     | false, None -> "Nobody could show a card."
     | true, Some c -> who ^ " shows you " ^ card_detail c
     | false, Some c -> who ^ " showed a card from their hand." in
-  set_info s
+  set_info s; add_to_log [(s, Graphics.black)]
 
 (* Displays that the player [string] could not answer with a card.
  * This is different from no one being able to show a card. *)
 let display_no_answer (who: string) : unit =
-  set_info (who ^ " has nothing to show.")
+  let _ = gui_delay 2.0 in
+  set_info (who ^ " has nothing to show.");
+  add_to_log [(who ^ " has nothing to show.", Graphics.black)]
 
 (* Displays end game victory text, string is who won. *)
 let display_victory (who: string) : unit =
+  let _ = if (not is_my_turn) then gui_delay 4.0 else () in
   set_info (who ^ " WINS!")
 
 (* Displays arbitrary text. *)
@@ -782,7 +905,8 @@ let prompt_continue () : unit =
   let loop () =
     match get_next_click_in_rects rects () with
     | ("continue", _) -> ();
-    | _ -> failwith "not a defines rectangle" in
+    | _ -> failwith ("not a defined rectangle: "
+                     ^ Pervasives.__LOC__)  in
   highlight_roll "CONTINUE" ();
   loop ()
 
@@ -792,6 +916,7 @@ let prompt_end_game () : unit =
   let loop () =
     match get_next_click_in_rects rects () with
     | ("quit", _) -> ();
-    | _ -> failwith "not a defines rectangle" in
+    | _ -> failwith ("not a defined rectangle"
+                      ^ Pervasives.__LOC__) in
   highlight_roll "QUIT" ();
   loop ()
