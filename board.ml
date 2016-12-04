@@ -103,9 +103,11 @@ let add_edge_if_space board c1 c2 =
   let (r,c) = (r-1,c-1) in
   let (x2,y2) = c2 in
   if x2 < 0 || x2 > c || y2 < 0 || y2 > r then board else
-  match (CoordMap.find c1 board.loc_map).info with
-  | Space _ -> add_edge board c1 c2 false
-  | Room_Rect _ -> board
+  let loc1 = (CoordMap.find c1 board.loc_map).info in
+  let loc2 = (CoordMap.find c2 board.loc_map).info in
+  match (loc1, loc2) with
+  | (Space _, Space _) -> add_edge board c1 c2 false
+  | _ -> board
 
 let edgify_spaces board =
   let (r,c) = board.dim in
@@ -144,6 +146,6 @@ let fill_board (r, c) room_temp_lst =
   let roomed = List.fold_left f empty room_temp_lst in
   let filled = fill_spaces roomed in
   let room_edged = List.fold_left edgify_room filled room_temp_lst in
-  let full_edged = edgify_spaces room_edged in
-  finish_rooms full_edged
+  let fully_edged = edgify_spaces room_edged in
+  finish_rooms fully_edged
 
