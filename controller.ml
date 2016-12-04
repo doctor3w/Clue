@@ -48,12 +48,13 @@ let handle_movement game = function
 (* Takes in a player and if a player with the same suspect is in the list,
  * pl replaces that player. Tail recursive. *)
 let replace_player pl lst =
-  let rec helper pls t =
+  List.map (fun pl' -> if pl'.suspect = pl.suspect then pl else pl') lst
+  (* let rec helper pls t =
     match t with
     | [] -> pls
     | pl'::t' when pl'.suspect = pl.suspect -> helper (pl::pls) t'
     | pl'::t' -> helper (pl'::pls) t'
-  in List.rev (helper [] lst)
+  in List.rev (helper [] lst) *)
 
 (* Checks if any [Human_t] players in the list are not out. If a player is
  * out then [is_out] will be true. *)
@@ -97,7 +98,7 @@ let move_player pls sus loc =
     | None -> pls in
   match sus with
   | Suspect s -> extr_pl (find_pl s pls)
-  | _ -> failwith "not a suspect"
+  | _ -> failwith ("not a suspect: "^Pervasives.__LOC__)
 
 let pl_eq (s:card) (pl:player) =
   match s with
@@ -107,22 +108,25 @@ let pl_eq (s:card) (pl:player) =
 let rec all_take_notes pls pub cur guess who_op =
   let rec helper pls' tl =
     match tl with
-    | [] -> pls
+    | [] -> pls'
     | pl::t ->
       let pl' =
         if pl.suspect = cur then pl
         else Agent.take_notes pl pub guess who_op in
-      helper (pl'::pls) t
+      helper (pl'::pls') t
   in List.rev (helper [] pls)
 
 let rec first_take_notes pls pub =
   let rec helper pls' tl =
     match tl with
-    | [] -> pls
+    | [] -> pls'
     | pl::t ->
       let pl' = Agent.first_take_note pl pub in
-      helper (pl'::pls) t
+      helper (pl'::pls') t
   in List.rev (helper [] pls)
+
+let print_pls pls =
+  List.map (fun pl -> print_endline pl.suspect; pl) pls
 
 (* [step] Recursively progresses through the game by doing one agent turn
  * at a time.
@@ -180,7 +184,7 @@ and handle_guess curr_p next_p game =
   let players' =
     if pl_eq s curr_p then game.players
     else move_player game.players s curr_p.curr_loc in
-  let group = reorder_pls curr_p game.players in
+  let group = reorder_pls curr_p players' in
   let rec get_answers pls =
     match pls with
     | [] -> None
