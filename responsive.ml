@@ -428,8 +428,8 @@ let get_guess player public : guess =
   let (s_lst, w_lst, r_lst) = public.deck in
   let matrix = player.listen in
   let sheet = player.sheet in
-  match (is_env_in_list matrix s_lst public),
-        (is_env_in_list matrix w_lst public) with
+  match (find_final_suspect (current_deck_to_env public player) <> None),
+        (find_final_weapon (current_deck_to_env public player) <> None) with
   | true, true ->
     let s = rand_from_lst (List.filter (no_env sheet) s_lst) in
     let w = rand_from_lst (List.filter (no_env sheet) w_lst) in
