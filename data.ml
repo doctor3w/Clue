@@ -37,7 +37,7 @@ let view_type = ref CLI
 
 (* Our testing flag. Making it true will turn off printing delays and
  * prompt_continues. *)
-let testing = ref false
+let testing = ref true
 
 (* The hand is just a card list *)
 type hand = card list
@@ -203,7 +203,8 @@ type listen_choice = Pure_unknown
                     | Maybe_in_hand
                     | Known
 
-(* Matrix of listen_choices: COLUMNS x ROWS info here please TODO! *)
+(* Matrix of listen_choices: Each row represents each card in the deck and each
+ * column represents each player in the game.  *)
 type listens = listen_choice array array
 
 (* [player] represents user info, whether it be AI or human, they contain the
@@ -214,7 +215,7 @@ type player = {suspect: string;
                sheet: sheet;
                agent: agent;
                is_out: bool;
-               listen: listens}      (* need to update model *)
+               listen: listens}
 
 (* Public information everyone should know, such as the current player name,
  * the board setup, the accusation room, the full deck, and the
