@@ -93,13 +93,20 @@ let rec check_all_out pls =
  * list at pl, puts the tail at the front and the players from hd to pl
  * (inclusive) at the back. Not tail recursive.
  * Requires: pl is in plrs *)
-let reorder_pls pl plrs =
+let reorder_pls order sus =
+  let rec helper checked left =
+    match left with
+    | [] -> List.rev checked
+    | h::t when h = sus -> t@(List.rev checked)@[h]
+    | h::t -> helper (h::checked) t
+  in helper [] order
+(* let reorder_pls pl plrs =
   let rec helper ps t =
     match t with
     | [] -> []@(List.rev ps)
     | h::t' when h.suspect = pl.suspect -> (t')@(List.rev (pl::ps))
     | h::t' -> helper (h::ps) t'
-  in helper [] plrs
+  in helper [] plrs *)
 
 (* Checks whether or not a card in the hand is in the guess. *)
 let can_show hand (s, w, r) =
@@ -212,19 +219,20 @@ and handle_guess curr_p next_p game =
   let players' =
     if pl_eq s curr_p then game.players
     else move_player game.players s curr_p.curr_loc in
-  let group = reorder_pls curr_p players' in
+  let group = reorder_pls game.public.player_order curr_p.suspect in
   let rec get_answers pls =
     match pls with
     | [] -> None
-    | pl::_ when pl.suspect = curr_p.suspect -> None
+    | pl::_ when pl = curr_p.suspect -> None
     | pl::t -> extract_answer pl t
   and extract_answer pl t =
-    if can_show pl.hand guess then
-      match Agent.get_answer pl game.public guess with
+    let p = get_player players' pl in
+    if can_show p.hand guess then
+      match Agent.get_answer p game.public guess with
       | None -> get_answers t
-      | Some card -> Some (pl, card)
+      | Some card -> Some (p, card)
     else
-      let () = Display.display_no_answer pl.suspect in
+      let () = Display.display_no_answer pl in
       get_answers t
   in match get_answers group with
   | None -> (* No card could be shown *)
