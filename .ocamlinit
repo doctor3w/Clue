@@ -1,6 +1,9 @@
 #require "yojson";;
 #require "str";;
 #require "graphics";;
+#thread;;
+#require "threads";;
+#require "threads.posix";;
 #directory "_build";;
 #load "data.cmo";;
 #load "board.cmo";;

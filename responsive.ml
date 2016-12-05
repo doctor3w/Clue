@@ -592,8 +592,8 @@ let get_answer (me:player) public guess : card option =
                 | _ -> acc in
   let mine_info = List.fold_left f [] (sus::weap::[room]) in
   match mine_info with
-  | [] -> None
-  | [(c, lst)] -> Some c
+  | [] -> print_endline "no cards in hand"; None
+  | [(c, lst)] -> print_endline "one cards in hand";Some c
   | lst -> Some (pick_to_show lst cp)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
