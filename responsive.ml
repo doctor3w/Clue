@@ -501,11 +501,11 @@ let listen_unk_to_env listen player public (s,w,r) :unit=
   let s_index = card_to_index public s in
   let w_index = card_to_index public w in
   let r_index = card_to_index public r in
-  (* let me = suspect_to_index public player.suspect in *)
+  let me = suspect_to_index public player.suspect in
   for j = 0 to List.length public.player_order -1
     do (
-     (*  if j = me then ()
-      else *)
+      if j = me then ()
+      else
       listen.(s_index).(j)<- Env;
       listen.(w_index).(j)<-Env;
       listen.(r_index).(j)<-Env) done
@@ -518,7 +518,7 @@ let listen_ans_update listen sus card public =
     listen.(c_index).(sus_index)<-Known;
   for j = 0 to (y_len-1)
   do (if j = sus_index
-      then () else listen.(c_index).(j)<-Not_in_hand) done;  
+      then () else listen.(c_index).(j)<-Not_in_hand) done;
     if is_all_notinhand listen.(c_index) then rewrite_env listen.(c_index)
     else
       let (ss, ws, rs) = public.deck in
@@ -536,15 +536,15 @@ let listen_ans_update listen sus card public =
 let show_card pl public answer (s,w,r) :player =
   match answer with
   | None ->
-    let () = Display.display_answer None "" false in
+    (* let () = Display.display_answer None "" false in *)
     let sheet' = unk_to_env s pl.sheet |> unk_to_env w |> unk_to_env r in
     listen_unk_to_env pl.listen pl public (s,w,r);{pl with sheet = sheet'}
   | Some (sus, card) ->
-    let () = Display.display_answer (Some card) sus false in
+    (* let () = Display.display_answer (Some card) sus false in *)
+    listen_ans_update pl.listen sus card public;
     let data = CardMap.find card pl.sheet in
     let data' = {data with card_info= ShownBy(sus)} in
     let sheet' = CardMap.add card data' pl.sheet in
-    listen_ans_update pl.listen sus card public;
     {pl with sheet = (process_of_elimination sheet' public)}
 
 
@@ -751,8 +751,8 @@ let compile_known matrix public lst ref_l =
            rewrite_env matrix.(i))
        else ()) done
 
-let adjacent_helper matrix x_index asking_index answering_index y_len= 
-  if (asking_index < answering_index) 
+let adjacent_helper matrix x_index asking_index answering_index y_len=
+  if (asking_index < answering_index)
   then (for new_i = (asking_index+1) to (answering_index-1)
       do (if matrix.(x_index).(new_i) = Known
         then ()
@@ -836,7 +836,7 @@ let take_notes player public guess str_option: player =
     | _,_,_ -> ());
   (* if the player only has n cards in hands and he already has n known,
     then any maybe_in_hand must be not_in_hand *)
-    for y=0 to (y_len-1) 
+    for y=0 to (y_len-1)
     do column_helper matrix y x_len player done;
   (* might need to do more to compile the data *)
   (* update not_in_hand if the player answering the guess is not adjacent
@@ -845,7 +845,7 @@ let take_notes player public guess str_option: player =
     let answering_index = suspect_to_index public str in
     adjacent_helper matrix s_index asking_index answering_index y_len;
     adjacent_helper matrix w_index asking_index answering_index y_len;
-    adjacent_helper matrix r_index asking_index answering_index y_len;  
+    adjacent_helper matrix r_index asking_index answering_index y_len;
   (* compile data *)
     (if all_but_one_known matrix public s_lst
     then compile_known matrix public s_lst l
