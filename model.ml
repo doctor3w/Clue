@@ -21,6 +21,7 @@ exception BadConfig
 
 module YJ = Yojson.Basic.Util
 
+(* loads a json object from file [file_name] *)
 let load_json file_name =
   let len = String.length file_name in
   if len < 5 then failwith "not a json, ln 26" (* can't end in .json *)
@@ -29,6 +30,7 @@ let load_json file_name =
   (*try (Yojson.Basic.from_file file_name) with _ -> failwith "can't make json, ln 28" *)
   else failwith ("not a .json, ln 30, filename: " ^ file_name)
 
+(* returns a shuffled copy of [lst] *)
 let shuffle_lst lst =
   let len = List.length lst in
   let weight = List.map (fun x -> (Random.int (len*10), x)) in
@@ -45,12 +47,13 @@ let pick_env (sus_lst, weap_lst, room_lst) : (card * card * card) * card list =
   | ((h1::t1), (h2::t2), (h3::t3)) -> ((h1, h2, h3), t1@t2@t3)
   | ([],_,_) | (_,[],_) | (_,_,[]) -> failwith "bad deck, ln 46"
 
+(* used by deal_hands to add an individual card [c] to the hand of
+ * player [p] *)
 let deal_card p c =
   let sd = try (CardMap.find c p.sheet) with _ -> failwith "can't deal card" in
   let sd' = {sd with card_info = Mine []} in
   {p with hand = c::p.hand;
           sheet = CardMap.add c sd' p.sheet}
-
 
 (* d is a card list where all card types have been jumbled *)
 let deal_hands game d =
@@ -65,12 +68,15 @@ let deal_hands game d =
               in loop (n+1) t (List.mapi f players)
   in {game with players = (loop 0 d_shuff game.players)}
 
+(* functionally similar to List.assoc *)
 let extract_pair_from_assoc s asc =
   let rec loop = function
   | [] -> failwith ("no such item: " ^ s)
   | (h,p)::t -> if h = s then p else loop t
 in loop asc
 
+(* extracts a coordinate [(int*int)] from json [j]
+ * [j] must define "row" and "col" *)
 let extract_coord j : int*int =
   match (Yojson.Basic.Util.to_assoc j) with
   | ((s1,n1)::(s2,n2)::[]) -> let y = if s1 = "row"
@@ -82,12 +88,14 @@ let extract_coord j : int*int =
                            in (x, y)
   | _ -> failwith "invalid coord"
 
+(* extracts the dimensions (row_count * col_count) from json [j] *)
 let extract_dim j : int*int =
   let asc = YJ.to_assoc j in
   let r = List.assoc "row_count" asc |> YJ.to_int in
   let c = List.assoc "col_count" asc |> YJ.to_int in
   (r,c)
 
+(* extracts a [player_temp] record from [json] *)
 let make_temp_player json : player_temp =
   let asc = Yojson.Basic.Util.to_assoc json in
   let p_temp = {p_id = ""; play_ord = -1; start = (-1, -1)} in
@@ -105,7 +113,10 @@ let make_temp_player json : player_temp =
   | (s,_)::t -> failwith ("can't recognize within player: " ^ s)
   in loop asc p_temp
 
+(* used as a rectangle that defines the bounds of a room *)
 type rt = {left:int; top:int; right:int; bottom:int}
+
+(* extracts an [rt[ from the json [r] *)
 let extract_rect r =
   let asc = Yojson.Basic.Util.to_assoc r in
   let rct = {left = -1; top = -1; right = -1; bottom = -1} in
@@ -123,6 +134,7 @@ let extract_rect r =
     | (s,_)::t -> failwith ("can't recognize within rectangle: " ^ s)
   in let rrt = loop asc rct in (rrt.left, rrt.right, rrt.bottom, rrt.top)
 
+(* extracts a [temp_room] record from [json] *)
 let make_temp_room json =
   let asc = Yojson.Basic.Util.to_assoc json in
   let r_temp = {r_id =""; rect =(-1, -1, -1, -1); passages = []; exits = []} in
@@ -143,6 +155,7 @@ let make_temp_room json =
     | (s,_)::t -> failwith ("can't recognize within room: " ^ s)
   in loop asc r_temp
 
+(* extracts an agent_type from [j] *)
 let make_agent_lst j =
   let lst = YJ.to_list j in
   let f s = match s with
@@ -159,11 +172,12 @@ let make_agent_lst j =
     (sus, at)::acc in
   List.fold_left f' [] lst
 
-
+(* returns the default_sheet out of [deck] with [Unknown] for every entry *)
 let default_sheet full_deck =
   let f acc el = CardMap.add el {card_info=Unknown; note=No_Note} acc
   in  List.fold_left f CardMap.empty full_deck
 
+(* returns [game] with an extra player corresponding to [player_temp] *)
 let add_player game full_deck player_temp agent_lst =
   let loc = try (CoordMap.find player_temp.start game.public.board.loc_map)
             with _ -> failwith "can't find start coord" in
@@ -230,14 +244,16 @@ let import_board (file_name: string) : game =
 in let game = {game with ai_only = all_ai} in
   deal_hands game (shuffle_lst mixed_deck)
 
-
+(* returns the player object that correspondes to the corresponding
+ * to the current player in [game] *)
 let get_curr_player (game: game) : player =
   let rec loop = function
   | [] -> failwith ("can't find current player: "^Pervasives.__LOC__)
   | h::t -> if h.suspect = game.public.curr_player then h else loop t
 in loop game.players
 
-
+(* [remove_dups lst] is [lst] with no duplicate elements.
+* The first instance of each element stays in the list. *)
 let remove_dups lst =
   let rec loop lst acc =
     match lst with
@@ -248,7 +264,6 @@ let remove_dups lst =
 
 (* [get_move_options] gets the options of Roll and Passage that the current
  * player can make. *)
-
 let get_move_options (g : game) : move list =
   let cp = get_curr_player g in
   let start_loc = cp.curr_loc in
@@ -267,54 +282,13 @@ let get_move_options (g : game) : move list =
   | Space _ -> [Roll]
   | Room_Rect _ -> List.fold_left f [Roll] start_loc.edges
 
-
-
-
-(*module PathMap = struct
-  type backpointer = (int*coord)
-  type t = backpointer CoordMap.t
-
-  let empty = CoordMap.empty
-  let mem = CoordMap.mem
-  let is_empty = CoordMap.is_empty
-
-  let make start =
-    CoordMap.add start (0, start) empty
-
-  let put (k:coord) ((s':int), (bp':coord)) (map: t) : t =
-    if CoordMap.mem k map
-    then let (s, bp) = try (CoordMap.find k map) with _ -> failwith "line 286" in
-      if (s' < s) then CoordMap.add k (s', bp') map
-      else map
-    else CoordMap.add k (s', bp') map
-
-  let poll_min (map:t) : (coord * backpointer * t) =
-    if is_empty map then failwith "can't poll empty PathMap" else
-    let f k (e1, e2) (ak, (a1, a2)) = if e1 < a1 then (k, (e1, e2)) else (ak, (a1, a2)) in
-    let (k, v) = CoordMap.fold f map (CoordMap.choose map) in
-    let map' = CoordMap.remove k map in
-    (k, v, map')
-
-  let length_to coord map =
-    let (x, y) = coord in
-    let (n, bp) = try (CoordMap.find coord map)
-    with Not_found -> failwith ("couldn't find coord ("
-      ^ Pervasives.string_of_int x ^ ", "
-      ^ Pervasives.string_of_int y ^ ") in length_to") in n
-
-  let nth_step_towards coord step map =
-    let rec loop c =
-      let (x,y) = c in
-      let (n, bp) = try (CoordMap.find c map)
-      with Not_found -> failwith ("couldn't find coord ("
-      ^ Pervasives.string_of_int x ^ ", "
-      ^ Pervasives.string_of_int y ^ ") in nth_step_towards") in
-      if n <= step then c else loop bp
-    in loop coord
-
-end *)
-
-let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
+(* [make_pathmap] is a new PathMap.t representing all paths within
+ * the board [board] originating from the coordinate defined by
+ * [start_loc].  [fast_out] allows for creation to terminate early.
+ * it must be defined as a function (frontier set, settled set) -> bool
+ * and will terminate to return the map [stld] if it is ever true.
+ * to get the full PathMap, use (fun _ -> false) *)
+let make_pathmap board start_loc (fast_out: (PathMap.t * PathMap.t) -> bool) =
   let settled = PathMap.make start_loc in
   let frontier = PathMap.empty in
   let (x,y) = start_loc in
@@ -334,7 +308,7 @@ let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
     match l.info with Room_Rect _ -> false | Space _ -> true in
   let g acc el = PathMap.put el (1, start_loc) acc in
   let rec loop frnt stld =
-    if PathMap.is_empty frnt || (fast_out frnt) then stld else
+    if PathMap.is_empty frnt || (fast_out (frnt, stld)) then stld else
     let (k, (n, bp), frnt') = PathMap.poll_min frnt in
     let stld' = PathMap.put k (n, bp) stld in
     let frnt'' = add_next k (n+1) frnt' stld' in
@@ -349,8 +323,8 @@ let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
  * player can move to. These options also come with a description in one of
  * the following fashions:
  *        head towards [room name]
- *        go into [room name] *)
-
+ *        go into [room name]
+ * it also returns the full pathmap to be sent to the GUI *)
 let get_movement_options (g: game) (steps: int) =
   let b = g.public.board in
   let start_loc = (get_curr_player g).curr_loc in
@@ -369,37 +343,3 @@ let get_movement_options (g: game) (steps: int) =
     | Room_Rect (s', _) when s' = s -> (loc, (s, true))
     | _ -> (loc, (s, false)) in
   (List.map f room_lst, full_paths)
-
-
-  (*let b = g.public.board in
-  let start_loc = (get_curr_player g).curr_loc in
-  let rec step_loop steps acc coord =
-    if steps < 0 then acc else
-    let loc = CoordMap.find coord b.loc_map in
-    match (loc.info) with
-    | Room_Rect (s, _) -> ("go into "^s, loc)::acc
-    | Space _ -> List.fold_left (step_loop (steps-1)) acc loc.edges in
-  let init = List.fold_left (step_loop (steps-1)) [] st
-
-
-
-  art_loc.edges in
-  let no_start = List.filter (fun (s,l) -> l != start_loc) init in
-  remove_dups no_start*)
-
-  (* let rec f = (fun acc el -> step_loop el (steps-1) acc)
-  and step_loop loc steps loclst =
-    if steps = 0 then loclst else
-    match (loc: loc) with
-    | Room (name, lst) -> loc::loclst
-    | Space ((r,c), lst) -> (List.fold_left f loclst lst)
-  in let f' = (fun acc el -> match el with | Space _ -> f acc el | _ -> acc)
-  in let start_loc = (get_curr_player g).curr_loc
-  in let step1 = match start_loc with
-                 Space(_, lst) | Room (_, lst) -> lst
-  in let lst_dups = List.fold_left f' [] step1
-  in let lst_nodups = remove_dups lst_dups
-  in let lst_final = List.filter (fun x -> x != start_loc) lst_nodups
-  in let room_name loc = match (loc: loc) with Room (n,_) -> n | _ -> failwith "not a room"
-  in List.map (fun loc -> ("head towards " ^ (room_name loc), loc)) lst_final *)
-
