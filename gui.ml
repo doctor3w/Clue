@@ -156,13 +156,70 @@ let draw_ell_in_rect x y w h ln fl =
   let ry = h/2 in
   draw_filled_ellipse (x+rx) (y+ry) rx ry ln fl
 
+(* turns the string [s] into a list of strings that
+ * can each be printed narrower than [w], splitting on
+ * white space. Used mainly by the log. *)
+let split_long_string w s =
+  let lst = Str.split (regexp_string " ") s in
+  let rec loop acc s lst =
+    match lst with
+    | [] -> acc @ [s]
+    | h::t -> let s' = if s <> "" then s ^ " " ^ h else h in
+              let (w', h') = Graphics.text_size s' in
+              if (w' > w) then loop (acc @ [s]) ("  " ^ h) t
+              else loop acc s' t in
+  loop [] "" lst
+
+let split_long_string_no_indent w s =
+  let lst = Str.split (regexp_string " ") s in
+  let rec loop acc s lst =
+    match lst with
+    | [] -> acc @ [s]
+    | h::t -> let s' = if s <> "" then s ^ " " ^ h else h in
+              let (w', h') = Graphics.text_size s' in
+              if (w' > w) then loop (acc @ [s]) (h) t
+              else loop acc s' t in
+  loop [] "" lst
+
+let split_on_all_chars w s =
+  let lst = Str.full_split (regexp "[a-zA-Z0-9]") s in
+  let lst = List.map (function Str.Text s | Str.Delim s -> s) lst in
+  let rec loop acc s lst =
+    match lst with
+    | [] -> List.rev (s::(List.rev acc))
+    | h::t -> let s' = if s <> "" then s ^ h else h in
+              let (w', h') = Graphics.text_size s' in
+              if (w' > w) then loop (List.rev (s::(List.rev acc))) (h) t
+              else loop acc s' t in
+  loop [] "" lst
+
+let strict_split_string w s =
+  let lst = split_long_string_no_indent w s in
+  let rec loop acc lst =
+    match lst with
+    | [] -> acc
+    | h::t -> let (w', _) = Graphics.text_size h in
+              if w' >= w
+              then let lst' = split_on_all_chars w h in
+                loop (acc@lst') t
+              else loop (List.rev (h::(List.rev acc))) t in
+  List.filter (fun s -> s<>"") (loop [] lst)
+
+(* prints the string [s] centered in the grect (x, y, w, h) *)
 let center_text_in_rect x y w h s =
   let lst = Str.split (regexp "[\n]+") s in
-  let count = List.length lst in
-  let longer (aw, ah) el =
-    let (w', h') = Graphics.text_size el in
-    if (w' > aw) then (w', h') else (aw, ah) in
-  let biggest_size = List.fold_left longer (0, 0) lst in
+  let rec length_check (aw, ah) acc lst =
+    match lst with
+    | [] -> ((aw, ah), acc)
+    | h::t -> let (w', h') = Graphics.text_size h in
+              if (w' > w)
+                then let l_split = strict_split_string w h in
+                  length_check (aw, ah) (acc@l_split) (t)
+              else if (w' > aw)
+                then length_check (w', h') (List.rev (h::(List.rev acc))) t
+              else length_check (aw, ah) (List.rev (h::(List.rev acc))) t in
+  let (biggest_size, lst') = length_check (0, 0) [] lst in
+  let count = List.length lst' in
   let rec loop n lst =
     match lst with
     | [] -> ()
@@ -517,17 +574,6 @@ let draw_info () =
 (* changes the text in the info box and redraws it *)
 let set_info s =
   window.last_info <- s; draw_info ()
-
-let split_long_string w s =
-  let lst = Str.split (regexp_string " ") s in
-  let rec loop acc s lst =
-    match lst with
-    | [] -> acc @ [s]
-    | h::t -> let s' = if s <> "" then s ^ " " ^ h else h in
-              let (w', h') = Graphics.text_size s' in
-              if (w' > w) then loop (acc @ [s]) ("  " ^ h) t
-              else loop acc s' t in
-  loop [] "" lst
 
 let draw_log () =
   grect_curry draw_filled_rect window.log_window Graphics.black Graphics.white;
