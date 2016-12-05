@@ -358,19 +358,19 @@
         "agent_type": "Human"
       }, {
         "suspect": "Colonel Mustard",
-        "agent_type": "Responsive"
+        "agent_type": "ResponsiveAI"
       }, {
         "suspect": "Mrs. White",
-        "agent_type": "Responsive"
+        "agent_type": "ResponsiveAI"
       }, {
         "suspect": "Mr. Green",
-        "agent_type": "Responsive"
+        "agent_type": "ResponsiveAI"
       }, {
         "suspect": "Madame Peacock",
-        "agent_type": "Responsive"
+        "agent_type": "ResponsiveAI"
       }, {
         "suspect": "Professor Plum",
-        "agent_type": "Responsive"
+        "agent_type": "ResponsiveAI"
       }
     ]
 }

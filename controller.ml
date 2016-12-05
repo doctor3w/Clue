@@ -272,14 +272,14 @@ let start file_name g_or_c =
         {game with players=(first_take_notes game.players game.public)} in
       (match !view_type with
       | CLI -> ()
-      | GUI -> Gui.init game');
+      | GUI -> print_endline "GUI enabled"; Gui.init game');
       step game'
     with
     | No_players -> Display.display_error "\nNo players in game file"
     | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
       Display.display_error ("\nSomething went wrong, here's what's up: "^s)
-    (* | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in *)in
+    | _ -> Display.display_error "\nGoodbye." in
   let () = Data.view_type := g_or_c in
   match file_name with
   | None -> load_go (Display.prompt_filename ())
