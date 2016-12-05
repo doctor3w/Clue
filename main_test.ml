@@ -16,7 +16,7 @@ let coord_of_loc loc = match loc.info with
 let (_, pm1) = get_movement_options game1 12
 let (_, pm2) = get_movement_options game2 12
 
-let loc1 = {info = Space (0,0);
+let loc1 = {info = Room_Rect("room 1",(1,1,1,1));
             edges = []}
 
 let blue = Suspect "blue"
