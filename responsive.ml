@@ -511,19 +511,14 @@ let listen_unk_to_env listen player public (s,w,r) :unit=
       listen.(r_index).(j)<-Env) done
 
 (* [listen_ans_update] updates listens when someone shows the AI a card *)
-let listen_ans_update listen sus card player public =
+let listen_ans_update listen sus card public =
+  let y_len = List.length public.player_order in
   let c_index = card_to_index public card in
   let sus_index = suspect_to_index public sus in
-  let pl_index = suspect_to_index public player.suspect in
     listen.(c_index).(sus_index)<-Known;
-    if pl_index < sus_index then
-      for j = pl_index + 1 to (sus_index -1)
-      do (listen.(c_index).(j)<-Not_in_hand) done
-    else
-      for j = sus_index - 1 downto 0
-      do (listen.(c_index).(j)<-Not_in_hand) done;
-      for j = pl_index + 1 to List.length public.player_order -1
-      do (listen.(c_index).(j)<-Not_in_hand) done;
+  for j = 0 to (y_len-1)
+  do (if j = sus_index
+      then () else listen.(c_index).(j)<-Not_in_hand) done;  
     if is_all_notinhand listen.(c_index) then rewrite_env listen.(c_index)
     else
       let (ss, ws, rs) = public.deck in
@@ -549,7 +544,7 @@ let show_card pl public answer (s,w,r) :player =
     let data = CardMap.find card pl.sheet in
     let data' = {data with card_info= ShownBy(sus)} in
     let sheet' = CardMap.add card data' pl.sheet in
-    listen_ans_update pl.listen sus card pl public;
+    listen_ans_update pl.listen sus card public;
     {pl with sheet = (process_of_elimination sheet' public)}
 
 
@@ -756,6 +751,20 @@ let compile_known matrix public lst ref_l =
            rewrite_env matrix.(i))
        else ()) done
 
+let adjacent_helper matrix x_index asking_index answering_index y_len= 
+  if (asking_index < answering_index) 
+  then (for new_i = (asking_index+1) to (answering_index-1)
+      do (if matrix.(x_index).(new_i) = Known
+        then ()
+        else matrix.(x_index).(new_i) <- Not_in_hand) done)
+  else (for new_i1 = 0 to (answering_index-1)
+      do (if matrix.(x_index).(new_i1) = Known
+        then ()
+        else matrix.(x_index).(new_i1) <- Not_in_hand) done;
+      for new_i2 = (asking_index+1) to (y_len-1)
+      do (if matrix.(x_index).(new_i2) = Known
+        then ()
+        else matrix.(x_index).(new_i2) <- Not_in_hand) done)
 
 (* [take_notes] is only called
   when another player is showing a card to another player
@@ -833,19 +842,9 @@ let take_notes player public guess str_option: player =
     to the player asking*)
     let asking_index = suspect_to_index public public.curr_player in
     let answering_index = suspect_to_index public str in
-    if (asking_index < answering_index)
-    then (for new_i = (asking_index+1) to (answering_index-1)
-        do (matrix.(s_index).(new_i) <- Not_in_hand;
-          matrix.(w_index).(new_i) <- Not_in_hand;
-          matrix.(r_index).(new_i) <- Not_in_hand;) done)
-    else (for new_i1 = 0 to (answering_index-1)
-        do  (matrix.(s_index).(new_i1) <- Not_in_hand;
-           matrix.(w_index).(new_i1) <- Not_in_hand;
-           matrix.(r_index).(new_i1) <- Not_in_hand;) done;
-        for new_i2 = (asking_index+1) to (y_len-1)
-        do  (matrix.(s_index).(new_i2) <- Not_in_hand;
-           matrix.(w_index).(new_i2) <- Not_in_hand;
-           matrix.(r_index).(new_i2) <- Not_in_hand;) done));
+    adjacent_helper matrix s_index asking_index answering_index y_len;
+    adjacent_helper matrix w_index asking_index answering_index y_len;
+    adjacent_helper matrix r_index asking_index answering_index y_len;  
   (* compile data *)
     (if all_but_one_known matrix public s_lst
     then compile_known matrix public s_lst l
@@ -857,4 +856,4 @@ let take_notes player public guess str_option: player =
     then compile_known matrix public r_lst l
     else ());
     (compile_notinhand matrix public x_len l);
-    update_player player l
+    update_player player l)
