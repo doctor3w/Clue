@@ -37,7 +37,7 @@ let view_type = ref CLI
 
 (* Our testing flag. Making it true will turn off printing delays and
  * prompt_continues. *)
-let testing = ref true
+let testing = ref false
 
 (* The hand is just a card list *)
 type hand = card list
