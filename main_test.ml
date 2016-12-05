@@ -2,6 +2,7 @@ open OUnit2
 open Data
 open Controller
 open Model
+open Responsive
 
 let game1 = Model.import_board "classic_dumb.json"
 let game2 = Model.import_board "small_mixed.json"
@@ -36,7 +37,7 @@ let room3 = Room "3"
 let room4 = Room "4"
 let r_lst = [room1;room2;room3;room4]
 
-let redp = {suspect="red";
+(* let redp = {suspect="red";
                hand=[gun; room3];
                curr_loc=loc1;
                sheet=default_sheet (s_lst@w_lst@r_lst);
@@ -66,7 +67,7 @@ let yellowp = {suspect="yellow";
                sheet=default_sheet (s_lst@w_lst@r_lst);
                agent=ResponsiveAI_t;
                is_out=false;
-               listen= Array.make_matrix 11 4 Pure_unknown}
+               listen= Array.make_matrix 11 4 Pure_unknown} *)
 
 
 let pub = {
@@ -102,7 +103,7 @@ let pathmap_tests =
 
 let responsive_tests =
 [
-  "take_note" >:: (fun _ -> assert_equal 0 (PathMap.length_to c1 pm1));
+  (* "take_note" >:: (fun _ -> assert_equal 0 (PathMap.length_to c1 pm1)); *)
 ]
 
 let tests = pathmap_tests@responsive_tests
