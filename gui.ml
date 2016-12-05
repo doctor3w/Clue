@@ -305,8 +305,7 @@ let translate_to_card pt =
   let weap_top = sus_bot - space in
   let weap_bot = weap_top - (window.weap_count*hght) in
   let room_top = weap_bot - space in
-  let room_bot = sy in
-
+  (* let room_bot = sy in *)
   let (x', y') = pt in
   let index =
     if      y' <= room_top then ((sh - y' - space*2) / hght)
@@ -618,7 +617,6 @@ let add_to_log lst =
 
 let draw_tick x dim py gy =
   let x_cent = x+dim/2 in
-  let y_space = py - gy - 25 in
   let x_min = x_cent - (dim/3) in
   let x_max = x_cent + (dim/3) in
   let y_point = py - 10 in
@@ -852,6 +850,7 @@ let prompt_guess loc (is_acc: bool) : string =
     match get_next_click_in_rects rects () with
     | ("guess", _) -> draw_roll (); (!s, !w, !r)
     | ("sheet", pt) -> set_card (translate_to_card pt); loop ()
+    | _ -> loop ()
   and set_card (n, card) =
     match (n, card) with
     | (i, Suspect _) -> s := card; has_sus := true
@@ -931,7 +930,7 @@ let make_rects lst =
 (* Prompts the user for a card to show.
  * Can be any card from the provided hand, and must be in the guess.
  * Can be none if there is no card to show. *)
-let prompt_answer hand guess : string =
+let rec prompt_answer hand guess : string =
   set_info (window.last_info^"\nPICK A CARD TO SHOW");
   po_set_answer_tick window.sheet_disp;
   grect_curry draw_filled_rect window.b_window Graphics.black answer_back;
@@ -941,12 +940,14 @@ let prompt_answer hand guess : string =
   let can_show = if List.mem room hand then room::can_show else can_show in
   let rects = make_rects can_show in
   let click = get_next_click_in_rects rects () in
-  let extract_card_text c = match c with | Suspect s | Weapon s | Room s -> s in
+  let extract_card_text c = match c with
+    | Suspect s | Weapon s | Room s -> s in
   draw_board [] (); draw_players ();
   match click with
   | ("suspect", _) -> extract_card_text sus
   | ("weapon", _) -> extract_card_text weap
   | ("room", _) -> extract_card_text room
+  | _ -> prompt_answer hand guess
 
 (* Displays the card shown to the human agent and by whom.
  * If None, no card could be shown. If false, the user is not shown the
@@ -995,7 +996,6 @@ let init game =
   window.weap_count <- List.length w;
   window.weap_count <- List.length r;
   window.po_lst <- game.public.player_order;
-  let p_count = List.length game.players in
   (*let colors = pick_n_colors p_count in*)
   let count = ref 0 in
   let f me =

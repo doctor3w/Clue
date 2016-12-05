@@ -16,10 +16,27 @@ To run our program, you can call make with a number of different arguments:
 ```
 make : runs our test unit suite.
 make test : runs our test unit suite. 
-make play : runs the game file named game.json in the directory test. 
-make play-gui : runs the game file named game.json in the directory test with a graphical user interface rather than the CLI. 
+make play : runs the game file named game.json in the directory tests. 
+make play-gui : runs the game file named game.json in the directory tests with a graphical user interface rather than the CLI. 
 make choose : runs the game, allowing you to later type in the file you wish to load. 
 make choose-gui : runs the game, allowing you to later type in the file you wish to load with a GUI. 
 
 make clean : cleans the build. 
+```
+Optionally, our game can also be run directly from the byte file. To complile run:
+`ocamlbuild -pkgs oUnit,yojson,str,graphics -tag thread main.byte`
+Then with the `main.byte` file you can run it with this usage:
+
+```
+USAGE: 
+
+./main.byte [OPTIONS] [FILE_NAME] [SEED]
+
+These can be in any order
+OPTIONS:
+	-gui : Uses a GUI instead of CLI
+FILE_NAME: 
+	optional filename to load on run
+SEED:
+	integer for loading seed on launch (makes repeating games easy)
 ```
