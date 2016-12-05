@@ -1,18 +1,90 @@
 {
   "dim":
   {
-    "row_count": 12,
-    "col_count": 12
+    "row_count": 24,
+    "col_count": 24
   },
   "rooms":
   [
     {
-      "id": "room 1",
+      "id": "Kitchen",
       "rect":
       {
         "left": 0,
-        "right": 4,
-        "top": 11,
+        "right": 5,
+        "top": 23,
+        "bottom": 18
+      },
+      "passages":
+        [
+          "Study"
+        ],
+      "exits":
+        [
+          {
+            "row": 17,
+            "col": 4
+          }
+        ]
+    },
+    {
+      "id": "Ball Room",
+      "rect":
+      {
+        "left": 8,
+        "right": 15,
+        "top": 23,
+        "bottom": 17
+      },
+      "passages": [],
+      "exits":
+        [
+          {
+            "row": 19,
+            "col": 7
+          },
+          {
+            "row": 19,
+            "col": 16
+          },
+          {
+            "row": 16,
+            "col": 9
+          },
+          {
+            "row": 16,
+            "col": 14
+          }
+        ]
+    },
+    {
+      "id": "Conservatory",
+      "rect":
+      {
+        "left": 18,
+        "right": 23,
+        "top": 23,
+        "bottom": 19
+      },
+      "passages":
+        [
+          "Lounge"
+        ],
+      "exits":
+        [
+          {
+            "row": 18,
+            "col": 18
+          }
+        ]
+    },
+    {
+      "id": "Dining Room",
+      "rect":
+      {
+        "left": 0,
+        "right": 7,
+        "top": 15,
         "bottom": 9
       },
       "passages":
@@ -20,68 +92,85 @@
       "exits":
         [
           {
-            "row": 8,
-            "col": 1
-          },
-          {
-            "row": 10,
-            "col": 5
-          }
-        ]
-    },
-    {
-      "id": "room 2",
-      "rect":
-      {
-        "left": 9,
-        "right": 11,
-        "top": 11,
-        "bottom": 7
-      },
-      "passages":
-        [],
-      "exits":
-        [
-          {
-            "row": 10,
+            "row": 12,
             "col": 8
           },
           {
-            "row": 6,
-            "col": 10
+            "row": 8,
+            "col": 6
           }
         ]
     },
     {
-      "id": "room 3",
+      "id": "Billiards Room",
       "rect":
       {
-        "left": 7,
-        "right": 11,
-        "top": 2,
-        "bottom": 0
+        "left": 18,
+        "right": 23,
+        "top": 16,
+        "bottom": 12
       },
       "passages":
         [],
       "exits":
         [
           {
-            "row": 1,
-            "col": 6
-          },
-          {
-            "row": 3,
-            "col": 10
+            "row": 15,
+            "col": 17
           }
         ]
     },
     {
-      "id": "room 4",
+      "id": "Library",
+      "rect":
+      {
+        "left": 17,
+        "right": 23,
+        "top": 10,
+        "bottom": 6
+      },
+      "passages":
+        [],
+      "exits":
+        [
+          {
+            "row": 11,
+            "col": 20
+          },
+          {
+            "row": 8,
+            "col": 16
+          }
+        ]
+    },
+    {
+      "id": "Lounge",
       "rect":
       {
         "left": 0,
-        "right": 2,
-        "top": 4,
+        "right": 6,
+        "top": 5,
+        "bottom": 0
+      },
+      "passages":
+        [
+          "Conservatory"
+        ],
+      "exits":
+        [
+          {
+            "row": 6,
+            "col": 6
+          }
+        ]
+    },
+    {
+      "id": "Hall",
+      "rect":
+      {
+        "left": 9,
+        "right": 14,
+        "top": 6,
         "bottom": 0
       },
       "passages":
@@ -89,123 +178,163 @@
       "exits":
         [
           {
-            "row": 5,
-            "col": 1
+            "row": 7,
+            "col": 11
           },
           {
-            "row": 1,
-            "col": 3
+            "row": 7,
+            "col": 12
           }
         ]
     },
     {
-      "id": "acc room",
+      "id": "Study",
       "rect":
       {
-        "left": 4,
-        "right": 7,
-        "top": 7,
-        "bottom": 4
+        "left": 17,
+        "right": 23,
+        "top": 3,
+        "bottom": 0
+      },
+      "passages":
+        [
+          "Kitchen"
+        ],
+      "exits":
+        [
+          {
+            "row": 4,
+            "col": 17
+          }
+        ]
+    },
+    {
+      "id": "Staircase",
+      "rect":
+      {
+        "left": 10,
+        "right": 14,
+        "top": 14,
+        "bottom": 8
       },
       "passages":
         [],
       "exits":
         [
           {
-            "row": 8,
-            "col": 5
+            "row": 15,
+            "col": 12
           },
           {
-            "row": 8,
-            "col": 6
+            "row": 7,
+            "col": 12
           },
           {
-            "row": 3,
-            "col": 5
+            "row": 13,
+            "col": 9
           },
           {
-            "row": 3,
-            "col": 6
+            "row": 13,
+            "col": 15
           },
           {
-            "row": 5,
-            "col": 3
+            "row": 9,
+            "col": 9
           },
           {
-            "row": 6,
-            "col": 3
-          },
-          {
-            "row": 5,
-            "col": 8
-          },
-          {
-            "row": 6,
-            "col": 8
+            "row": 9,
+            "col": 15
           }
         ]
     }
   ],
-  "acc_room": "acc room",
+  "acc_room": "Staircase",
   "suspects":
     [
       {
-        "id": "Red",
+        "id": "Miss Scarlet",
         "play_order": 0,
         "start_space":
         {
-          "row": 10,
-          "col": 6
+          "row": 0,
+          "col": 7
         }
       },
       {
-        "id": "Yellow",
+        "id": "Colonel Mustard",
         "play_order": 1,
         "start_space":
         {
-          "row": 1,
-          "col": 5
+          "row": 7,
+          "col": 0
         }
       },
       {
-        "id": "Green",
+        "id": "Mrs. White",
         "play_order": 2,
         "start_space":
         {
-          "row": 6,
-          "col": 1
+          "row": 23,
+          "col": 7
         }
       },
       {
-        "id": "Blue",
+        "id": "Mr. Green",
         "play_order": 3,
         "start_space":
         {
+          "row": 23,
+          "col": 16
+        }
+      },
+      {
+        "id": "Madame Peacock",
+        "play_order": 4,
+        "start_space":
+        {
+          "row": 18,
+          "col": 23
+        }
+      },
+      {
+        "id": "Professor Plum",
+        "play_order": 5,
+        "start_space":
+        {
           "row": 5,
-          "col": 10
+          "col": 23
         }
       }
     ],
     "weapons":
     [
-      "gun",
-      "sword",
-      "rope"
+      "Candlestick",
+      "Dagger",
+      "Lead Pipe",
+      "Revolver",
+      "Rope",
+      "Wrench"
     ],
     "agent_config":
     [
       {
-        "suspect": "Red",
-        "agent_type": "DumbAI"
-      }, {
-        "suspect": "Yellow",
+        "suspect": "Miss Scarlet",
         "agent_type": "SmartAI"
       }, {
-        "suspect": "Green",
+        "suspect": "Colonel Mustard",
         "agent_type": "SmartAI"
       }, {
-        "suspect": "Blue",
+        "suspect": "Mrs. White",
         "agent_type": "SmartAI"
+      }, {
+        "suspect": "Mr. Green",
+        "agent_type": "SmartAI"
+      }, {
+        "suspect": "Madame Peacock",
+        "agent_type": "SmartAI"
+      }, {
+        "suspect": "Professor Plum",
+        "agent_type": "ResponsiveAI"
       }
     ]
 }
