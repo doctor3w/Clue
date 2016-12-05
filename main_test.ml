@@ -4,8 +4,8 @@ open Controller
 open Model
 open Responsive
 
-let game1 = Model.import_board "classic_dumb.json"
-let game2 = Model.import_board "small_mixed.json"
+let game1 = Model.import_board "tests/classic_dumb.json"
+let game2 = Model.import_board "tests/small_mixed.json"
 let p1a = List.hd game1.players
 let p2a = List.hd game2.players
 
