@@ -577,9 +577,9 @@ let pick_to_show lst cp =
   match pre_shown with
   | [] -> fst (rand_from_lst lst)
   | [(c, shn)] -> c
-  | lst' -> match (room_not_preferred lst') with
-            | [] -> fst (rand_from_lst lst')
-            | _  -> fst (rand_from_lst (room_not_preferred lst'))
+  | lst' -> let no_rooms = room_not_preferred lst' in
+            if List.length no_rooms > 0 then fst (rand_from_lst no_rooms)
+            else fst (rand_from_lst lst')
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
@@ -739,10 +739,12 @@ let update_player player l =
   let f acc el =
     let sh = acc.sheet in
     let d = CardMap.find el sh in
-    let d' = {d with card_info = Envelope} in
+    let d' = match d.card_info with
+            | Unknown -> {d with card_info = Envelope}
+            | _ -> d in
     let sh' = CardMap.add el d' sh in
     {acc with sheet = sh'} in
-  List.fold_left f player !l
+  List.fold_left f player l
 
 let compile_known matrix public lst ref_l =
   let counter = ref None in
@@ -807,9 +809,9 @@ let take_notes player public guess str_option: player =
              then compile_known matrix public r_lst l
              else ());
              (compile_notinhand matrix public x_len l);
-                (*  print_endline "hey what's up";
-              print_int (List.length (!l)); *)
-             update_player player l)
+                 print_endline "hey what's up";
+              print_int (List.length (!l));
+             update_player player !l)
   | Some str ->
   (* update all the Pure_unknown to Maybe_in_hand *)
     (let p_index = suspect_to_index public str in
@@ -863,4 +865,4 @@ let take_notes player public guess str_option: player =
     then compile_known matrix public r_lst l
     else ());
     (compile_notinhand matrix public x_len l);
-    update_player player l)
+    update_player player !l)

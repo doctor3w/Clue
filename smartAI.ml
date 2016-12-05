@@ -238,8 +238,9 @@ let get_answer (me:player) public guess : card option =
   let weap_sht = (CardMap.find weap me.sheet).card_info in
   let room_sht = (CardMap.find room me.sheet).card_info in*)
   let f acc el = match (CardMap.find el me.sheet).card_info with
-                | Mine lst -> (el, lst)::acc
-                | _ -> acc in
+                 | Mine [] -> (el, [])::acc
+                 | Mine lst -> (el, lst)::acc
+                 | _ -> acc in
   let mine_info = List.fold_left f [] (sus::weap::[room]) in
   match mine_info with
   | [] -> None
