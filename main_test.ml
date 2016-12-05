@@ -124,7 +124,7 @@ let pub = {
 
 
 let pubr = {
-    curr_player = "yellow";
+    curr_player = "red";
     acc_room = "acc";
     board = {
       dim = (-1,-1);
@@ -187,30 +187,6 @@ let m =   [|[|Not_in_hand; Pure_unknown; Pure_unknown; Pure_unknown|];
           [|Known; Not_in_hand; Not_in_hand; Not_in_hand|];
           [|Not_in_hand; Pure_unknown; Pure_unknown; Pure_unknown|]|]
 
-let t =  [|[|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|]|]
-
-let t1 =  [|[|Not_in_hand; Not_in_hand; Not_in_hand; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Not_in_hand; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Not_in_hand; Pure_unknown|];
-    [|Not_in_hand; Not_in_hand; Maybe_in_hand; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|];
-    [|Pure_unknown; Pure_unknown; Pure_unknown; Pure_unknown|]|]
-
 let redp_env = update_player redp (blue,rope,room3)
 let greenp_env = update_player greenp (blue,rope,room3)
 let yellowp_env = update_player yellowp (blue,rope,room3)
@@ -251,8 +227,6 @@ let agent_tests =
   "responsive first_take_note" >:: (fun _->assert_equal {redr with listen = m}
   (Agent.first_take_note redr pubr));
 
-  "responsive take_note" >:: (fun _->assert_equal {redr with listen = t}
-    (Agent.take_notes redr pub (green,rope,room2) (Some "green")));
 ]
 
 let tests = pathmap_tests@agent_tests
