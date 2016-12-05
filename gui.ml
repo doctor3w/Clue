@@ -26,6 +26,7 @@ type graphic_board = {
   mutable weap_count: int;
   mutable room_count: int;
   mutable log: (string * Graphics.color) list;
+  mutable po_lst: string list;
 }
 
 let window = {
@@ -51,7 +52,8 @@ let window = {
     sus_count = 1;
     weap_count = 1;
     room_count = 1;
-    log = [("Welcome to CLUE.", Graphics.black)]
+    log = [("Welcome to CLUE.", Graphics.black)];
+    po_lst = []
   }
 
 let player_border = Graphics.black
@@ -68,6 +70,7 @@ let lock_color = Graphics.rgb 63 63 63
 let answer_back = Graphics.rgb 31 31 31
 let dark_space_color = Graphics.rgb 127 127 127
 let dark_room_color = Graphics.rgb 63 63 63
+let tick_color = Graphics.rgb 41 63 39
 
 
 (* Delays for [secs] seconds
@@ -564,9 +567,52 @@ let add_to_log lst =
   window.log <- loop lst window.log;
   draw_log ()
 
-let draw_po () =
+let draw_tick x dim py gy =
+  let x_cent = x+dim/2 in
+  let y_space = py - gy - 25 in
+  let x_min = x_cent - (dim/3) in
+  let x_max = x_cent + (dim/3) in
+  let y_point = py - 10 in
+  let y_min = gy + 15 in
+  let y_max = (y_point + y_min)/2 in
+  let ary = Array.of_list [(x_cent, y_point); (x_max, y_max); (x_max, y_min);
+                           (x_min, y_min); (x_min, y_max)] in
+  Graphics.set_color tick_color;
+  Graphics.fill_poly ary;
+  Graphics.set_color Graphics.black;
+  Graphics.draw_poly ary
+
+let draw_po tick () =
   grect_curry draw_filled_rect window.po_window Graphics.black Graphics.white;
-  ()
+  let (has_tick, tick_who) =
+    match tick with
+    | Some s -> (true, s)
+    | None -> (false, "") in
+    let (gx, gy, gw, gh) = window.po_window in
+  let count = List.length window.po_lst in
+  let max_w = if count <> 0 then (gw - 15*(count+1))/count
+    else failwith ("count should never be 0: " ^ Pervasives.__LOC__) in
+  let max_h = (gh - 30)/2 in
+  let dim = if max_w < max_h then max_w else max_h in
+  let space = (gw - dim*count)/(count+1) in
+  let rec loop ps n =
+    match ps with
+    | [] -> ()
+    | h::t -> let color = StringMap.find h window.player_colors in
+              let x = gx + (n+1)*space + n*dim in
+              let y = gy + gh - 15 - dim in
+              let grect = (x, y, dim, dim) in
+              grect_curry draw_ell_in_rect grect Graphics.black color;
+              let _ = if has_tick && (h = tick_who)
+                      then draw_tick x dim y gy else () in
+              loop t (n+1) in
+  loop (window.po_lst) 0
+
+let po_start_turn () =
+  draw_po (None) ()
+
+let po_set_answer_tick who =
+  draw_po (Some who) ()
 
 (* redraws the entire window *)
 let redraw () =
@@ -576,7 +622,7 @@ let redraw () =
   draw_sheet ();
   draw_info ();
   draw_log ();
-  draw_po();
+  draw_po None ();
   ()
 
 (* Displays the relocation of suspect [string] to the Room loc *)
@@ -606,11 +652,24 @@ let highlight_coord transform coord =
 let display_error (e_msg: string) : unit =
   set_info ("ERROR: " ^ e_msg)
 
+(* splits a [lst] at the first occurence of [el] and moves all preceeding
+ * elements to the end. [cycle_to] maintains all relative order if the list
+ * is considered cyclic. *)
+let cycle_to el lst =
+  let rec loop back front =
+    match front with
+    | [] -> back
+    | h::t -> if h = el then front@back
+              else loop (List.rev (h::(List.rev back))) t in
+  loop [] lst
+
 (* Displays a description of who's turn it is. *)
 let display_turn (public:Data.public) : unit =
   let this_turn = public.curr_player in
   window.curr_player <- this_turn;
   let s = ("It is " ^ window.curr_player ^ "'s turn.") in
+  window.po_lst <- cycle_to this_turn window.po_lst;
+  po_start_turn ();
   set_info s;
   add_to_log [(s, StringMap.find this_turn window.player_colors)]
 
@@ -649,14 +708,13 @@ let prompt_move (movelst: move list) : string =
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
-  let _ = if not (is_my_turn ()) then gui_delay 1.0 else () in
   let s = (" has rolled a " ^ (Pervasives.string_of_int roll) ^ ".") in
   set_info (window.curr_player ^ s);
-  add_to_log [((window.curr_player ^ s), Graphics.black)]
+  add_to_log [((window.curr_player ^ s), Graphics.black)];
+  if not (is_my_turn ()) then gui_delay 1.0 else ()
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move move : unit =
-  let _ = if not (is_my_turn ()) then gui_delay 1.0 else () in
   let f loc = match loc.info with
   | Room_Rect (s,_) -> s
   | Space _ -> failwith ("can't take a passage to a space: "
@@ -668,7 +726,8 @@ let display_move move : unit =
     display_relocate window.curr_player loc
   | Roll ->
     let s = window.curr_player ^ " rolled the dice." in
-    set_info s; add_to_log [(s, Graphics.black)]
+    set_info s; add_to_log [(s, Graphics.black)];
+    if not (is_my_turn ()) then gui_delay 1.0 else ()
 
 (* Prompts the user for the room they would like to go to.
  * [loc * (string * bool)] the location and whether or not room [string] is
@@ -700,8 +759,12 @@ let prompt_movement pathmap acc_room roll : loc =
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (l, (s, b)) : unit =
-  let _ = if not (is_my_turn ()) then gui_delay 2.0 else () in
-  display_relocate window.curr_player l
+  display_relocate window.curr_player l;
+  let log_text = if b then window.curr_player ^ " entered the " ^ s
+               else window.curr_player ^ " headed towards the " ^ s in
+
+  add_to_log [(log_text, Graphics.black)];
+  if not (is_my_turn ()) then gui_delay 1.0 else ()
 
 (* Prompts the user for a guess.
  * Takes in the current location (must be a room) and
@@ -711,6 +774,7 @@ let prompt_guess loc (is_acc: bool) : string =
   let has_room = ref (not is_acc) in
   let has_weap = ref false in
   let has_sus = ref false in
+  po_set_answer_tick window.curr_player;
   let r = ref
     (match (is_acc, loc.info) with
     | (true, _) -> (Room "")
@@ -747,9 +811,9 @@ let prompt_guess loc (is_acc: bool) : string =
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
-  let _ = if not (is_my_turn ()) then gui_delay 2.0 else () in
   let guesser = window.curr_player in
-  match guess with
+  po_set_answer_tick window.curr_player;
+  let _ = match guess with
   | (Suspect who, Weapon what, Room where) ->
     let s0 = guesser ^ " thinks " in
     let s1 = "it was " ^ who in
@@ -761,7 +825,8 @@ let display_guess guess : unit =
                 ("    "^s2, Graphics.black);
                 ("    "^s3, Graphics.black)]
 
-  | _ -> failwith ("bad guess order: " ^ Pervasives.__LOC__)
+  | _ -> failwith ("bad guess order: " ^ Pervasives.__LOC__) in
+  if not (is_my_turn ()) then gui_delay 3.0 else ()
 
 
 let make_rects lst =
@@ -811,6 +876,7 @@ let make_rects lst =
  * Can be none if there is no card to show. *)
 let prompt_answer hand guess : string =
   set_info (window.last_info^"\nPICK A CARD TO SHOW");
+  po_set_answer_tick window.sheet_disp;
   grect_curry draw_filled_rect window.b_window Graphics.black answer_back;
   let (sus, weap, room) = guess in
   let can_show = if List.mem sus hand then [sus] else [] in
@@ -829,7 +895,8 @@ let prompt_answer hand guess : string =
  * If None, no card could be shown. If false, the user is not shown the
  * details of the card. *)
 let display_answer (c:card option) (who: string) (detail: bool) : unit =
-  let _ = if (who <> window.sheet_disp) then gui_delay 2.0 else () in
+  let my_ans = who = window.sheet_disp in
+  po_set_answer_tick who;
   let card_detail c =
     match c with
     | Suspect s -> "a Suspect: " ^ s
@@ -841,23 +908,26 @@ let display_answer (c:card option) (who: string) (detail: bool) : unit =
     | false, None -> "Nobody could show a card."
     | true, Some c -> who ^ " shows you " ^ card_detail c
     | false, Some c -> who ^ " showed a card from their hand." in
-  set_info s; add_to_log [(s, Graphics.black)]
+  set_info s; add_to_log [(s, Graphics.black)];
+  let _ = if not my_ans then gui_delay 2.0 else ()
+  in ()
 
 (* Displays that the player [string] could not answer with a card.
  * This is different from no one being able to show a card. *)
 let display_no_answer (who: string) : unit =
-  let _ = gui_delay 2.0 in
+  po_set_answer_tick who;
   set_info (who ^ " has nothing to show.");
-  add_to_log [(who ^ " has nothing to show.", Graphics.black)]
+  add_to_log [(who ^ " has nothing to show.", Graphics.black)];
+  gui_delay 2.0
 
 (* Displays end game victory text, string is who won. *)
 let display_victory (who: string) : unit =
-  let _ = if not (is_my_turn ()) then gui_delay 4.0 else () in
   set_info (who ^ " WINS!")
 
 (* Displays arbitrary text. *)
 let display_message (text: string) : unit =
-  set_info text
+  set_info text;
+  gui_delay 2.0
 
 let init game =
   window.board <- game.public.board;
@@ -867,6 +937,7 @@ let init game =
   window.sus_count <- List.length s;
   window.weap_count <- List.length w;
   window.weap_count <- List.length r;
+  window.po_lst <- game.public.player_order;
   let p_count = List.length game.players in
   let colors = pick_n_colors p_count in
   let count = ref 0 in
@@ -890,6 +961,9 @@ let init game =
   let (gx, gy) = window.win_bounds in
   Graphics.resize_window gx gy;
   Graphics.set_window_title "CLUE";
+  let s = "You are " ^ window.sheet_disp ^ "." in
+  set_info (s);
+  add_to_log [(s, StringMap.find window.sheet_disp window.player_colors)];
   redraw ()
 
 let show_sheet sheet : unit =
