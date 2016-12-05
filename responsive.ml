@@ -2,6 +2,8 @@ open Data
 
 module Display = View
 
+(* Used when the AI can't use a certain list of places. Should never
+ * be propogated up *)
 exception No_place_to_go
 
 let p_mod i n = ((i mod n)+n) mod n

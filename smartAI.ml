@@ -84,26 +84,13 @@ let is_env_card me c =
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move  (me:player) public (passages: move list) : move =
   let knows_room = knows_room me in
-  if knows_room then
-    let f acc pass =
-      match pass with
-      | Passage r when is_my_room me r -> (Passage r)::acc
-      | _ -> acc in
-    let g acc pass =
-      match pass with
-      | Passage r when is_env_room me r -> (Passage r)::acc
-      | _ -> acc in
-    let my_rooms = List.fold_left f [] passages in
-    if List.length my_rooms > 0 then rand_from_lst my_rooms
-    else let env_room = List.fold_left g [] passages in
-      if List.length env_room > 0 then rand_from_lst env_room else
-      Roll
+  let fold f acc pass =
+    match pass with
+    | Passage r when f me r -> (Passage r)::acc
+    | _ -> acc in
+  if knows_room then Roll
   else
-    let h acc pass =
-      match pass with
-      | Passage r when is_unknown_room me r -> (Passage r)::acc
-      | _ -> acc in
-    let unknowns = List.fold_left h [] passages in
+    let unknowns = List.fold_left (fold is_unknown_room) [] passages in
     if List.length unknowns > 0 then rand_from_lst unknowns else Roll
 
 (* true if s is the acc_room, takes in an element from [movelst] below *)
@@ -123,89 +110,64 @@ let get_movement (me:player) public (movelst:movement list) =
   else
     let b = (fun x -> not (is_acc_room public x)) in
     let movelst' = List.filter b movelst in
-    if room_env
-    then
-      let f acc el = match el with
-      | (l, (s, true)) when is_my_card me (Room s) -> (l, (s, true))::acc
+    let fold f b acc el = match el with
+      | (l, (s, b)) when f me (Room s) -> (l, (s, b))::acc
       | _ -> acc in
-      let g acc el = match el with
-      | (l, (s, true)) when is_env_card me (Room s) -> (l, (s, true))::acc
-      | _ -> acc in
-      let h acc el = match el with
-      | (l, (s, false)) when is_my_card me (Room s) -> (l, (s, false))::acc
-      | _ -> acc in
-      let p acc el = match el with
-      | (l, (s, false)) when is_env_card me (Room s) -> (l, (s, false))::acc
-      | _ -> acc in
-      let fs = List.fold_left f [] movelst' in
+    if room_env then
+      let fs = List.fold_left (fold is_my_card true) [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
-      else let gs = List.fold_left g [] movelst' in
+      else let gs = List.fold_left (fold is_env_card true) [] movelst' in
       if List.length gs > 0 then rand_from_lst gs
-      else let hs = List.fold_left h [] movelst' in
+      else let hs = List.fold_left (fold is_my_card false) [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
-      else let ps = List.fold_left p [] movelst' in
+      else let ps = List.fold_left (fold is_env_card false) [] movelst' in
       if List.length ps > 0 then rand_from_lst ps
       else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
     else
-      let f' acc el = match el with
-      | (l, (s, true)) when is_unknown_card me (Room s) -> (l, (s, true))::acc
-      | _ -> acc in
-      let h' acc el = match el with
-      | (l, (s, false)) when is_unknown_card me (Room s)-> (l, (s, false))::acc
-      | _ -> acc in
-      let fs = List.fold_left f' [] movelst' in
+      let fs = List.fold_left (fold is_unknown_card true) [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
-      else let hs = List.fold_left h' [] movelst' in
+      else let hs = List.fold_left (fold is_unknown_card false) [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
       else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
 
+(* gets the cards in the sheet with a certain info *)
+let get_cards_with_info info sheet =
+  let l = CardMap.filter (fun _ data -> (data.card_info = info)) sheet in
+  List.map (fun (c,_) -> c) (CardMap.bindings l)
+
+(* Makes a Room card out of a room location *)
+let get_card_for_loc l = match l.info with
+  | Room_Rect (s, i) -> Room s
+  | _ -> failwith "Not a room"
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
-let get_guess (me:player) public : guess =
-  let room = match me.curr_loc.info with
-             | Room_Rect (s, _) -> (Room s)
-             | _ -> failwith "trying to guess from not room" in
-  let sus_env = knows_sus me in
-  let weap_env = knows_weap me in
-  let l = CardMap.bindings me.sheet in
-  let s_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Suspect _, Unknown -> true
-                                       | _ -> false) lst in
-                  if List.length u > 0 then rand_from_lst u |> fst
-                  else failwith "don't know sus, but no sus unknown" in
-  let w_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Weapon _, Unknown -> true
-                                       | _ -> false) lst in
-                  if List.length u > 0 then rand_from_lst u |> fst
-                  else failwith "don't know weap, but no weaps unknown" in
-  let s_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Suspect _, Mine _ -> true
-                                       | _ -> false) lst in
-                  if List.length m > 0 then rand_from_lst m |> fst
-                else
-                  let n = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Suspect _, Envelope -> true
-                                       | _ -> false) lst in
-                    if List.length n > 0 then rand_from_lst n |> fst
-                    else failwith "no sus_mine/env for guess" in
-  let w_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Weapon _, Mine _ -> true
-                                       | _ -> false) lst in
-                  if List.length m > 0 then rand_from_lst m |> fst
-                  else
-                    let n = List.filter (fun (c, i) -> match c, i.card_info with
-                                       | Weapon _, Envelope -> true
-                                       | _ -> false) lst in
-                      if List.length n > 0 then rand_from_lst n |> fst
-                      else failwith "no weap_mine/env for guess" in
-  match sus_env, weap_env with
-  | true, true    -> (s_m l, w_m l, room)
-  | true, false   -> (s_m l, w_u l, room)
-  | false, true   -> (s_u l, w_m l, room)
-  | false, false  -> (s_u l, w_u l, room)
+let get_guess pl public : guess =
+  let r = get_card_for_loc pl.curr_loc in
+  let unks = get_cards_with_info Unknown pl.sheet in
+  let envs = get_cards_with_info Envelope pl.sheet in
+  let mins = pl.hand in
+  let s_only c = match c with Suspect s -> true | _ -> false in
+  let w_only c = match c with Weapon s -> true | _ -> false in
+  let my_s = List.filter s_only mins in
+  let my_w = List.filter w_only mins in
+  let env_s = List.filter s_only envs in
+  let env_w = List.filter w_only envs in
+  let unks_s = List.filter s_only unks in
+  let unks_w = List.filter w_only unks in
+  let s =
+    try List.hd my_s with _ ->
+    try List.hd env_s with _ ->
+    if List.length unks_s = 0 then failwith "No card to guess"
+    else List.nth unks_s (Random.int (List.length unks_s)) in
+  let w =
+    try List.hd my_w with _ ->
+    try List.hd env_w with _ ->
+    if List.length unks_w = 0 then failwith "No card to guess"
+    else List.nth unks_w (Random.int (List.length unks_w)) in
+  (s, w, r)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
@@ -234,9 +196,6 @@ let pick_to_show lst cp =
 let get_answer (me:player) public guess : card option =
   let (sus, weap, room) = guess in
   let cp = public.curr_player in
-  (*let sus_sht = (CardMap.find sus me.sheet).card_info in
-  let weap_sht = (CardMap.find weap me.sheet).card_info in
-  let room_sht = (CardMap.find room me.sheet).card_info in*)
   let f acc el = match (CardMap.find el me.sheet).card_info with
                  | Mine [] -> (el, [])::acc
                  | Mine lst -> (el, lst)::acc
@@ -246,59 +205,6 @@ let get_answer (me:player) public guess : card option =
   | [] -> None
   | [(c, lst)] -> Some c
   | lst -> Some (pick_to_show lst cp)
-
-(* let env_nm card me =
-  let f c = let sd = CardMap.find c me.sheet in
-    match sd.card_info with
-    | Unknown -> let sht' = CardMap.add c {sd with card_info = Envelope} me.sheet in
-                 {me with sheet = sht'}
-    | _ -> me
-
-let deduce_env me:player =
-  let bindings = CardMap.bindings me.sheet in
-  let fs = (fun (c,i) -> match c with | Suspect _ -> true | _ -> false ) in
-  let fw = (fun (c,i) -> match c with | Weapon _ -> true | _ -> false ) in
-  let fr = (fun (c,i) -> match c with | Room _ -> true | _ -> false ) in
-  let suss = List.filter fs bindings in
-  let weaps = List.filter fw bindings in
-  let rooms = List.filter fr bindings in
-  let count_unkn = (fun acc (c, i) -> match i.card_info with
-                                      | Unknown -> acc+1
-                                      | _ -> acc) in
-  let env_un acc (c, i) =
-    match i.card_info with
-    | Unknown -> CardMap.add c {i with card_info = Envelope} acc
-    | _ -> acc in
-  let f lst acc = if List.fold_left count_unkn 0 lst = 1
-                  then List.fold_left env_un acc lst
-                  else acc in
-  let sht' = me.sheet |> f suss |> f weaps |> f rooms in
-  {me with sheet = sht'}
- *)
-
-(* [show_card pl pu c g] updates the players sheet based on the new card seen
- * and the guess. If card is None, then that means no one had cards in the
- * guess and needs to be updated accordingly. Also needs to use process of
- * elimination for certain AIs. The string is who showed's suspect ID. *)
-(* let show_card (me:player) public (shown:(string * card) option) guess : player =
-  let sht = (fun c -> CardMap.find c me.sheet) in
-  let (s, w, r) = guess in
-  let me' = match shown with
-  | None -> me |> env_nm s |> env_nm w |> env_nm r
-  | Some (sus, c) -> let old_sd = sht c in
-                     let sht'  = CardMap.add
-                     {old_c_info with card_info = (ShownBy sus)} me.sheet in
-                     {me with sheet = sht'} in
-  me' |> deduce_env *)
-
-(* Adds [sus] to [pl]'s list of 'shown to people' for a specific card [card] *)
-(* let show_person (me:player) card  (who:string) : player =
-  let sd = CardMap.find card me.sheet in
-  let shown = match sd.info with
-              | Mine s -> s
-              | _ -> failwith "showed card not in hand!" in
-  let shown' = if List.mem who shown then shown else who::shown in
-  {me with sheet=(CardMap.add card {sd with card_info = Mine shown'})} *)
 
 (* [take_notes pl pu] updates the ResponsiveAIs sheet based on the listen data
  * in public. *)
