@@ -1,59 +1,22 @@
 open Data
 
-(*module Coord = struct
-  type t = int*int
-  let compare (r1,c1) (r2,c2) =
-    if r1 < r2 then -1
-    else if r1 > r2 then 1
-    else if c1 < c2 then -1
-    else if c1 > c2 then 1
-    else 0
-end
-
-module CoordMap = Map.Make(Coord)
-module StringMap = Map.Make(String)*)
-
-(* row * col *)
-(*type coord = int*int
-
-(* x0, x1, y0, y1 *)
-type rect = int*int*int*int
-
-type coord_info = Space of (int*int) | Room_Rect of string * (int*int*int*int)
-
-type loc' =
-{
-  info: coord_info;
-  edges: (int*int) list
-}
-
-type board =
-{
-  dim: int*int;
-  loc_map: loc' CoordMap.t;
-  room_coords: coord StringMap.t
-} *)
-
+(* returns [board] with an extra edge defined from [coord1] to [coord2].
+ * if [both] is true, [add edge board' coord2 coord1 false] is called *)
 let rec add_edge board coord1 coord2 both =
-  (*let ((x1, y1), (x2, y2)) = (coord1, coord2) in
-  Pervasives.print_endline ("adding edge from ("
-  ^ Pervasives.string_of_int x1 ^ ", "
-  ^ Pervasives.string_of_int y1 ^ ") to ("
-  ^ Pervasives.string_of_int x2 ^ ", "
-  ^ Pervasives.string_of_int y2 ^ ")");*)
   let ((a1, a2), (b1, b2)) = (coord1, coord2) in
   let loc1 = try (CoordMap.find coord1 board.loc_map)
     with _ -> failwith ("couldn't find loc ("
                       ^ (Pervasives.string_of_int a1) ^ ", "
                       ^ (Pervasives.string_of_int a2) ^ ") for ("
                       ^ (Pervasives.string_of_int b1) ^ ", "
-                      ^ (Pervasives.string_of_int b2) ^")")
-  (*|> (fun x -> match x with Some y -> y | None -> failwith "no coord") *)in
+                      ^ (Pervasives.string_of_int b2) ^")") in
   let loc1' = {loc1 with edges = coord2::loc1.edges} in
   let board' = {board with loc_map = (CoordMap.add coord1 loc1' board.loc_map)} in
   if both then (add_edge board' coord2 coord1 false) else board'
 
-(* do this before adding edges! *)
+(* adds the room to [board.loc_map] for all coordinates that fall within the
+ * [room] defined by [room_temp]
+ * do this before adding edges! *)
 let fill_room board room_temp =
   let s = room_temp.r_id in
   let rect = room_temp.rect in
@@ -69,6 +32,7 @@ let fill_room board room_temp =
       in loopx board (x'+1,y')
   in loopx board (x0, y0)
 
+(* puts spaces in all remaining coordinates within the dimensions of [board[ *)
 let fill_spaces board =
   let (r, c) = board.dim in
   let (r, c) = (r-1,c-1) in
@@ -85,11 +49,14 @@ let fill_spaces board =
       in loopx board' (x'+1, y')
   in loopx board (0,0)
 
+(* builds a completely empty board with [r] rows and [c] columns *)
 let build_empty_board r c =
   {dim = (r,c);
    loc_map = CoordMap.empty;
    room_coords = StringMap.empty}
 
+(* adds the exits and passages from a room to [loc.edges] for the
+ * corresponding room in [board.room_locs] and [board.loc_map] *)
 let edgify_room board room_temp =
   let s = room_temp.r_id in
   let r_coord = (StringMap.find s board.room_coords) in
@@ -98,6 +65,7 @@ let edgify_room board room_temp =
   let f' acc el = add_edge board' r_coord (StringMap.find el board.room_coords) false in
   List.fold_left f' board' room_temp.passages
 
+(* adds an edge from [c1] to [c2] iff they are both Spaces *)
 let add_edge_if_space board c1 c2 =
   let (r,c) = board.dim in
   let (r,c) = (r-1,c-1) in
@@ -109,6 +77,7 @@ let add_edge_if_space board c1 c2 =
   | (Space _, Space _) -> add_edge board c1 c2 false
   | _ -> board
 
+(* puts edges between all adjacent spaces in [board] *)
 let edgify_spaces board =
   let (r,c) = board.dim in
   let (r,c) = (r-1,c-1) in
@@ -125,6 +94,8 @@ let edgify_spaces board =
     loopx board' (x+1,y) in
   loopx board (0,0)
 
+(* makes sure every [coord] within any given room matches every other coord
+ * in that room.  This allows rooms to be looked up by any interior coord *)
 let finish_rooms board =
   let f coord loc board =
     match loc.info with
@@ -136,6 +107,10 @@ let finish_rooms board =
     | Space _ -> board in
   CoordMap.fold f board.loc_map board
 
+(* makes a new board with dimensions (r, c) containing a room for each
+ * element in [room_temp_lst] with all edges and spaces necessary for full
+ * traversal.  Model calls this from [import_board] and it is the only
+ * part of Board called anywhere in the project. *)
 let fill_board (r, c) room_temp_lst =
   let empty = build_empty_board r c in
   let f = (fun acc el ->

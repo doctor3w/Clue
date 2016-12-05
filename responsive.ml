@@ -6,33 +6,41 @@ module Display = View
  * be propogated up *)
 exception No_place_to_go
 
+(* returns positive result of i mod n*)
 let p_mod i n = ((i mod n)+n) mod n
 
+(* finds the index of [x] in [lst] *)
 let rec find x lst =
     match lst with
     | [] -> failwith ("Not Found: " ^ Pervasives.__LOC__)
     | h :: t -> if x = h then 0 else 1 + find x t
 
+(* returns corresponding index of [sus] in the matrix *)
 let suspect_to_index public (sus:string) : int =
 	find sus public.player_order
 
+(* returns the corresponding suspect name based on the index [i] *)
 let index_to_suspect public i : string = List.nth public.player_order i
 
+(* returns corresponding index of the [card] in the matrix *)
 let card_to_index public (card:card) : int =
 	let (s_lst, w_lst, r_lst) = public.deck in
 	let deck' = s_lst @ w_lst @ r_lst in
 	find card deck'
 
+(* returns the corresponding card based on the index [i] *)
 let index_to_card public i : card =
 	let (s_lst, w_lst, r_lst) = public.deck in
 	let deck' = s_lst @ w_lst @ r_lst in
 	List.nth deck' i
 
+(* returns a random element in [lst] *)
 let rand_from_lst lst =
   let len = List.length lst in
   if len = 0 then failwith ("no lst: " ^ Pervasives.__LOC__)
   else let n = Random.int len in
     List.nth lst n
+
 (* return the max number in the list *)
 let my_max =
   function
@@ -58,6 +66,7 @@ let current_deck_to_env public me =
               else f t in
   f deck'
 
+(* returns Some card if [lst] contains a suspect card else return None*)
 let rec find_final_suspect lst =
   match lst with
   | [] -> None
@@ -66,6 +75,7 @@ let rec find_final_suspect lst =
     | Suspect s -> Some h
     | _ -> find_final_suspect t
 
+(* returns Some card if [lst] contains a weapon card else return None *)
 let rec find_final_weapon lst =
   match lst with
   | [] -> None
@@ -74,6 +84,7 @@ let rec find_final_weapon lst =
     | Weapon s -> Some h
     | _ -> find_final_weapon t
 
+(* returns Some card if [lst] contains a room card,else return None*)
 let rec find_final_room lst =
   match lst with
   | [] -> None
@@ -92,11 +103,12 @@ let count_listenchoice a t =
      else ()) done;
   !counter
 
-(* check if the entire array [a] is all Not_in_hand*)
+(* checks if the entire array [a] is all Not_in_hand*)
 let is_all_notinhand a =
   let count = count_listenchoice a Not_in_hand in
   Array.length a = count
 
+(* updates [counter] with the number of Known in the matrix *)
 let rec helper matrix public (lst: card list) counter =
   match lst with
   | [] -> ()
@@ -183,6 +195,7 @@ let rec check_p_known player public passage_list =
             check_p_known player public t
           else h:: check_p_known player public t
 
+(* returns the largest element in [lst] *)
 let my_max lst = match lst with
   | [] -> failwith ("my max has an empty list" ^ Pervasives.__LOC__)
   | x::xs -> List.fold_left max x xs
@@ -276,6 +289,8 @@ let get_notknwon_cards card_lst matrix public =
   let new_lst = f card_array_list in
   List.map (fun y -> fst y) new_lst
 
+(* returns the maximum number and its corresponding card that Listen_choice [t]
+ * appears in the matrix *)
 let most_type card_lst (matrix: listen_choice array array) public t =
   let array_card_list =
     List.map (fun x -> (matrix.(card_to_index public x), x)) card_lst in
@@ -736,6 +751,7 @@ let first_take_note player public: player =
       help t public)) in help hand public;
   player
 
+(* returns player with a updated [player].sheet *)
 let update_player player l =
   let f acc el =
     let sh = acc.sheet in
@@ -747,6 +763,7 @@ let update_player player l =
     {acc with sheet = sh'} in
   List.fold_left f player l
 
+(* updates [ref_l] and rewrites [matrix] based on [lst]*)
 let compile_known matrix public lst ref_l =
   let counter = ref None in
   let index_lst = List.map (fun x -> card_to_index public x) lst in
@@ -758,6 +775,8 @@ let compile_known matrix public lst ref_l =
            rewrite_env matrix.(i))
        else ()) done
 
+(* updates row [x_index]in [matrix] between column [asking_index] and column
+ * [answering_index] to Not_in_hand  *)
 let adjacent_helper matrix x_index asking_index answering_index y_len=
   if (asking_index < answering_index)
   then (for new_i = (asking_index+1) to (answering_index-1)
@@ -773,19 +792,11 @@ let adjacent_helper matrix x_index asking_index answering_index y_len=
         then ()
         else matrix.(x_index).(new_i2) <- Not_in_hand) done)
 
-(* [take_notes] is only called
-  when another player is showing a card to another player
-  /no one could show a card to another player.
-  It takes four inputs:  player, public, current_guess and string_option,
-  where player is responsive AI itself, public is just the type public,
-  guess is the current guess by some other player and
-  string_option is if there is a player having any card to show him.
-  It returns a new player as the output
-  where we mainly change the player.listen and possibly player.sheet.
+(* [take_notes] takes [player[, [public], [current_guess] and [str_option],
+ * guess is the current guess by some other player and
+ * string_option is if there is a player having any card to show him.
+ * It returns a new player as the output with an updated listen and sheet
  *)
-
- (* !!!!!!!!!!!!! need to update the note when responsive AI gets the hand.
-    However, take_note is not called at that time *)
 let take_notes player public guess str_option: player =
   let l = ref [] in
   let (s_lst, w_lst, r_lst) = public.deck in
