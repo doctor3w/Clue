@@ -159,30 +159,48 @@ let get_card_for_loc l = match l.info with
 
 (* [get_guess] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent guesses. *)
-let get_guess pl public : guess =
-  let r = get_card_for_loc pl.curr_loc in
-  let unks = get_cards_with_info Unknown pl.sheet in
-  let envs = get_cards_with_info Envelope pl.sheet in
-  let mins = pl.hand in
-  let s_only c = match c with Suspect s -> true | _ -> false in
-  let w_only c = match c with Weapon s -> true | _ -> false in
-  let my_s = List.filter s_only mins in
-  let my_w = List.filter w_only mins in
-  let env_s = List.filter s_only envs in
-  let env_w = List.filter w_only envs in
-  let unks_s = List.filter s_only unks in
-  let unks_w = List.filter w_only unks in
-  let s =
-    try List.hd my_s with _ ->
-    try List.hd env_s with _ ->
-    if List.length unks_s = 0 then failwith "No card to guess"
-    else List.nth unks_s (Random.int (List.length unks_s)) in
-  let w =
-    try List.hd my_w with _ ->
-    try List.hd env_w with _ ->
-    if List.length unks_w = 0 then failwith "No card to guess"
-    else List.nth unks_w (Random.int (List.length unks_w)) in
-  (s, w, r)
+let get_guess (me:player) public : guess =
+  let room = match me.curr_loc.info with
+             | Room_Rect (s, _) -> (Room s)
+             | _ -> failwith "trying to guess from not room" in
+  let sus_env = knows_sus me in
+  let weap_env = knows_weap me in
+  let l = CardMap.bindings me.sheet in
+  let s_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Suspect _, Unknown -> true
+                                       | _ -> false) lst in
+                  if List.length u > 0 then rand_from_lst u |> fst
+                  else failwith "don't know sus, but no sus unknown" in
+  let w_u lst = let u = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Weapon _, Unknown -> true
+                                       | _ -> false) lst in
+                  if List.length u > 0 then rand_from_lst u |> fst
+                  else failwith "don't know weap, but no weaps unknown" in
+  let s_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Suspect _, Mine _ -> true
+                                       | _ -> false) lst in
+                  if List.length m > 0 then rand_from_lst m |> fst
+                else
+                  let n = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Suspect _, Envelope -> true
+                                       | _ -> false) lst in
+                    if List.length n > 0 then rand_from_lst n |> fst
+                    else failwith "no sus_mine/env for guess" in
+  let w_m lst = let m = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Weapon _, Mine _ -> true
+                                       | _ -> false) lst in
+                  if List.length m > 0 then rand_from_lst m |> fst
+                  else
+                    let n = List.filter (fun (c, i) -> match c, i.card_info with
+                                       | Weapon _, Envelope -> true
+                                       | _ -> false) lst in
+                      if List.length n > 0 then rand_from_lst n |> fst
+                      else failwith "no weap_mine/env for guess" in
+  match sus_env, weap_env with
+  | true, true    -> (s_m l, w_m l, room)
+  | true, false   -> (s_m l, w_u l, room)
+  | false, true   -> (s_u l, w_m l, room)
+  | false, false  -> (s_u l, w_u l, room)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
  * a card list of 1 room, 1 suspect, and 1 weapon that the agent thinks is
