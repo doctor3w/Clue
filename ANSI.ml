@@ -7,7 +7,8 @@ open Data
  * single character feature is new.
  **)
 
-(* Custom colors can carry an int in the range of 0-255 *)
+(* Custom colors can carry an int in the range of 0-255. This is
+ * the only new feature added from ANSITerminal. *)
 type color =
     Black | Red | Green | Yellow | Blue | Magenta | Cyan | White | Default
     | Custom of int
@@ -74,6 +75,8 @@ let print_with pr style txt =
   pr "\027[0m"
 
 let print_string style txt = print_with print_string style txt
+
+(**** New Stuff Below ****)
 
 (* turn the testing flag on to remove the delay *)
 let char_delay = if !testing then 0. else 0.035
