@@ -110,24 +110,39 @@ let get_movement (me:player) public (movelst:movement list) =
   else
     let b = (fun x -> not (is_acc_room public x)) in
     let movelst' = List.filter b movelst in
-    let fold f b acc el = match el with
-      | (l, (s, b)) when f me (Room s) -> (l, (s, b))::acc
-      | _ -> acc in
     if room_env then
-      let fs = List.fold_left (fold is_my_card true) [] movelst' in
+      let f acc el = match el with
+      | (l, (s, true)) when is_my_card me (Room s) -> (l, (s, true))::acc
+      | _ -> acc in
+      let g acc el = match el with
+      | (l, (s, true)) when is_env_card me (Room s) -> (l, (s, true))::acc
+      | _ -> acc in
+      let h acc el = match el with
+      | (l, (s, false)) when is_my_card me (Room s) -> (l, (s, false))::acc
+      | _ -> acc in
+      let p acc el = match el with
+      | (l, (s, false)) when is_env_card me (Room s) -> (l, (s, false))::acc
+      | _ -> acc in
+      let fs = List.fold_left f [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
-      else let gs = List.fold_left (fold is_env_card true) [] movelst' in
+      else let gs = List.fold_left g [] movelst' in
       if List.length gs > 0 then rand_from_lst gs
-      else let hs = List.fold_left (fold is_my_card false) [] movelst' in
+      else let hs = List.fold_left h [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
-      else let ps = List.fold_left (fold is_env_card false) [] movelst' in
+      else let ps = List.fold_left p [] movelst' in
       if List.length ps > 0 then rand_from_lst ps
       else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
     else
-      let fs = List.fold_left (fold is_unknown_card true) [] movelst' in
+      let f' acc el = match el with
+      | (l, (s, true)) when is_unknown_card me (Room s) -> (l, (s, true))::acc
+      | _ -> acc in
+      let h' acc el = match el with
+      | (l, (s, false)) when is_unknown_card me (Room s)-> (l, (s, false))::acc
+      | _ -> acc in
+      let fs = List.fold_left f' [] movelst' in
       if List.length fs > 0 then rand_from_lst fs
-      else let hs = List.fold_left (fold is_unknown_card false) [] movelst' in
+      else let hs = List.fold_left h' [] movelst' in
       if List.length hs > 0 then rand_from_lst hs
       else if List.length movelst' > 0 then rand_from_lst movelst'
       else failwith ("impossible in " ^ Pervasives.__LOC__)
