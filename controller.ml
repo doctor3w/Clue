@@ -272,14 +272,7 @@ let start file_name g_or_c =
     | Failure s ->
       Display.display_error ("\nSomething went wrong, here's what's up: "^s)
     (* | _ -> Display.display_error "\nWhoa, that's bad. Goodbye." in *)in
-  let () =
-    if g_or_c = GUI then
-      let (w, h) = Gui.window.win_bounds in
-      let win_s = " "^(string_of_int w)^"x"^(string_of_int h) in
-      print_endline "GUI enabled";
-      Graphics.open_graph win_s;
-      Data.view_type := g_or_c
-    else Data.view_type := CLI in
+  let () = Data.view_type := g_or_c in
   match file_name with
   | None -> load_go (Display.prompt_filename ())
   | Some s -> load_go s
