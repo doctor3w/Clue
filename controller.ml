@@ -278,7 +278,9 @@ let start file_name g_or_c =
     | No_players -> Display.display_error "\nNo players in game file"
     | Player_not_found -> Display.display_error "\nNo player with suspect name"
     | Failure s ->
-      Display.display_error ("\nSomething went wrong, here's what's up: "^s)
+      Display.display_error ("\n"^s)
+    | Graphics.Graphic_failure s ->
+      Display.display_error "\nGraphics error. "
     | _ -> Display.display_error "\nGoodbye." in
   let () = Data.view_type := g_or_c in
   match file_name with
