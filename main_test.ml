@@ -16,7 +16,7 @@ let coord_of_loc loc = match loc.info with
 let (_, pm1) = get_movement_options game1 12
 let (_, pm2) = get_movement_options game2 12
 
-let loc1 = {info = Room_Rect("room 1",(1,1,1,1));
+let loc1 = {info = Room_Rect("1",(1,1,1,1));
             edges = []}
 
 let blue = Suspect "blue"
@@ -70,7 +70,7 @@ let yellowp = {suspect="yellow";
 
 
 let pub = {
-    curr_player = "blue";
+    curr_player = "red";
     acc_room = "acc";
     board = {
       dim = (-1,-1);
@@ -82,6 +82,7 @@ let pub = {
     current_guess = (Suspect "", Weapon "", Room "");
     current_response = None;
   }
+
 
 let pathmap_tests =
 [
@@ -100,7 +101,9 @@ let pathmap_tests =
 ]
 
 let responsive_tests =
-[]
+[
+  "take_note" >:: (fun _ -> assert_equal 0 (PathMap.length_to c1 pm1));
+]
 
 let tests = pathmap_tests@responsive_tests
 
