@@ -270,7 +270,7 @@ let get_move_options (g : game) : move list =
 
 
 
-module PathMap = struct
+(*module PathMap = struct
   type backpointer = (int*coord)
   type t = backpointer CoordMap.t
 
@@ -312,7 +312,7 @@ module PathMap = struct
       if n <= step then c else loop bp
     in loop coord
 
-end
+end *)
 
 let make_pathmap board start_loc (fast_out: PathMap.t -> bool) =
   let settled = PathMap.make start_loc in
