@@ -1,0 +1,5 @@
+Comments for improving GUI:
+1. Define the color yellow - a vibrant yellow will do
+    Suggestion for RGB: 1. R:255, G:210, B:0
+                        2. R:255, G:179, B:0
+2. The continue button delays  - does not change to red until movement happens
