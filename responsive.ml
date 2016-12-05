@@ -624,9 +624,9 @@ let pick_to_show lst cp =
   match pre_shown with
   | [] -> fst (rand_from_lst lst)
   | [(c, shn)] -> c
-  | lst' -> match (room_not_preferred lst') with
-            | [] -> fst (rand_from_lst lst')
-            | _  -> fst (rand_from_lst (room_not_preferred lst'))
+  | lst' -> let not_rooms = room_not_preferred lst' in
+            if List.length not_rooms > 0 then fst (rand_from_lst not_rooms)
+            else fst (rand_from_lst lst')
 
 (* [get_answer] takes in a hand and the current guess and returns Some card
  * if a card from the hand and also in the list can be shown. Returns None
