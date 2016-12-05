@@ -253,8 +253,7 @@ let agent_tests =
 
   "responsive take_note" >:: (fun _->assert_equal {redr with listen = t}
     (Agent.take_notes redr pub (green,rope,room2) (Some "green")));
-  "responsive take_note2" >:: (fun _->assert_equal {redd with listen = t1}
-    (Agent.take_notes redd pub (blue,sword,room1) None));
+
 ]
 
 let tests = pathmap_tests@agent_tests
