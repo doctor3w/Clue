@@ -37,7 +37,7 @@ let view_type = ref CLI
 
 (* Our testing flag. Making it true will turn off printing delays and
  * prompt_continues. *)
-let testing = ref true
+let testing = ref false
 
 (* The hand is just a card list *)
 type hand = card list
@@ -94,7 +94,7 @@ module StringMap = Map.Make(String)
 (* A temporary record for use during import. Not used after import has
  * been completed. *)
 type player_temp = {
-  p_id:string; play_ord:int; start:int*int
+  p_id:string; play_ord:int; start:int*int; color: int*int*int
 }
 
 (* [rect] is a rectangle declaration using x-y coordinates. *)
@@ -215,7 +215,8 @@ type player = {suspect: string;
                sheet: sheet;
                agent: agent;
                is_out: bool;
-               listen: listens}
+               listen: listens;
+               color: int*int*int;}
 
 (* Public information everyone should know, such as the current player name,
  * the board setup, the accusation room, the full deck, and the
