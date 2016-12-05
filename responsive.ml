@@ -234,7 +234,6 @@ let is_p_env player public passage_list =
 (* [answer_move] gets the type of movement the agent wants to perform,
  * so either roll the dice or take a secret passage if possible  *)
 let answer_move player public move_list : move =
-  let () = Display.show_sheet player.sheet in
   if is_r_env_known player && is_w_env_known player && is_s_env_known player
   then
     Roll
@@ -593,8 +592,8 @@ let get_answer (me:player) public guess : card option =
                 | _ -> acc in
   let mine_info = List.fold_left f [] (sus::weap::[room]) in
   match mine_info with
-  | [] -> print_endline "no cards in hand"; None
-  | [(c, lst)] -> print_endline "one cards in hand";Some c
+  | [] -> None
+  | [(c, lst)] -> Some c
   | lst -> Some (pick_to_show lst cp)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
@@ -809,8 +808,6 @@ let take_notes player public guess str_option: player =
              then compile_known matrix public r_lst l
              else ());
              (compile_notinhand matrix public x_len l);
-                 print_endline "hey what's up";
-              print_int (List.length (!l));
              update_player player !l)
   | Some str ->
   (* update all the Pure_unknown to Maybe_in_hand *)
