@@ -203,7 +203,7 @@ let strict_split_string w s =
               then let lst' = split_on_all_chars w h in
                 loop (acc@lst') t
               else loop (List.rev (h::(List.rev acc))) t in
-  List.filter (fun s -> s<>"") (loop [] lst)
+  List.filter (fun s -> s <> "") (loop [] lst)
 
 (* prints the string [s] centered in the grect (x, y, w, h) *)
 let center_text_in_rect x y w h s =
@@ -214,7 +214,8 @@ let center_text_in_rect x y w h s =
     | h::t -> let (w', h') = Graphics.text_size h in
               if (w' > w)
                 then let l_split = strict_split_string w h in
-                  length_check (aw, ah) (acc@l_split) (t)
+                  let l_split = List.filter (fun s -> s <> "") l_split in
+                  length_check (aw, ah) (acc) (l_split@t)
               else if (w' > aw)
                 then length_check (w', h') (List.rev (h::(List.rev acc))) t
               else length_check (aw, ah) (List.rev (h::(List.rev acc))) t in
@@ -978,6 +979,7 @@ let display_message (text: string) : unit =
   gui_delay 2.0
 
 let init game =
+  Graphics.open_graph "";
   window.board <- game.public.board;
   window.player_locs <- StringMap.empty;
   window.player_colors <- StringMap.empty;
@@ -1005,7 +1007,6 @@ let init game =
   then let p = List.hd game.players in
     (window.sheet_disp <- p.suspect; window.sheet <- p.sheet)
   else ();
-  Graphics.open_graph "";
   let (gx, gy) = window.win_bounds in
   Graphics.resize_window gx gy;
   Graphics.set_window_title "CLUE";
