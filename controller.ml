@@ -229,7 +229,7 @@ and handle_guess curr_p next_p game =
     let p = get_player players' pl in
     if can_show p.hand guess then
       match Agent.get_answer p game.public guess with
-      | None -> failwith "No cheating!!!"; get_answers t
+      | None -> get_answers t
       | Some card -> Some (p, card)
     else
       let () = Display.display_no_answer pl in

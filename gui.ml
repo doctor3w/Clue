@@ -727,7 +727,6 @@ let prompt_filename () : string =
 
 (* Prompts the user for whether he rolls dice or not. *)
 let prompt_move_gui (movelst: move list) : move =
-  let transform = get_b_transform () in
   let coords = ref [] in
   let add_loc_coord loc =
     match loc.info with

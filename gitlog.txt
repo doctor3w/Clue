@@ -1,0 +1,3457 @@
+commit 8c9bac0bd77b45f1ea62e80a981f61fc347d8878
+Merge: 9356471 59c4213
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 06:14:11 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 93564714dd21def4945006a55750bcf178f3fe65
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 06:14:01 2016 -0500
+
+    added RandomAI agent type to json
+
+ model.ml           |  4 ++++
+ tests/cornell.json | 14 +++++++-------
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+commit 59c4213a33d2a8ec71ee77d0797a2bdac6f79195
+Merge: afa36e9 cfdbefc
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 06:08:26 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit cfdbefca1ba7fb34c37541135e444d9b506dc7e9
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:08:52 2016 -0500
+
+    unit test
+
+ main_test.ml | 2 --
+ 1 file changed, 2 deletions(-)
+
+commit 5d44ad7e5259a489df777b63b9627283f4c0ac57
+Merge: 89ad5b8 0ab9b59
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:08:28 2016 -0500
+
+    Merged branch master into master
+
+commit afa36e9c7c99c5538535acaa4ffdcfccff0efc09
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 06:08:13 2016 -0500
+
+    README.txt from md
+
+ README.txt | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+commit 89ad5b84832d082e7890764d4a7f170af820ee1c
+Merge: f10da8e 54417ba
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:07:42 2016 -0500
+
+    Merged branch master into master
+
+commit 0ab9b594cdab12249a445c606a36e43b939d945d
+Merge: 5be0320 749c102
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 06:07:03 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 5be03202eeb91fd18bf6478542738683433dabe5
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 06:06:52 2016 -0500
+
+    better passages
+
+ data.ml |  2 +-
+ gui.ml  | 14 +++++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+commit 749c10249193faab9f5aef45a88f5f054ca4dbdd
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 06:06:42 2016 -0500
+
+    final game put in
+
+ data.ml                            | 2 +-
+ cornell.json => tests/cornell.json | 0
+ tests/game.json                    | 6 +++---
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+commit f10da8e7b802ef9f7915e1f601c3504c9c1ed384
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:06:08 2016 -0500
+
+    Revert "unit test"
+    
+    This reverts commit 1d504654702094d58956e4dfae590208f205d055.
+
+ main_test.ml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 1d504654702094d58956e4dfae590208f205d055
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:06:08 2016 -0500
+
+    unit test
+
+ main_test.ml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+commit 443b516fdd38073ec6feab4a01b84b22ad9f8a66
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 06:05:58 2016 -0500
+
+    unit test added
+
+ main_test.ml | 221 ++++++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 187 insertions(+), 34 deletions(-)
+
+commit 54417ba1ce9a66dfc4935a74d712071bd4a69007
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 06:03:32 2016 -0500
+
+    tried fixing bug
+
+ README.md     | 21 +++++++++++++++++++--
+ controller.ml |  4 +++-
+ model.ml      |  7 ++++---
+ 3 files changed, 26 insertions(+), 6 deletions(-)
+
+commit fff935d89ab46e5b31467a8a13ab33029efc7fec
+Merge: edd5c0b 979ea2a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:43:41 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit edd5c0b67c08641249783b2eb7d388b54347b366
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:43:29 2016 -0500
+
+    fixed choose-gui
+
+ controller.ml                   |  4 ++--
+ tests/classic_human_v_resp.json | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+commit 979ea2aa4eb3ed96b793e6f6efb513eaabe89b5a
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 05:41:16 2016 -0500
+
+    removed GUINotes file
+
+ Comments for improving GUI.txt | 5 -----
+ 1 file changed, 5 deletions(-)
+
+commit 589ae159702dd7e51e4417c10211da87db0ed297
+Merge: 34194f3 bb8f97e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:37:34 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 34194f31e4447beeb01b82402c983cd9c185677e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:37:28 2016 -0500
+
+    little thing
+
+ gui.ml       | 12 ++++++------
+ main_test.ml |  4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+commit bb8f97ef05ff2230c192e947604f294036eee423
+Merge: 5845b1a 1d1cd82
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 05:36:30 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 5845b1aedcf1f4b5302186d315b44396bc4f8b76
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 05:36:14 2016 -0500
+
+    GUI failsafe
+
+ gui.ml | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+commit 1d1cd828a57635412e1b792ffeaf11e680353169
+Merge: f558d62 7832f4f
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:20:27 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit f558d62e0efa044932f80a9dd42de56bd8bd52ad
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 05:20:17 2016 -0500
+
+    moved files
+
+ classic_svd.json                                   | 376 ---------------------
+ human_v_dumb.json                                  | 376 ---------------------
+ classic_dumb.json => tests/classic_dumb.json       |   0
+ .../classic_human_v_resp.json                      |   0
+ classic_resp.json => tests/classic_resp.json       |   0
+ classic_smart.json => tests/classic_smart.json     |   0
+ .../classic_smart_v_dumb.json                      |   0
+ tests/game_svd.json                                | 376 ---------------------
+ small_mixed.json => tests/small_mixed.json         |   0
+ small_resp.json => tests/small_resp.json           |   0
+ .../small_resp_no_human.json                       |   0
+ smart_v_dumb.json => tests/smart_v_dumb.json       |   0
+ 12 files changed, 1128 deletions(-)
+
+commit 7832f4fbebb6be0749b7794656da180f6b78a83d
+Merge: 6262a09 b8f255d
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 05:11:42 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 6262a0969508fa3338119bfa5e345d3ed275c691
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 05:11:23 2016 -0500
+
+    working on string wrap
+
+ gui.ml | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 62 insertions(+), 16 deletions(-)
+
+commit b8f255d38c7580a6a136c3fd2f970205624deab9
+Merge: 23bca7f c986f57
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 04:21:14 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 23bca7f2654db6eb474fb4912c959097602fb641
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 04:21:01 2016 -0500
+
+    fixed bug
+
+ smartAI.ml | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
+
+commit c986f571d90f72ca8fbeb01bd8dec0336b514b56
+Merge: b058d01 b3df047
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 04:13:00 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit b058d01e8e65a6f648875ec9e13f557fd10da33d
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 04:12:23 2016 -0500
+
+    added cornell.json
+
+ cornell.json | 461 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 461 insertions(+)
+
+commit b3df0477fa9e3b1eac589d32240aee5f00b89642
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 04:10:42 2016 -0500
+
+    cleaned up some responsive
+
+ cli.ml        |   7 ++-
+ data.ml       |   2 +-
+ responsive.ml | 178 +++++++++++++++++++++++++++-------------------------------
+ 3 files changed, 89 insertions(+), 98 deletions(-)
+
+commit cef0b1a56166cfde33e8c0823d821973ab29baf9
+Merge: c287962 7da88fb
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 03:26:19 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 7da88fbf9c98caaaeb3117fc5449b748087d9d4a
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 03:20:09 2016 -0500
+
+    added custom colors
+
+ classic_dumb.json         | 36 ++++++++++++++++++++++++++++++++++++
+ classic_hvr.json          | 46 +++++++++++++++++++++++++++++++++++++++++-----
+ classic_resp.json         | 36 ++++++++++++++++++++++++++++++++++++
+ classic_smart.json        | 36 ++++++++++++++++++++++++++++++++++++
+ classic_smart_v_dumb.json | 36 ++++++++++++++++++++++++++++++++++++
+ classic_svd.json          | 36 ++++++++++++++++++++++++++++++++++++
+ data.ml                   |  7 ++++---
+ gui.ml                    | 15 +++++++++------
+ human_v_dumb.json         | 36 ++++++++++++++++++++++++++++++++++++
+ model.ml                  | 15 ++++++++++++++-
+ small_mixed.json          | 24 ++++++++++++++++++++++++
+ small_resp.json           | 28 ++++++++++++++++++++++++++--
+ small_resp_no_human.json  | 24 ++++++++++++++++++++++++
+ tests/game.json           | 36 ++++++++++++++++++++++++++++++++++++
+ tests/game_human.json     | 36 ++++++++++++++++++++++++++++++++++++
+ tests/game_sm.json        | 24 ++++++++++++++++++++++++
+ tests/game_svd.json       | 36 ++++++++++++++++++++++++++++++++++++
+ 17 files changed, 490 insertions(+), 17 deletions(-)
+
+commit c287962c20d812de07ef7772b7c755bcd80456fb
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 03:20:11 2016 -0500
+
+    cleaned up board.ml
+
+ ANSI.ml  |  5 ++++-
+ board.ml | 60 +++++++++++++++++++++++++++++++++---------------------------
+ 2 files changed, 37 insertions(+), 28 deletions(-)
+
+commit 1a4ba9a5a507854a0012e092aa26e81195a14a01
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 03:11:52 2016 -0500
+
+    Cleaned up model
+
+ model.ml | 124 ++++++++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 67 insertions(+), 57 deletions(-)
+
+commit aa05843e37136b6ae17dc0f541d03323b4590795
+Merge: a48a852 0d01bc3
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 03:00:09 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit a48a852ad57d8b5069d8d05a224044bc6506cfb1
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 03:00:04 2016 -0500
+
+    cleaned up code a lot and added random seed when none is provided
+
+ data.ml       |   2 +-
+ dumbAI.ml     |  73 +++++++++++++---------
+ main.ml       |  24 +-------
+ responsive.ml |   2 +
+ smartAI.ml    | 190 +++++++++++++++-------------------------------------------
+ 5 files changed, 98 insertions(+), 193 deletions(-)
+
+commit 0d01bc308379ff2746aa5b0e51f6038309f6b277
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 02:25:02 2016 -0500
+
+    documented Board
+
+ board.ml | 61 ++++++++++++++++++-------------------------------------------
+ 1 file changed, 18 insertions(+), 43 deletions(-)
+
+commit e8c90bd8fb9138f35dd89eec8f17cf4585077040
+Merge: 79d4e83 3d790cf
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 02:07:25 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 79d4e838301a20fa9f86f5d73be60cf29f5f14b3
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 02:07:23 2016 -0500
+
+    documented model
+
+ model.ml | 122 ++++++++++++++++-----------------------------------------------
+ 1 file changed, 31 insertions(+), 91 deletions(-)
+
+commit 3d790cf13227f890018994747cac4f0f400a0077
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 02:04:56 2016 -0500
+
+    documentation for responsive and data
+
+ data.ml       |  7 ++++---
+ responsive.ml | 37 ++++++++++++++++++++++++-------------
+ 2 files changed, 28 insertions(+), 16 deletions(-)
+
+commit 0aed98e49d5877bdc11633e7d37b78669086366a
+Merge: f4a129f 40fc7b6
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 01:35:51 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit f4a129f7ad4bd1daa0575850804a82cf5000c72c
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 01:35:44 2016 -0500
+
+    documentation and cleanup
+
+ agent.ml     |  2 ++
+ data.ml      | 24 ++++++++++++++++++++----
+ main_test.ml |  2 --
+ 3 files changed, 22 insertions(+), 6 deletions(-)
+
+commit 40fc7b670d508df91c520572df51d141abca908f
+Merge: 5f1f92a c719dce
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 01:26:18 2016 -0500
+
+    Merged branch master into master
+
+commit 5f1f92a98949813ffbfa0fc9efc2e4ff56547f85
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 01:26:12 2016 -0500
+
+    GUi comments
+
+ Comments for improving GUI.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit c719dce1af047c6ce750e2a08a3bbad249dbfcd7
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 01:21:34 2016 -0500
+
+    new game and removed prints
+
+ classic_hvr.json | 340 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ data.ml          |   2 +-
+ responsive.ml    |   7 +-
+ 3 files changed, 343 insertions(+), 6 deletions(-)
+
+commit f594dba1dfacf803b5e5bf4aa7e1a933697535a9
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 00:59:27 2016 -0500
+
+    rechanged
+
+ responsive.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit d7993b09a708159632825644d9329e73c6f8b3cd
+Merge: 05decab 6b5d1f1
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 00:52:50 2016 -0500
+
+    Merge branch 'graham/temp'
+
+commit 6b5d1f1184676a2cf036caff820b29596d28d616
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Mon Dec 5 00:36:24 2016 -0500
+
+    small fix
+
+ responsive.ml | 20 +++++++++++---------
+ smartAI.ml    |  5 +++--
+ 2 files changed, 14 insertions(+), 11 deletions(-)
+
+commit 05decab58ff81556ec4a80e227064e100bf44e5c
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 00:49:28 2016 -0500
+
+    compiled responsive
+
+ responsive.ml | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+commit 00763bb3f8a7a964bcc8eb9033b90d13a1cb59af
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 00:48:37 2016 -0500
+
+    main_test fixed sorry!
+
+ main_test.ml | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+commit 518fd4ba0e653871808f350d5a2a6d3a3dc07893
+Merge: 96a8ecc a96e559
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 00:35:05 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 96a8ecce9c129389050a4d793af7dea5e91b2e58
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Dec 5 00:34:59 2016 -0500
+
+    added fail if cheat
+
+ .ocamlinit    | 5 ++++-
+ controller.ml | 2 +-
+ responsive.ml | 4 ++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+commit a96e559886cbf50e2ca92b0ea0cfb858a1f3ed4b
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Dec 5 00:21:59 2016 -0500
+
+    main_test changed
+
+ main_test.ml | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+commit 07b627fffb3544b26d42044b14f23e100135c894
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 00:19:23 2016 -0500
+
+    with responsive players
+
+ main_test.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit d2f8b87fce3c2405f6e14f6b646c4bd160132f8d
+Merge: bb662bf a4c93d3
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 00:15:36 2016 -0500
+
+    Merged branch master into master
+
+commit bb662bf38c0ae8951611934c6c1089a6c1ad21bd
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Dec 5 00:15:25 2016 -0500
+
+    added cards and players ready for testing
+
+ main_test.ml | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
+
+commit a4c93d301dff4f1405c5496ec22dffa6b02938d0
+Merge: d7d213d c52b9bf
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 23:39:53 2016 -0500
+
+    Merged branch master into master
+
+commit d7d213d365fc21f0bed5e7ef23e65da3498ecbc9
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 23:39:48 2016 -0500
+
+    responsive.ml updated
+
+ responsive.ml | 44 ++++++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
+
+commit c52b9bf11fb3e0320fea79c710414b6d0cc76636
+Merge: 93d7ccc c026125
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 23:33:08 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 93d7ccc5dfc2589edc64f9c5ca5b48cb94235c5a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 23:31:03 2016 -0500
+
+    changed test file
+
+ tests/game.json      | 289 +++++++++++++++++++++++++++++++------------
+ tests/game_resp.json | 340 ---------------------------------------------------
+ tests/game_sm.json   | 211 ++++++++++++++++++++++++++++++++
+ 3 files changed, 420 insertions(+), 420 deletions(-)
+
+commit c026125adfc60c053fd5376b4187f445cdcb8aa1
+Merge: bd2e410 1ea9329
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 23:29:17 2016 -0500
+
+    Merge branch 'graham/pathfinding'
+
+commit 1ea9329d1873f0e260c30a5f75c4f6e53540bb11
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 23:28:25 2016 -0500
+
+    added some pathing tests
+
+ main_test.ml | 32 ++++++++++++++++++++++++++++++--
+ model.ml     |  4 ++--
+ 2 files changed, 32 insertions(+), 4 deletions(-)
+
+commit bd2e410ba8152eb7fffb08cc4a47fd2beba47213
+Merge: 2406c0f 7aae7c1
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 23:15:47 2016 -0500
+
+    Merged branch master into master
+
+commit 2406c0f7bc1c5da310fcc2cd6395231abbd72a4b
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 23:15:02 2016 -0500
+
+    supposedly fixed get_guess
+
+ responsive.ml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 7aae7c1a21dde77fcc0ac0c7a16d0f6fbd471a33
+Merge: f069c38 3844690
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 22:48:30 2016 -0500
+
+    Merge branch 'graham/pathfinding'
+
+commit 38446904673978d1b35214462282e915a1459f35
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 22:46:25 2016 -0500
+
+    fixed a responsive bug
+
+ responsive.ml | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+commit f069c38d2c9136b6543786e7595e32598aa21eaa
+Merge: 1c4a410 ad25076
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 22:13:00 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit ad25076ca33c2009dd535904ee1275cfb58b4885
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 22:12:03 2016 -0500
+
+    gui never leaves without click now
+
+ controller.ml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 1c4a410948a6c2f605ed2bdde2a9e8af1c14d227
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 21:44:08 2016 -0500
+
+    small responsive test with no humans
+
+ small_resp_no_human.json | 211 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 211 insertions(+)
+
+commit 392113e552e5e73cd1de0966fdf1c61550063fd4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 21:43:44 2016 -0500
+
+    show_card uncomment that was not supposed to be commented
+
+ responsive.ml | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+commit 383f1bf09be1f83c108b90e1722fbc291016a89e
+Merge: dbce508 4c18334
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 21:36:33 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit dbce508611df3f0f6be44dfbec2a1a275530d929
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 21:36:20 2016 -0500
+
+    fixed answer order
+
+ controller.ml | 24 ++++++++++++++++--------
+ data.ml       |  2 +-
+ 2 files changed, 17 insertions(+), 9 deletions(-)
+
+commit 4c18334a43677b79cdcab27c11afec18c2e15c84
+Merge: 5bb025d f3a84cc
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 20:09:49 2016 -0500
+
+    Merged branch master into master
+
+commit 5bb025d8637302d87dd9606fc397da86bb4d1122
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 20:09:36 2016 -0500
+
+    fixed another bug in take_note
+
+ responsive.ml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit f3a84cc9ab01ba6f58c2d6e0e924e304e025719c
+Merge: 77159ce a83408a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 19:39:26 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit 77159ceba7862f1419b1e89ecc200a307dc5ee64
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 19:39:12 2016 -0500
+
+    fixed open before file input
+
+ controller.ml | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+commit a83408ab8ecd62f2956ca196e9db1c87110a1d25
+Merge: 5a7f64a cde94be
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 19:14:26 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 5a7f64a35b225594b52353d4c717779fbdbc2b32
+Merge: 74aea5d 53b0fbd
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 19:12:42 2016 -0500
+
+    Merged branch master into master
+
+commit 74aea5d53eba288d3084902ddfa8b892be9c3d6b
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 19:12:36 2016 -0500
+
+    fixed one bug in show_card and one in take_note
+
+ responsive.ml | 49 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 24 insertions(+), 25 deletions(-)
+
+commit cde94bebd0f9f2d4f87fefe3d4a973ab52598ea8
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 19:11:16 2016 -0500
+
+    removed view doubling
+
+ data.ml | 2 +-
+ view.ml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 409a010c824b43202fc1faf9108c9aae6bf53721
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 19:07:54 2016 -0500
+
+    added player_order display
+
+ gui.ml | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 93 insertions(+), 19 deletions(-)
+
+commit 53b0fbdacaa03c743971701e5fcd06677eb9682f
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 19:06:23 2016 -0500
+
+    Changed to player order
+
+ controller.ml | 24 +++++++++++++++++++++---
+ data.ml       |  2 +-
+ 2 files changed, 22 insertions(+), 4 deletions(-)
+
+commit 8a63d81661c1f062b1bfb53832cd1ca551b236ad
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 16:36:19 2016 -0500
+
+    fixed gui is_my_turn
+
+ data.ml |  2 +-
+ gui.ml  | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+commit 4ee2ab4d87a90d7ceadcf297b545faf4f32426c6
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 15:53:48 2016 -0500
+
+    made seed_test better
+
+ ANSI.ml         | 2 +-
+ agent.ml        | 6 ------
+ gui.ml          | 2 +-
+ seed_test       | 7 ++++++-
+ tests/game.json | 2 +-
+ 5 files changed, 9 insertions(+), 10 deletions(-)
+
+commit c3cdd4301e8b204dfda77db2bff13715f1ff7e0e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 15:31:12 2016 -0500
+
+    added seed generator
+
+ .gitignore                                |   3 +-
+ ANSI.ml                                   |   8 +-
+ controller.ml                             |   4 +-
+ main.ml                                   |  25 ++-
+ seed_test                                 |  10 +
+ tests/game.json                           | 295 ++++++++------------------
+ tests/{game copy.json => game_human.json} |   0
+ tests/game_resp.json                      | 340 ++++++++++++++++++++++++++++++
+ tests/game_svd.json                       | 340 ++++++++++++++++++++++++++++++
+ 9 files changed, 805 insertions(+), 220 deletions(-)
+
+commit e25bd4b058d306ea40ebf489929764511a5021e9
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 12:36:48 2016 -0500
+
+    fixed make and index bug in responsive
+
+ data.ml              |   2 +-
+ main.ml              |   2 +-
+ responsive.ml        |  17 +--
+ tests/game copy.json | 340 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/game.json      |  12 +-
+ 5 files changed, 358 insertions(+), 15 deletions(-)
+
+commit 00706c5102aa9dba3d94fc2f0b757ff7f78ed539
+Merge: cef8d84 f99d161
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 12:03:17 2016 -0500
+
+    merge conflicts
+
+commit cef8d8466277cf6675e2236d9575883ba3201262
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Dec 4 12:02:05 2016 -0500
+
+    added documentation and readme.txt
+
+ README.txt    | 25 +++++++++++++++++++++++++
+ agent.mli     |  1 +
+ cli.ml        | 11 ++++-------
+ controller.ml |  9 +++++++++
+ data.ml       | 43 ++++++++++++++++++++++++++++++-------------
+ human.ml      | 17 +++++++++++++----
+ main.ml       |  3 +++
+ view.mli      |  6 ++++++
+ 8 files changed, 91 insertions(+), 24 deletions(-)
+
+commit f99d1616abbfc09029ceb81a46fe6083d30014e5
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 11:18:37 2016 -0500
+
+    small change in first_take_note
+
+ responsive.ml | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+commit 9f562247ad1dc5137211ebfd15ed9fa2906745fc
+Merge: c153f46 61176a5
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 07:15:16 2016 -0500
+
+    Merged branch master into master
+
+commit c153f46a25a307c890fbc12ccdbe7b88a7318b83
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 07:15:12 2016 -0500
+
+    first_take_notes fixed.
+
+ responsive.ml | 71 ++++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 36 insertions(+), 35 deletions(-)
+
+commit 61176a519ae48b7bae3caf919fd097d939ab0dd6
+Merge: 91d96ce 66e3e05
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 01:24:14 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 66e3e057f9416a0f4791b917afe4e3ea7d824e9e
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Dec 4 01:23:07 2016 -0500
+
+    added the log
+
+ board.ml      |  12 +++--
+ controller.ml |   3 +-
+ data.ml       |   2 +-
+ gui.ml        | 169 +++++++++++++++++++++++++++++++++++++++++++++++++---------
+ model.ml      |   2 +-
+ view.ml       |   2 +-
+ 6 files changed, 157 insertions(+), 33 deletions(-)
+
+commit 91d96cec9ec2ccf940cc2fba10a86587c3fea27d
+Merge: 0158337 79ba8a3
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 01:14:03 2016 -0500
+
+    Merged branch master into master
+
+commit 0158337945988848f71bb148dfa9713f996ec490
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Dec 4 01:04:44 2016 -0500
+
+    small fix in show_card
+
+ responsive.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 79ba8a3db4d6d09f14ce756a47ed8589905baaa3
+Merge: 124fae3 254d4a8
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 00:20:25 2016 -0500
+
+    Merged branch master into master
+
+commit 124fae31d7e2abb044fc4efd3e900384f05026bb
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sun Dec 4 00:20:03 2016 -0500
+
+    first_take_note fixed
+
+ responsive.ml | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
+
+commit 254d4a8baadfd2b756c7f2d74a275f1ee64e7994
+Merge: 1864af1 9a192e4
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 15:45:03 2016 -0500
+
+    Merge branch 'graham/cleanup'
+
+commit 9a192e4f35ee3305118b15f56b5a5a12ca0a92dd
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 15:43:36 2016 -0500
+
+    removed random issue
+
+ data.ml       | 2 +-
+ responsive.ml | 2 +-
+ smartAI.ml    | 1 +
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+commit 1864af1465fd051f36644916b7dae11ea5b9faaa
+Merge: 5f35137 db93df7
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 14:57:37 2016 -0500
+
+    Merge branch 'graham/cleanup'
+
+commit db93df767e0f1e47c4fe5eaa3d1adf2dc523d131
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 14:53:34 2016 -0500
+
+    added better error message
+
+ controller.ml |  2 +-
+ gui.ml        | 14 +++++++++-----
+ model.ml      |  9 +++++----
+ responsive.ml | 18 ++++++++++--------
+ 4 files changed, 25 insertions(+), 18 deletions(-)
+
+commit 5f351378ee5253af273dd0e420fe01c4b8d6fe19
+Merge: ab38522 c6934b9
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 14:43:59 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit c6934b94b46c6fb8c1e26e9d27aa5b34186d2f2c
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 14:42:55 2016 -0500
+
+    added GUI delays
+
+ data.ml | 2 +-
+ view.ml | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+commit ab385225e76b301510a0ec66ecbe6e2d1eba8488
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 01:24:11 2016 -0500
+
+    fixed make choose-gui
+
+ main.ml | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+commit 21d2bd8332b10fd833bdce3032ac75fdbeaa0068
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 01:19:50 2016 -0500
+
+    added make instructions
+
+ README.md | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+commit a92fbcbc034a1bd5d10c201865449eadb92522fa
+Merge: 0ce34eb 00dec52
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 01:13:28 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2 into drew/readme
+
+commit 0ce34ebe7986e9d57450c54672f14d52b239f982
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 01:13:07 2016 -0500
+
+    fixed player order bug
+
+ Makefile      | 10 +++++-----
+ README.md     | 10 ++++++++++
+ controller.ml | 18 +++++++++++-------
+ data.ml       |  2 +-
+ 4 files changed, 27 insertions(+), 13 deletions(-)
+
+commit 00dec52d766de6af68ff570edc1d4ae05e9d8d12
+Merge: 116467c e30ede6
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 00:54:37 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit e30ede60ec7ccf190c3cb6c1d113dfb175fe430e
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 00:53:47 2016 -0500
+
+    answer background
+
+ gui.ml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit c0817e2a9690d4ee6a478db5d8a5f3850ac8cd18
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Dec 3 00:52:19 2016 -0500
+
+    added small_resp.json
+
+ data.ml         |   2 +-
+ responsive.ml   |   4 +-
+ small_resp.json | 211 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 214 insertions(+), 3 deletions(-)
+
+commit 116467ca44dca18cbab2f4f41cf43837108ac240
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 00:15:53 2016 -0500
+
+    Answer doesn't CLI prompt anymore
+
+ view.ml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+commit 249d2619191e1a7c663f89c7009048ce2c8db3e3
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Dec 3 00:07:16 2016 -0500
+
+    sheet now updates
+
+ agent.ml      | 12 ++++++++++--
+ cli.ml        |  6 +++++-
+ controller.ml |  6 ++++--
+ data.ml       |  2 +-
+ gui.ml        | 10 ++++++++++
+ responsive.ml |  1 +
+ view.ml       |  7 ++++++-
+ view.mli      |  4 +++-
+ 8 files changed, 40 insertions(+), 8 deletions(-)
+
+commit aa95c8700c90311f6ea908155dd016be986973cb
+Merge: 6803bcf cac34ef
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Fri Dec 2 22:42:47 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit cac34efc77ae98d0d6a2167ff96bc4f3b8d6762d
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Fri Dec 2 22:41:55 2016 -0500
+
+    prompt_answer added
+
+ gui.ml  | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ view.ml |  5 ++++-
+ 2 files changed, 76 insertions(+), 8 deletions(-)
+
+commit 6803bcf07b8ff8140ecbc527f54ab3433b6c6059
+Merge: 5b5fe8a 08c47f5
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Fri Dec 2 21:17:00 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 08c47f5c4fe7cd2a5e691427a859c5c7be6196b5
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Fri Dec 2 21:15:23 2016 -0500
+
+    guess works!
+
+ gui.ml | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 61 insertions(+), 7 deletions(-)
+
+commit 9f3ae0d92fbbdf70a02c905bca04cfacfce9ed54
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Fri Dec 2 19:16:32 2016 -0500
+
+    sheet prompt
+
+ gui.ml  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ view.ml |  3 ++-
+ 2 files changed, 52 insertions(+), 5 deletions(-)
+
+commit 5b5fe8a699e6a73e8fd0c75315e969b670a483d6
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Dec 2 00:37:16 2016 -0500
+
+    added check envelope in answer_move
+
+ responsive.ml | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+commit 2bcc069fee54b2f6941142ef83ba044a5528051d
+Merge: 737847d 9088d9e
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Dec 2 00:34:41 2016 -0500
+
+    Merged branch master into master
+
+commit 9088d9ef64a40f4aeb4b9eb84838158cd1d01c44
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Dec 2 00:28:18 2016 -0500
+
+    Fixed responsiveAI bug and no printing
+
+ controller.ml |  2 +-
+ responsive.ml | 39 ++++++++++++++++++++++++---------------
+ 2 files changed, 25 insertions(+), 16 deletions(-)
+
+commit d494c91b36710f5fcaccb86d79f0b13d3ae0a9bc
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 23:02:18 2016 -0500
+
+    added a first take notes for everyone
+
+ agent.ml      |  5 +++++
+ agent.mli     |  2 ++
+ controller.ml | 15 +++++++++++++--
+ responsive.ml |  2 +-
+ 4 files changed, 21 insertions(+), 3 deletions(-)
+
+commit 9add0082ae85f791ecdd46ff2ba56c5928c864d2
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 22:48:48 2016 -0500
+
+    removed print
+
+ controller.ml | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit 385b74be15b7dacaf916015d1f223f61a42beee6
+Merge: a74ccab 27c99c2
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 21:39:29 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 27c99c20a4db137d43f530817314ced8c2c98727
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 21:38:27 2016 -0500
+
+    .
+
+ responsive.ml | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+commit a74ccabdf8f5c77ca58f53ca09b43c3057f7c094
+Merge: ca4cefc d841631
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 21:30:31 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit d841631a8f2cc17a62251d63df07da73cb07b22f
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 20:53:11 2016 -0500
+
+    fixed player_order
+
+ model.ml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit ca4cefc485863259c815afd941d523da0c348a70
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 20:47:15 2016 -0500
+
+    added cur not taking notes
+
+ ANSI.ml       | 3 +--
+ controller.ml | 5 ++++-
+ data.ml       | 2 ++
+ view.ml       | 1 +
+ 4 files changed, 8 insertions(+), 3 deletions(-)
+
+commit 737847da2b3af331f2f981fd94b0f1257527def3
+Merge: 5155ae5 df115fb
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 20:46:00 2016 -0500
+
+    Merged branch master into master
+
+commit df115fb46863a3da52c22086b2eca730570b1f25
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 20:05:17 2016 -0500
+
+    added responsive into game
+
+ agent.ml      | 16 +++++++++++-----
+ controller.ml | 18 ++++++++++++++----
+ 2 files changed, 25 insertions(+), 9 deletions(-)
+
+commit 5155ae53d388977e7797f19a40441562ad80f942
+Merge: ac145da 01775cf
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 19:57:53 2016 -0500
+
+    Merged branch master into master
+
+commit 01775cf756c10e200f21e4261379a1dcd0ade768
+Merge: 67d991e dab7b5e
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 19:41:55 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit dab7b5e301e26ef49fa9f9ffa8d7140b5cc5c4d4
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 19:37:37 2016 -0500
+
+    built with resp
+
+ model.ml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 9172af6c5dc221f8264e380904fe99f99c73118a
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 19:26:24 2016 -0500
+
+    resp.json
+
+ classic_resp.json | 340 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ data.ml           |   4 +-
+ 2 files changed, 343 insertions(+), 1 deletion(-)
+
+commit a130dd585b5d27a40b368f8678758fa1556f5383
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 17:24:29 2016 -0500
+
+    fixed doors
+
+ gui.ml | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+commit 67d991e59cedf5babec52b733f844ea888592bbe
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 18:04:33 2016 -0500
+
+    fixed the unbound value
+
+ responsive.ml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit b8b0e605ae78d930b4b08592a2f153a84a71fabe
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 17:32:09 2016 -0500
+
+    cleaned data.ml
+
+ data.ml | 5 -----
+ 1 file changed, 5 deletions(-)
+
+commit 0a3e6e9ae377e07515eeeac9be81de1c80a5af41
+Merge: d56a412 6511ddc
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 17:26:50 2016 -0500
+
+    Merged branch master into tongtongannie/responsive
+
+commit 6511ddc99699afc25334fd5b623b681be3b21861
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 17:23:33 2016 -0500
+
+    fixed prompt continue
+
+ controller.ml | 8 ++++----
+ view.mli      | 4 +++-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+commit d56a412f79424220e5630348da73b16785098e86
+Merge: ceece3d ef14d37
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 17:20:52 2016 -0500
+
+    Merged branch master into tongtongannie/responsive
+
+commit ceece3dbe473e05aa19eec40b0fbafe957ed2a09
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 17:19:20 2016 -0500
+
+    Done!!!!!!!!!!!
+
+ responsive.ml | 70 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 57 insertions(+), 13 deletions(-)
+
+commit ef14d373307850a56a9c5505f3c280dfc84d8733
+Merge: c06e05c e827118
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 17:05:26 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit e827118bc501b6d6e5de5f3661760caff6de5e34
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 17:04:03 2016 -0500
+
+    added prompt_continue to GUI
+
+ gui.ml  | 37 +++++++++++++++++++++++++++++--------
+ view.ml |  5 +++--
+ 2 files changed, 32 insertions(+), 10 deletions(-)
+
+commit c06e05c177cb2888c58436e71eaaceb199ba2628
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 17:04:12 2016 -0500
+
+    almost full gui play
+
+ agent.mli     | 2 +-
+ controller.ml | 3 ++-
+ model.mli     | 6 ------
+ view.ml       | 1 -
+ 4 files changed, 3 insertions(+), 9 deletions(-)
+
+commit 464887f22887ed849545ea20c0d9062171945313
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 16:49:17 2016 -0500
+
+    added comments for get_guess and its helper
+
+ responsive.ml | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+commit 3a8b1aeb8c0ff2c7ff7506865794779da5733b18
+Merge: 2b9227c be66f7d
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 16:43:32 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit be66f7da841721d9dd3d51a4430c83a039298c0d
+Merge: 8beee6c 368c6e7
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 16:41:05 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 368c6e79a84978e191f8f03e3c2d6046fd9dbdae
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 16:38:51 2016 -0500
+
+    fixed sheet bands
+
+ gui.ml | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+commit 2b9227cd0c61beeeaafe14d97aa96ec367fba68a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 16:35:23 2016 -0500
+
+    prepared for GUI prompt
+
+ agent.ml      |  4 ++--
+ agent.mli     |  2 +-
+ controller.ml |  2 +-
+ gui.ml        |  5 +----
+ human.ml      | 19 ++++++++++++-------
+ model.ml      |  2 +-
+ model.mli     |  8 +++++++-
+ 7 files changed, 25 insertions(+), 17 deletions(-)
+
+commit d5bddab936024b12ea847490c29903f1144aa4ab
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 16:14:19 2016 -0500
+
+    making move work
+
+ gui.ml  | 22 +++++++++++++---------
+ view.ml |  3 ++-
+ 2 files changed, 15 insertions(+), 10 deletions(-)
+
+commit 2042c732280332d5bc5e37b9426eb39b62bec471
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 14:33:37 2016 -0500
+
+    messing with spacing
+
+ gui.ml | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit 341290b3d4a2fce79d35d6b1d781d2c4181f1bd6
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 02:12:56 2016 -0500
+
+    spacing sheet
+
+ gui.ml | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+commit 38398591f7f55850db43a233d997ad000a692831
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 16:05:19 2016 -0500
+
+    get_movement done -  im literally dying
+
+ responsive.ml | 221 +++++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 156 insertions(+), 65 deletions(-)
+
+commit 8beee6c2a7733339e1278e0c84191dde794c6456
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 15:15:09 2016 -0500
+
+    replaced Display = Cli with Display = View
+
+ agent.ml | 5 +----
+ human.ml | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+commit 71d4dc77c3a30dd42fc42f57f03dcb2de10ec696
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 14:49:40 2016 -0500
+
+    fixed gui launch when not enabled
+
+ controller.ml | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+commit cb1a4c69c9b8824540625a0f44eaa7b07e1c1176
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 14:43:48 2016 -0500
+
+    integrated GUI
+
+ Makefile       |  7 +++++--
+ controller.ml  |  8 ++++----
+ controller.mli |  2 +-
+ main.ml        | 10 +++++-----
+ 4 files changed, 15 insertions(+), 12 deletions(-)
+
+commit dba2cdc4316862f88f385aaaa8aa6747ecbc4e6a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 30 14:21:21 2016 -0500
+
+    Finished view.ml, started work on controller view flag
+
+ ANSI.ml       |   4 +-
+ cli.ml        |   2 +-
+ controller.ml |  31 ++++++++++------
+ data.ml       |   8 ++--
+ gui.ml        |  23 +++++-------
+ main.ml       |  38 +++++++++++++++++--
+ view.ml       | 116 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ view.mli      |   6 ++-
+ 8 files changed, 192 insertions(+), 36 deletions(-)
+
+commit 80cfd2f4ebe98974d6ddbccf67be8111ea684abf
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 07:57:17 2016 -0500
+
+    get_guess done. Need to do more in take note
+
+ responsive.ml | 167 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 161 insertions(+), 6 deletions(-)
+
+commit 3c356ee83ab68093904f5fd5fc1d77687b13308e
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 05:21:34 2016 -0500
+
+    logic explained for answer_move
+
+ responsive.ml | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+commit 8b3d477a25b56a3db2c17df2291bd73181451d0e
+Merge: 15db38d 80503dd
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 05:18:59 2016 -0500
+
+    Merged branch master into tongtongannie/responsive
+
+commit 15db38dd4e39f491954c53099ccd26d824ccbab4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 05:08:44 2016 -0500
+
+    show_card updated; clean up helper
+
+ responsive.ml | 44 ++++++++++++++++++++++++++------------------
+ 1 file changed, 26 insertions(+), 18 deletions(-)
+
+commit c06463a2435044a4fb932796271b615f8af63f7c
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 04:47:23 2016 -0500
+
+    answer_move done; show_card needs fix; neverending updates
+
+ responsive.ml | 152 ++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 90 insertions(+), 62 deletions(-)
+
+commit 762444ef509a562a28076d9e7b4f79eb5e3a1eb1
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 01:55:19 2016 -0500
+
+    thumb down
+
+ responsive.ml | 60 ++++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 39 insertions(+), 21 deletions(-)
+
+commit 65d7b2535c6b20dce0f9cfe8604a34c4e2270e16
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 01:47:08 2016 -0500
+
+    changed helper functions
+
+ responsive.ml | 119 ++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 57 insertions(+), 62 deletions(-)
+
+commit 80503dd41e6957fc2c595dbbc2bfc08142706451
+Merge: 548cb24 b4eec0b
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 01:42:07 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit b4eec0bc51ab511379ee03fb939dcda1c72c280a
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 01:41:15 2016 -0500
+
+    hsv colors
+
+ temp.ml | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+commit d09155b91a18e3965889aaa7a0306fad461563aa
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 01:39:27 2016 -0500
+
+    hsv colors
+
+ gui.ml  | 99 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ temp.ml | 11 ++++++++
+ 2 files changed, 99 insertions(+), 11 deletions(-)
+
+commit 362959c5b57aad21d33a8e4c16923192acf96be4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 01:32:55 2016 -0500
+
+    data latest
+
+ data.ml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+commit e6ed8974e3de4bece3b238345562d25e48a3a053
+Merge: 8bcfcd9 6389ce7
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 01:32:09 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit 6389ce7bf2a83e968e45b8f11d6d46aed05431e2
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 01:29:47 2016 -0500
+
+    data changed
+
+ data.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 8bcfcd92644cdf311df5dabb517db79d7f1e4060
+Merge: 2d38839 88e61c4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Wed Nov 30 01:19:09 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit 88e61c489f8c0465c063fe95eedbf56242f80a03
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 30 00:41:33 2016 -0500
+
+    Added helper functions
+
+ responsive.ml | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
+
+commit 548cb24fe5450064ffd3b62a757bb0a734822c08
+Merge: dadd41d 78615b3
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 00:11:30 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 78615b3ac9463efc505117b36e81a694de9db6cf
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Wed Nov 30 00:09:02 2016 -0500
+
+    added sheet to GUI
+
+ gui.ml   | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ model.ml |   6 ++--
+ 2 files changed, 106 insertions(+), 8 deletions(-)
+
+commit 2d388395a917a9a501d81fa64a54fa1c36047fac
+Merge: 2649fb9 dadd41d
+Author: annieyuan <ly83@cornell.edu>
+Date:   Tue Nov 29 20:00:12 2016 -0500
+
+    Merge remote-tracking branch 'refs/remotes/origin/master'
+    
+    Conflicts:
+            data.ml
+
+commit dadd41da69dfe823b01d56a38e19a8fe9925fc92
+Merge: 5648c26 e71ec20
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 17:32:47 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit e71ec2056a4fac6d39d661613975d1e6d1dfd6df
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 17:31:09 2016 -0500
+
+    added roll_button and prompt_move
+
+ gui.ml | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+commit ed7b7178de4a0461e01c8016da254614af15d91d
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 16:46:07 2016 -0500
+
+    added passages and roll button
+
+ gui.ml | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 44 insertions(+), 4 deletions(-)
+
+commit ab012b5a0698e87672ec1234a134a1eead9c0128
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 15:51:53 2016 -0500
+
+    merging
+
+ ansi.ml | 99 -----------------------------------------------------------------
+ 1 file changed, 99 deletions(-)
+
+commit 11070d634b15f3bdd43d8199177732f271760ffb
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 15:50:49 2016 -0500
+
+    merging
+
+ .ocamlinit |  2 +-
+ ansi.ml    | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+), 1 deletion(-)
+
+commit e5c45f897ca686b13b49f252c3bfd7c26451c235
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 00:12:00 2016 -0500
+
+    multi-rect clickregistering added
+
+ gui.ml | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+commit 5648c2673e22e5e9fc6c55b525fbf89e943d0bfd
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 17:15:23 2016 -0500
+
+    added prompt for continue
+
+ ANSI.ml       | 2 +-
+ cli.ml        | 6 ++++++
+ controller.ml | 4 ++++
+ 3 files changed, 11 insertions(+), 1 deletion(-)
+
+commit b5d2a0d4fc6040d950d0f136164759c2cddb7a7a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 16:45:19 2016 -0500
+
+    new files
+
+ classic_smart_v_dumb.json | 340 ++++++++++++++++++++++++++++++++++++++++++++++
+ classic_svd.json          | 340 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 680 insertions(+)
+
+commit 4303f4c4128b929fc35821dda4eb13b73bca5672
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 16:00:49 2016 -0500
+
+    fixed dumbAI
+
+ dumbAI.ml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+commit 0523ef2e74b5249e2a80c4e46d498021aae12629
+Merge: 10d1b13 eb3d376
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 15:58:22 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit eb3d37614a35c26eb32ba6d8293f290e015712a1
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Tue Nov 29 15:57:28 2016 -0500
+
+    fixed same room+knows envelope+no rooms in hand bug
+
+ dumbAI.ml  | 1 +
+ smartAI.ml | 2 ++
+ 2 files changed, 3 insertions(+)
+
+commit 10d1b137f533ce4853d7a6ffae1145b8dc3e3a3f
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 15:44:57 2016 -0500
+
+    cleaned up code
+
+ dumbAI.ml | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
+
+commit 635dde54fb2ff5868f9004ccabd2fc80311328f3
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 15:44:47 2016 -0500
+
+    fixed dumbAI failing when in room it knows is envelope and is in that room
+
+ controller.ml |  3 +++
+ dumbAI.ml     | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 43 insertions(+), 8 deletions(-)
+
+commit 722e9383cbfa3f7a111d9c3dd5ebe837fa18f7e1
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 15:06:54 2016 -0500
+
+    made smart_v_dumb
+
+ ANSI.ml           |  43 ++++++-----
+ smartAI.ml        |   4 +-
+ smart_v_dumb.json | 211 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 238 insertions(+), 20 deletions(-)
+
+commit 65b5c5e98bb5fd07ee4aaabef5819d6702bf0864
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 12:24:15 2016 -0500
+
+    added ascii art for title
+
+ ANSI.ml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit 85ee88902b72e0718258ed6b19e4b6c3670dc0a2
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 12:23:18 2016 -0500
+
+    added ascii art for title
+
+ ANSI.ml | 18 +++++++++++++++++-
+ cli.ml  |  2 +-
+ main.ml |  3 ++-
+ 3 files changed, 20 insertions(+), 3 deletions(-)
+
+commit e24f4047be9c4fb1f581a1c9e2e27eb24597a687
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 29 11:45:43 2016 -0500
+
+    checks if player is the one guessed
+
+ controller.ml | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+commit 2649fb906d90994ec2e46d27de90b05968892543
+Author: annieyuan <ly83@cornell.edu>
+Date:   Tue Nov 29 01:47:24 2016 -0500
+
+    fix syntax error
+
+ responsive.ml | 86 +++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 43 insertions(+), 43 deletions(-)
+
+commit ee2fa557a6bd32a8ca2aa1ba6af0812175f0c857
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Tue Nov 29 00:54:09 2016 -0500
+
+    comment added
+
+ responsive.ml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit f69ac845fb97844124f12702108e44dc212440b7
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Tue Nov 29 00:50:46 2016 -0500
+
+    comments for take_note added
+
+ responsive.ml | 286 +++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 153 insertions(+), 133 deletions(-)
+
+commit 129c2f0811ea9302cc24f015fb07b7a0ba0f4e4b
+Author: annieyuan <ly83@cornell.edu>
+Date:   Tue Nov 29 00:13:50 2016 -0500
+
+    show_Card done
+
+ responsive.ml | 222 +++++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 188 insertions(+), 34 deletions(-)
+
+commit ea531428c17d22826895cccfe2174789743569cc
+Merge: 6b47d8e bbf9b77
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Tue Nov 29 00:08:04 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit 6b47d8e617e8161a8aee7c872f856f505dff7b7e
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Tue Nov 29 00:07:32 2016 -0500
+
+    take_note done
+
+ responsive.ml | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 141 insertions(+), 19 deletions(-)
+
+commit 9f2a973f394e29298aaed9989572406299e7b486
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 28 22:04:29 2016 -0500
+
+    added displaying of relocating
+
+ controller.ml | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+commit 62c044afb9b3923a603c040f3c933de2673e76f9
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 28 21:57:52 2016 -0500
+
+    Added custom colors
+
+ ANSI.ml   |  39 ++++++++++++++++++++++-
+ cli.ml    | 104 ++++++++++++++++++++++++--------------------------------------
+ dumbAI.ml |   7 -----
+ human.ml  |   2 +-
+ 4 files changed, 79 insertions(+), 73 deletions(-)
+
+commit bbf9b77e3b43800cd230e932029859cbe722c579
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 18:26:52 2016 -0500
+
+    take_notes signature updated
+
+ agent.ml   | 2 +-
+ agent.mli  | 7 +++++--
+ data.ml    | 5 +++--
+ dumbAI.ml  | 2 +-
+ human.ml   | 2 +-
+ model.ml   | 1 -
+ smartAI.ml | 2 +-
+ 7 files changed, 12 insertions(+), 9 deletions(-)
+
+commit d1a9b877af6c86572e78ac46b702ede1c9feb04b
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 28 16:21:30 2016 -0500
+
+    made cli print one char at a time
+
+ ANSI.ml    | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile   |  9 ++++++---
+ cli.ml     | 33 ++++++++++++++++++++++++++++-----
+ smartAI.ml |  1 -
+ 4 files changed, 96 insertions(+), 9 deletions(-)
+
+commit a89c95e128ff6611d30dea25005736fb01877442
+Merge: 2c84adb 8afc681
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 16:14:49 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit 2c84adb83095b190f921f6dd06ef6fef6309be32
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 16:14:20 2016 -0500
+
+    data changed and helper is_adjacent added
+
+ data.ml       |  3 +--
+ responsive.ml | 31 +++++++++++++++----------------
+ 2 files changed, 16 insertions(+), 18 deletions(-)
+
+commit 8afc681b0bb6357d0db79a0b2af7c7e1128aa749
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 16:13:57 2016 -0500
+
+    update listens type
+
+ data.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ae60473b014edb4446f7a31c31f592cce774e6ca
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 15:52:47 2016 -0500
+
+    added maybe_in_hand in listens
+
+ data.ml | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+commit 8eba3641b5de4f2b042b7f833c35a023d2f3ac11
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 15:51:04 2016 -0500
+
+    discard extra get_accusation
+
+ responsive.ml | 5 -----
+ 1 file changed, 5 deletions(-)
+
+commit b2c96739d80dc5e0a0a6183c901a16ff595b1740
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 15:49:36 2016 -0500
+
+    update take_note input
+
+ agent.ml  | 10 +++++-----
+ agent.mli |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+commit 5b7e974b5314f1dddfc9af23988f46a06bb06c4c
+Merge: 30c07c7 6f4d22d
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 04:43:52 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit 30c07c76b7bbac3ba9250e20081e947ce81a7e17
+Merge: dc61130 25a0c64
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 04:42:40 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+    
+    take_notes is not done
+
+commit 6f4d22dcd678f5cea476854855363e7ee21811fd
+Merge: dc61130 25a0c64
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 04:42:40 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit dc61130b8deac1a520f619567c099e0a19c0923c
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 04:38:22 2016 -0500
+
+    added a mutable response to public + TODO
+    
+    when others show me card or show others card, i take note - where can I learn that others are showing cards to other people - this is the time where we need to take note - we have the mutable guesses which stores the current guess of the turn, no matter who is playing - however, we do not have the response from other players
+    where do we update the mutable guess and mutable response in the game?
+    
+    when I make a guess/make a movement/ make accusation/get answer , i do not take note
+    ( I call take note for information needed to make a decision)
+
+ data.ml       |  1 +
+ responsive.ml | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+commit 25a0c645fa99c027bad2a5cc79c9b7cafcb91149
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 04:38:22 2016 -0500
+
+    added a mutable response to public + TODO
+
+ data.ml       |  1 +
+ responsive.ml | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+commit fee31b79170776961173d3238aca8669fdc04860
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 03:36:09 2016 -0500
+
+    get_answer done
+
+ responsive.ml | 97 ++++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 66 insertions(+), 31 deletions(-)
+
+commit 5bc9503d5df1e768e16129aff3ff71233d91163c
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 03:32:39 2016 -0500
+
+    take_note done
+
+ data.ml       |  2 +-
+ responsive.ml | 25 ++++++++++++++++++++++++-
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+
+commit d5d3d3e178edfb3a69138817dbb5027db77d2f22
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 02:25:39 2016 -0500
+
+    changed the position of helper functions
+
+ responsive.ml | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
+
+commit 3caa53e4753b8ce18c6a4704914d4774f090117e
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 02:25:04 2016 -0500
+
+    cleaned
+
+ data.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 3011ba790af65b2175e867cb0917245dc39cba6f
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 02:24:23 2016 -0500
+
+    cleaned
+
+ data.ml | 4 ----
+ 1 file changed, 4 deletions(-)
+
+commit 9967063cf6306546d41759f8e8656e98cc7936ef
+Merge: 9938536 f7566ad
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 02:21:43 2016 -0500
+
+    Merged branch tongtongannie/responsive into tongtongannie/responsive
+
+commit f7566ad67e92c21651dc02a4590cdc6c6a27741c
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 02:20:17 2016 -0500
+
+    helper functions done. data.ml changed
+
+ data.ml       |  9 +++++----
+ responsive.ml | 15 ++++++++++++++-
+ 2 files changed, 19 insertions(+), 5 deletions(-)
+
+commit ad8a278d968620023805ba28db08a02bf5d425ed
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 01:45:06 2016 -0500
+
+    data updated
+
+ data.ml | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+commit 993853670922f19d7fb5ab81e43256dc4195c60a
+Merge: f3c79c4 e0177ef
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 28 00:10:33 2016 -0500
+
+    Merge remote-tracking branch 'refs/remotes/origin/tongtongannie/responsive'
+    
+    Conflicts:
+            data.ml
+
+commit e0177eff5b32c8fc33a4ec9847fb5a85df3ea2b0
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Mon Nov 28 00:07:35 2016 -0500
+
+    changed data
+
+ data.ml | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+commit 04152a4296fab3b6030bf834db392d2d6b8757ee
+Merge: 65c3253 bde6c97
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Nov 27 15:27:38 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit 65c3253c9e1bab24490664bc1324cd3645fa14dd
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Nov 27 22:21:52 2016 -0500
+
+    moved players on guess
+
+ controller.ml | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+commit db11fba326d7a6f8a39f034188743af26fe2213f
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Nov 27 21:56:53 2016 -0500
+
+    fixed the location bug where same space would accidentally use wrong headed towards
+
+ agent.ml      |  6 +++---
+ agent.mli     |  2 +-
+ controller.ml |  7 +++----
+ data.ml       |  3 +++
+ dumbAI.ml     | 32 +++++---------------------------
+ human.ml      |  3 ++-
+ smartAI.ml    | 23 +++++++++++------------
+ 7 files changed, 28 insertions(+), 48 deletions(-)
+
+commit bde6c97d81407fd89db3263173cfff52f7a5d31f
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Nov 27 15:26:42 2016 -0500
+
+    movement prompt works
+
+ board.ml | 14 +++++++++++++-
+ gui.ml   | 22 +++++++++++++++-------
+ 2 files changed, 28 insertions(+), 8 deletions(-)
+
+commit 4f030e92ef0acf73e06778642e0a308a4fc2b85f
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sun Nov 27 14:52:59 2016 -0500
+
+    prompt_movement might work
+
+ data.ml | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ gui.ml  | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
+
+commit 90e8d62d293d7fe502a9cc5f7f988ceb95939c4d
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 23:20:10 2016 -0500
+
+    added small_mixed.json
+
+ .ocamlinit       |   2 +-
+ small_mixed.json | 211 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 212 insertions(+), 1 deletion(-)
+
+commit f3c79c41d80c92a8fc525496aa7eb4a9d9a03185
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Nov 27 00:18:43 2016 -0500
+
+    update player field in model and data
+
+ data.ml  | 2 +-
+ model.ml | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+commit f1fea178af0ca891a45903c69a5149aa53d0d406
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Nov 27 00:14:17 2016 -0500
+
+    updated
+
+ responsive.ml | 45 ++++++---------------------------------------
+ 1 file changed, 6 insertions(+), 39 deletions(-)
+
+commit 3afcf45a4bd138bf1f26c7a38e6aac71d3730236
+Merge: 605e2ae 8dcdce4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sun Nov 27 00:11:55 2016 -0500
+
+    Merge remote-tracking branch 'refs/remotes/origin/master'
+    
+    Conflicts:
+            responsive.ml
+
+commit 605e2ae3a1224a2bae56b5b9b3de5ae159a1ed18
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sat Nov 26 23:57:00 2016 -0500
+
+    player add cards_weight
+
+ data.ml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 5e195a39e07074df9a6a72d8a57a8b28fdba02e8
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sat Nov 26 23:17:59 2016 -0500
+
+    get_answer done 2.0
+
+ responsive.ml | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
+
+commit 899e658cae78512efa7a732929b1b7e3b07f53db
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sat Nov 26 23:11:30 2016 -0500
+
+    init rewrite show_card for responsive
+
+ agent.ml      | 39 +++++++++++++++++++++------------------
+ responsive.ml | 45 ++++++++++++++++-----------------------------
+ 2 files changed, 37 insertions(+), 47 deletions(-)
+
+commit db27689668dc96b3182df3b49ac7dae3232cf267
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Sat Nov 26 23:08:29 2016 -0500
+
+    get_answer done
+
+ responsive.ml | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+commit ac145dafbf2cdd7744832ab5bfff15e418c231c0
+Merge: a0da0ae 8dcdce4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sat Nov 26 22:27:54 2016 -0500
+
+    Merged branch master into master
+
+commit 8dcdce4e43df89fcf5ea7a429620cfb44c5086ae
+Merge: ef0cf16 de5e8ab
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 21:55:22 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit de5e8aba0900a91a5d4186b8891c23950f5ef344
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 21:54:13 2016 -0500
+
+    players drawn
+
+ gui.ml | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+commit ef0cf16b209c4d5238a696ecd6446ef724c73108
+Merge: 513a498 b1266f6
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 20:13:42 2016 -0500
+
+    Merge branch 'graham/GUI'
+
+commit b1266f6531092271b1997698036b5d0e34d29041
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 20:12:34 2016 -0500
+
+    drawing players
+
+ Makefile      |  6 +++---
+ cli.ml        | 11 ++++++++++-
+ controller.ml |  2 ++
+ gui.ml        | 37 ++++++++++++++++++++++++++++++++++++-
+ view.mli      |  5 ++++-
+ 5 files changed, 55 insertions(+), 6 deletions(-)
+
+commit 741adb6c713af6fc8ab743fd3ca805a93055eaa2
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 18:39:54 2016 -0500
+
+    draws board
+
+ .ocamlinit |   6 +-
+ gui.ml     | 250 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ model.ml   |   2 +
+ 3 files changed, 257 insertions(+), 1 deletion(-)
+
+commit 513a49897d0f795883a24de9653cbf9a0af470d9
+Merge: 73146c7 def2a6c
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 18:47:51 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit def2a6cf346b0e77caff89438068c38608851e97
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 18:46:40 2016 -0500
+
+    commented smartAI
+
+ smartAI.ml | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+commit 73146c75eee616b52349837d211a1641ed779a44
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Nov 26 12:03:21 2016 -0500
+
+    added people not showing cards
+
+ cli.ml        | 14 ++++++++++++--
+ controller.ml |  4 +++-
+ view.mli      |  4 ++++
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+
+commit 37c70a64ba2d4568616fc6547fab3bfe89c43b69
+Merge: c5e7fc7 37b02a0
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 10:49:05 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit 37b02a06fdbea429296641d275b22ba7d1ff731f
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 10:46:26 2016 -0500
+
+    fixed smartAI and passages
+
+ board.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit a0da0ae66909c56760fb6b94d9623d12bfaf9954
+Merge: 4b25f8f c5e7fc7
+Author: annieyuan <ly83@cornell.edu>
+Date:   Sat Nov 26 02:51:29 2016 -0500
+
+    Merged branch master into master
+
+commit c5e7fc78ef2f0d806d7e84388b4a9fad7c892ebe
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Nov 26 01:30:02 2016 -0500
+
+    fixed smartai bug
+
+ smartAI.ml | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+commit d8ce8c6e487d4156a3d7d8c78aa99ebf0fa203ee
+Merge: 0f6680d 8da8d1c
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 00:53:13 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit 8da8d1cbfb33893e2966ab6d12305b5faf94845e
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 00:51:37 2016 -0500
+
+    smartAI working
+
+ model.ml   |  3 +++
+ smartAI.ml | 44 +++++++++++++++++++++++++++-----------------
+ 2 files changed, 30 insertions(+), 17 deletions(-)
+
+commit 2eba681bc693c80943f00a2cc67fc2c7b6da12a4
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 00:19:40 2016 -0500
+
+    smart to debug
+
+ smartAI.ml | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+commit fd579a0607c97a4ddd4bb63fe7895319891a2aa2
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Sat Nov 26 00:15:44 2016 -0500
+
+    smart to debug
+
+ agent.ml           |  12 +-
+ classic_smart.json | 340 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ human_v_dumb.json  |   4 +-
+ model.ml           |   6 +-
+ smartAI.ml         | 169 ++++++++++++++++++++++----
+ 5 files changed, 498 insertions(+), 33 deletions(-)
+
+commit 0f6680dc877a4a953fa9831bd6c358ccbcc66659
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sat Nov 26 00:38:22 2016 -0500
+
+    tried adding delays
+
+ cli.ml        | 14 +++++++-------
+ controller.ml | 15 ++++-----------
+ dumbAI.ml     | 13 +++++++++----
+ 3 files changed, 20 insertions(+), 22 deletions(-)
+
+commit b3bfbb454c8e2b3b73779e1333ba0a2c1508c139
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 23:43:35 2016 -0500
+
+    Added sheet and hand abilities
+
+ cli.ml          | 29 ++++++++++++++++++++++++++++-
+ dumbAI.ml       |  3 +--
+ human.ml        | 55 ++++++++++++++++++++++++++++++++++++-------------------
+ tests/game.json |  2 +-
+ view.mli        |  4 ++++
+ 5 files changed, 70 insertions(+), 23 deletions(-)
+
+commit 048edea9824c08d151094b832374ac372ef36f9a
+Author: Le Yuan <ly83@cornell.edu>
+Date:   Fri Nov 25 21:53:01 2016 -0500
+
+    init responsive
+
+ responsive.ml | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+commit 4b25f8fbfacec2116f849188aba3dde7def55877
+Merge: 45cd5c0 7d6349d
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 21:52:55 2016 -0500
+
+    Merged branch tongtongannie/responsive into master
+
+commit 7d6349d4462fd01de5f10d46de04965158295bf9
+Merge: ee57b2c 45cd5c0
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 21:51:10 2016 -0500
+
+    Merged master into tongtongannie/responsive
+
+commit ee57b2cd0b5f3835e8f52a17a84a3f35bf91700e
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 21:50:37 2016 -0500
+
+    init responsiveai
+
+ responsive.ml | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+commit 45cd5c0a91aa4a41185553030f57d36721628169
+Merge: 511cc65 d917ceb
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 21:40:12 2016 -0500
+
+    Merged branch master into master
+
+commit d917ceb5d3650beb626044f85a5d6450bb22c170
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 20:35:24 2016 -0500
+
+    fixed human parsing movements
+
+ cli.ml   | 2 +-
+ human.ml | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+commit 82d534c91a5190a176851f80b6090a92be05d819
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 20:13:28 2016 -0500
+
+    dumbAI can't lose
+
+ dumbAI.ml | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
+
+commit 511cc659241271d74c0085acad930055645833fb
+Merge: b7d7555 40dc442
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 20:10:40 2016 -0500
+
+    Merged branch master into master
+
+commit 40dc442fb0ea87f5bb4170ffc12cd530c397aa25
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 20:08:09 2016 -0500
+
+    fixed DumbAI
+
+ cli.ml    |  2 +-
+ dumbAI.ml | 16 +++++++++++++---
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+commit b7d755556059a7049f4377218352e8b947b155c8
+Merge: e26eca6 ba66dba
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 20:06:41 2016 -0500
+
+    Merged branch master into master
+
+commit ba66dba9271dd0ce768ec8de8ee2d7352d5a2228
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 20:01:01 2016 -0500
+
+    fixed bug
+
+ dumbAI.ml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit e26eca6521e176ebf1f01875cf926f2e6715f38e
+Merge: d206b77 c9db20e
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 19:55:51 2016 -0500
+
+    Merged branch master into master
+
+commit c9db20e6e8ac4180d023f976f6f4721312a0bf05
+Merge: dd53a7c 7c38bf9
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 19:54:36 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit dd53a7c3e458f1201a70aa2756e0c3e4362ab2c8
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 19:54:28 2016 -0500
+
+    change in CLI
+
+ cli.ml    | 8 ++++++--
+ dumbAI.ml | 2 --
+ human.ml  | 4 +++-
+ view.mli  | 7 ++++---
+ 4 files changed, 13 insertions(+), 8 deletions(-)
+
+commit d206b77efc22356f09117384a12999be8da03af2
+Merge: 877d4b5 8a62cea
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 19:46:51 2016 -0500
+
+    Merged branch master into master
+
+commit 8a62cea95a7d8bb3b21eddb10a92ff338704fe52
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 19:42:15 2016 -0500
+
+    DumbAI doesn't go to acc room
+
+ dumbAI.ml | 39 ++++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
+
+commit 877d4b5a0c8abbaeaa7df4c17de1116c9e6ced10
+Merge: a4f3ddc fdeaa77
+Author: annieyuan <ly83@cornell.edu>
+Date:   Fri Nov 25 19:01:37 2016 -0500
+
+    Merged branch master into master
+
+commit fdeaa77beedf2ee2c29eb520c93b904eb5abceff
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 18:56:19 2016 -0500
+
+    Fixed DumbAI guess amd accuse
+
+ controller.ml     |   4 +-
+ dumbAI.ml         | 134 ++++++++++++---------
+ human_v_dumb.json | 340 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 423 insertions(+), 55 deletions(-)
+
+commit e2c4e25ad96618e8041a9f83858a342ebb6f6167
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 17:56:39 2016 -0500
+
+    Fixed bugs in dumb, human and agent
+
+ agent.ml  | 16 ++++++++--------
+ dumbAI.ml | 28 +++++++++++++++++-----------
+ human.ml  | 19 +++++++++----------
+ 3 files changed, 34 insertions(+), 29 deletions(-)
+
+commit e5789576e09ddb3c0aabd45dcd36ef23d2a58cca
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 17:33:02 2016 -0500
+
+    commented out show card smartAI
+
+ smartAI.ml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit b11b8eb4c595d780d04977b5fe0198e7960b4457
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 17:31:37 2016 -0500
+
+    fixed some bugs
+
+ agent.ml | 14 ++++++++++++++
+ human.ml | 17 +++++++++++++----
+ 2 files changed, 27 insertions(+), 4 deletions(-)
+
+commit 45bc9b3724ee1ffe4756b0bfcf1b48e7f04b2b78
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 16:49:48 2016 -0500
+
+    fixed prompts in CLI and changed model's description string to room and accessible bool in get paths
+
+ agent.mli     |   2 +-
+ cli.ml        | 216 ++++++++++++++++++++++++----------------------------------
+ controller.ml |  20 ++++--
+ dumbAI.ml     |   8 +--
+ human.ml      |   2 +-
+ model.ml      |  17 +++--
+ model.mli     |   9 ++-
+ view.mli      |   8 +--
+ 8 files changed, 127 insertions(+), 155 deletions(-)
+
+commit 8086afef7726e3f5454929afee89df31f35a353a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 25 14:29:39 2016 -0500
+
+    work on cli prompts
+
+ cli.ml  | 25 ++++++++++++++++---------
+ main.ml |  2 +-
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
+commit 7c38bf962edae214601ed39e156e0a3dbf764dac
+Merge: 8a62cea 2069b18
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Thu Nov 24 23:53:39 2016 -0500
+
+    Merge branch 'graham/smartAI2'
+
+commit 2069b1836bea8e55a8e7de59fd0346a32e3963c9
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Thu Nov 24 23:45:40 2016 -0500
+
+    answer_move in
+
+ model.ml   |  2 +-
+ smartAI.ml | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 50 insertions(+), 2 deletions(-)
+
+commit f223bb9769f7468b3ee3691a29298a24ee0f1e48
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 21:11:23 2016 -0500
+
+    added documentation
+
+ human.ml | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+commit f72c5c0cca12e439883b1e7eb4c558ae4fd390de
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 21:02:22 2016 -0500
+
+    finished human
+
+ human.ml | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 62 insertions(+), 12 deletions(-)
+
+commit 515024ec926ebb1e9184c8d8ad0c14267f88d87a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:03:19 2016 -0500
+
+    more human parsing
+
+ human.ml | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+commit eb756f944bdb39ed8fdf682852a31781e75cee81
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 00:19:06 2016 -0500
+
+    finished parse movement
+
+ human.ml | 22 +++++++++++++++++++---
+ view.mli |  3 ++-
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+commit c71911997c4c27ae4ba063c8bc27de245e214bb6
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:23:08 2016 -0500
+
+    fixed controller
+
+ controller.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit d19ec66d27ae704adb5ff8676dfce25442686f0e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:19:45 2016 -0500
+
+    renamed tests
+
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 6d237f55700a0480fc51932a0b294d5b8d2cdd3d
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:19:20 2016 -0500
+
+    renamed tests
+
+ {test => tests}/game.json | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 7284faed813f9521eee6c58d087401afef863706
+Merge: 63031c9 9ac6969
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:08:57 2016 -0500
+
+    removed show_card and show_person
+
+commit 63031c9312227d33d54ac7bdde055cb58d9897e4
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 24 18:06:43 2016 -0500
+
+    removed smartAI show card
+
+ smartAI.ml | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+
+commit 9ac696915961aa298f9af207d392d071920656f5
+Author: Le Yuan <ly83@cornell.edu>
+Date:   Thu Nov 24 17:51:01 2016 -0500
+
+    merged - code compiles but does not pass test
+
+ dumbAI.ml | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 94 insertions(+), 8 deletions(-)
+
+commit 025c44f1eb4c93fc0d68a96380d93326b6bbb86f
+Merge: e847924 ad2d8a5
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Thu Nov 24 13:45:14 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit ad2d8a54468c5a6e06338d4967bc261a9bf68eff
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Thu Nov 24 13:43:57 2016 -0500
+
+    sheet marking added
+
+ smartAI.ml | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
+
+commit e8479240fd9a2618d6c1bbf984ef437c7c60727e
+Author: gtr34 <gtr34@cornell.edu>
+Date:   Thu Nov 24 01:52:30 2016 -0500
+
+    merge fixed
+
+ cli.ml | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
+
+commit c82ff5c0dcf28f2bd61a345f862bac0317f2666e
+Merge: 50a8413 c23f9e8
+Author: Ubuntu <ubuntu@csvm>
+Date:   Thu Nov 24 01:47:47 2016 -0500
+
+    Merge branch 'graham/smartAI'
+
+commit c23f9e88127dbb3ac15953db993e8425fc7a7e80
+Author: Ubuntu <ubuntu@csvm>
+Date:   Thu Nov 24 01:42:27 2016 -0500
+
+    started SmartAI
+
+ cli.ml | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+commit 0d5b4856871661c9d35772bb2c44873d3eca9193
+Author: Ubuntu <ubuntu@csvm>
+Date:   Thu Nov 24 01:39:41 2016 -0500
+
+    started smartAI
+
+ smartAI.ml | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
+
+commit 2f5864e4b17d969b349d73f3a22ecef9237d7314
+Author: Ubuntu <ubuntu@csvm>
+Date:   Thu Nov 24 01:08:14 2016 -0500
+
+    fixed board bugs
+
+ .ocamlinit |  1 +
+ board.ml   | 16 +++++++++++-----
+ model.ml   | 10 +++++-----
+ 3 files changed, 17 insertions(+), 10 deletions(-)
+
+commit fbc5567f6d32609fa67841c20a015026eb896a03
+Author: Ubuntu <ubuntu@csvm>
+Date:   Thu Nov 24 00:20:50 2016 -0500
+
+    model debug in wrong branch
+
+ .ocamlinit | 10 +++++++++-
+ model.ml   | 42 +++++++++++++++++++++++++++++-------------
+ 2 files changed, 38 insertions(+), 14 deletions(-)
+
+commit 50a841337e3c8c05c14b8075b7cf5cd99f0de30d
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 23:40:24 2016 -0500
+
+    started debug
+
+ main.ml        |   2 +-
+ test/game.json | 340 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 341 insertions(+), 1 deletion(-)
+
+commit 63e6efc08ced46221948c8047e64dfc4ec124de2
+Merge: 40b38ab 5716232
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 23:17:01 2016 -0500
+
+    merge
+
+commit 40b38abf69128882d5522ac503d53013b6c4a781
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 23:16:10 2016 -0500
+
+    added display function
+
+ agent.ml | 2 ++
+ cli.ml   | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+commit 5716232c24919bcda6d1d2657290643bb0d2e342
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 23 21:45:34 2016 -0500
+
+    adjusted cli.ml format
+
+ cli.ml | 106 ++++++++++++++++++++++++++++++++---------------------------------
+ 1 file changed, 53 insertions(+), 53 deletions(-)
+
+commit 053af0bc8f443a19b9ddce3dca184a9b6533dcd8
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 23 21:40:20 2016 -0500
+
+    cli.ml basically done
+
+ cli.ml | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+commit e29fb46c3b4f82de59aeba14a1c2e5a3fdd4b89c
+Author: Tongtong Lian <tl547@cornell.edu>
+Date:   Wed Nov 23 21:35:42 2016 -0500
+
+    delete "open agent"
+
+ cli.ml | 177 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 160 insertions(+), 17 deletions(-)
+
+commit 0b65755a84662cb4b3c541371e236a2c2efdbc0e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 19:19:30 2016 -0500
+
+    started human
+
+ .ocamlinit |  1 +
+ agent.ml   |  2 ++
+ human.ml   | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ view.mli   |  2 +-
+ 4 files changed, 54 insertions(+), 1 deletion(-)
+
+commit bd9c823311edfa435d59f6fd28c0d3e1f80d714b
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 18:04:04 2016 -0500
+
+    added documentation
+
+ agent.ml | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+commit 4a3a3b5671b75b928ca3433d4f4e4d202f874f52
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 14:51:11 2016 -0500
+
+    finished showing card
+
+ agent.ml      | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ agent.mli     | 13 ++++++++++++
+ controller.ml | 34 ++++--------------------------
+ data.ml       |  3 ++-
+ dumbAI.ml     |  3 +++
+ 5 files changed, 89 insertions(+), 31 deletions(-)
+
+commit bff45c069cffc4669ef89ff09674e164da636772
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 23 12:31:35 2016 -0500
+
+    added player order
+
+ data.ml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 0af47f8a68346f5b337f466ca15b5076ff128121
+Merge: 102bbe1 4e214a9
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 23 00:26:05 2016 -0500
+
+    Merge branch 'graham/pathfinding'
+
+commit 4e214a93cd5d1b9d071eef1c9418464db170201c
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 23 00:23:58 2016 -0500
+
+    implemented Djikstra's
+
+ model.ml | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 77 insertions(+), 3 deletions(-)
+
+commit 102bbe113bea8096a31592393762177577ccc476
+Merge: 7219257 1f06e9e
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 22 22:35:02 2016 -0500
+
+    Merge branch 'graham/pathfinding'
+
+commit 1f06e9e1285eb283307b57aadee24a8fcd57a602
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 22 22:27:54 2016 -0500
+
+    fixed import bug
+
+ board.ml          | 14 ++++++++++----
+ classic_dumb.json |  8 ++++----
+ model.ml          | 28 ++++++++++++++++++++--------
+ 3 files changed, 34 insertions(+), 16 deletions(-)
+
+commit 7219257becc877cc47a6f6aa7e47d973d18b827c
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 21 16:33:10 2016 -0500
+
+    few changes
+
+ Makefile      | 3 +++
+ controller.ml | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+commit a4f3ddc366232d256cace86dd129a0e5233b6c2a
+Merge: 0b1b7c5 91c6b76
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 21 15:18:26 2016 -0500
+
+    Merged annie/dumbai into master
+
+commit 91c6b7626e3f81f077b5a4556b9126dd890b17d4
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 21 14:48:07 2016 -0500
+
+    dummy dumbAI that passes things but do not work correctly
+
+ agent.mli |  2 +-
+ dumbAI.ml | 11 ++++++-----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+
+commit 69779aa214419b5772cca2b8a16d675a73d53861
+Author: annieyuan <ly83@cornell.edu>
+Date:   Mon Nov 21 14:36:37 2016 -0500
+
+    dummy answer_move
+
+ dumbAI.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 0b1b7c5554dcc33920820263b65c49684b6e2e89
+Merge: d9eb6da f8664fd
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 21 12:20:21 2016 -0500
+
+    Merge branch 'graham/pathfinding'
+
+commit f8664fd5042865f680a6c43ad8f6738cc93e4b0b
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 21 12:17:25 2016 -0500
+
+    preliminary pathing with full board
+
+ model.ml | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
+
+commit c79002d0fd441abf1e00eaa2183a06113e71c376
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 18:16:09 2016 -0500
+
+    updated get_move_options for new board
+
+ model.ml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+commit d2392c9c7b4d869fa1f92e4b699a0ce54e65ebda
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 18:15:46 2016 -0500
+
+    updated get_move_options for new board
+
+ model.ml | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+commit 9ef6781bef4c425e74e63d013ba1dbaf3f89b5ef
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 00:35:07 2016 -0500
+
+    preliminary pathing builds
+
+ model.ml | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+commit 1aceced3ebe30bedc92422070d27b3b0e97eb588
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 00:22:26 2016 -0500
+
+    preliminary pathing done
+
+ model.ml | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
+
+commit 9a1866a138762523d37463b2274aed9a9ada2e77
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 14 23:45:48 2016 -0500
+
+    added passage checks
+
+ model.ml | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+commit a52ab2a9b171b80645ec0688273d31c1f68578d0
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 14 21:34:22 2016 -0500
+
+    started pathing
+
+ model.ml | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+commit d9eb6da7b17e188bb4ee8e499f0354ba85422d32
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 16 23:05:43 2016 -0500
+
+    finished controlle
+
+ controller.ml | 40 ++++++++++++++++++++++++++++++++++++++--
+ data.ml       |  4 ++--
+ model.ml      |  4 ++--
+ 3 files changed, 42 insertions(+), 6 deletions(-)
+
+commit d401abe0dd31811e9b2375cf217b45982776073b
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 16 17:02:42 2016 -0500
+
+    finished all but getting answers. Added docs
+
+ cli.ml        |  2 +-
+ controller.ml | 93 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ data.ml       |  2 --
+ 3 files changed, 75 insertions(+), 22 deletions(-)
+
+commit 100c744d82012295601c65220ffa1b48d10865b7
+Merge: 916469a 60d7ec6
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 18:03:49 2016 -0500
+
+    Merge branch 'graham/import2'
+
+commit 60d7ec68985eb138fd508450ca40e86ffb4e0486
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 18:02:38 2016 -0500
+
+    merging full import
+
+ classic_dumb.json |  4 ++--
+ controller.ml     |  2 +-
+ data.ml           | 32 ++++++++++++++++++--------
+ model.ml          | 69 ++++++++++++++++++++++++++++++++++++++++---------------
+ 4 files changed, 77 insertions(+), 30 deletions(-)
+
+commit 7fc85458d9ce8f0a5c22dbc9981fc0a4b23dc2f8
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 16:31:57 2016 -0500
+
+    about to build sheet
+
+ board.ml          | 51 +++++++++++++++++++++++----------------------
+ classic_dumb.json |  4 ++--
+ controller.ml     | 12 +++++------
+ data.ml           | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ model.ml          | 24 +++++++++++++++++++--
+ 5 files changed, 113 insertions(+), 40 deletions(-)
+
+commit 51242b330dd3449adbc7f91bb4e95debd73b8e89
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 15:07:52 2016 -0500
+
+    board built
+
+ board.ml | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+commit e87ee0164b4c9189efec1b51de77a1d336e2986b
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 14:54:10 2016 -0500
+
+    board near finished
+
+ board.ml | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 84 insertions(+), 6 deletions(-)
+
+commit c2aad6511bbcd98a7e9b433125ea92fdf7a91294
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 12:15:40 2016 -0500
+
+    game without board
+
+ data.ml  | 16 ++++++++++++++--
+ model.ml | 30 ++++++++++++++++++++----------
+ 2 files changed, 34 insertions(+), 12 deletions(-)
+
+commit 351d4b451d28b3c294f0f7c77e3ed10962262928
+Author: Ubuntu <ubuntu@csvm>
+Date:   Wed Nov 16 00:08:28 2016 -0500
+
+    json almost split
+
+ model.ml | 112 ++++++++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 85 insertions(+), 27 deletions(-)
+
+commit c922fb440a3ffe43d652094a166b72de64897462
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 22:52:01 2016 -0500
+
+    building
+
+ model.ml | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
+
+commit e3c778aefd984ab0d9f1a1533895ba9f3176f8b1
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 22:28:57 2016 -0500
+
+    deeper into implementation
+
+ board.ml | 28 ++++++++++++++++++++++++++++
+ model.ml | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 85 insertions(+), 7 deletions(-)
+
+commit d17a1dda88d4bfd0cf5b17e72fa87871b60b375d
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 13:02:13 2016 -0500
+
+    working on import
+
+ model.ml | 41 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
+
+commit 52d85be4da6072bece41abaaf74aed35fb033fd2
+Author: Ubuntu <ubuntu@csvm>
+Date:   Tue Nov 15 12:38:03 2016 -0500
+
+    built config for classic
+
+ classic_dumb.json | 340 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 340 insertions(+)
+
+commit 916469a3bfa72d202298c4e6fbed44cfd2b15ab8
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Wed Nov 16 15:37:56 2016 -0500
+
+    Added OrderedCard and nearly finished controller. Implemented making players be out
+
+ cli.ml        |   7 +++-
+ controller.ml | 126 ++++++++++++++++++++++++++++++++++------------------------
+ data.ml       |  18 ++++++++-
+ view.mli      |   3 ++
+ 4 files changed, 98 insertions(+), 56 deletions(-)
+
+commit 87c1183d1331d0e451de3c8d16beb50e19c19cba
+Merge: f587596 28f0c50
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 22:11:52 2016 -0500
+
+    merge
+
+commit f58759651dc1c856f1dd3b019430f82921c9dd57
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 22:08:00 2016 -0500
+
+    fixed agent module selection
+
+ agent.ml      | 35 ++++++++++++++++++++++++++++
+ agent.mli     |  1 -
+ cli.ml        | 10 ++++----
+ controller.ml | 75 +++++++++++++++++++++++++++++++++++++----------------------
+ data.ml       |  9 ++++---
+ dumbAI.ml     | 11 ++++-----
+ model.ml      |  6 ++---
+ 7 files changed, 102 insertions(+), 45 deletions(-)
+
+commit 673d974e75298e88221e71878f6f5a7dd3bf5992
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 18:16:46 2016 -0500
+
+    more controller
+
+ cli.ml        | 25 +++++++++++++------------
+ controller.ml | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ dumbAI.ml     | 10 +++++-----
+ 3 files changed, 63 insertions(+), 28 deletions(-)
+
+commit a35413d72de1d281801f76a9711dfe583f4e1d85
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 15:12:30 2016 -0500
+
+    changes
+
+ controller.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit d8e062583f1d29938d3904dec8b9a2e3d023cde9
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 18:17:25 2016 -0500
+
+    Fixed victory signature
+
+ view.mli | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 28f0c500808bf8d8fb341e9382825b3f574fce3d
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 18:16:46 2016 -0500
+
+    more controller
+
+ cli.ml        | 25 +++++++++++++------------
+ controller.ml | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ dumbAI.ml     | 10 +++++-----
+ 3 files changed, 63 insertions(+), 28 deletions(-)
+
+commit 3cec92048a2f88e4f9ca03e80a46dbc0d42cd37c
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 15:12:30 2016 -0500
+
+    changes
+
+ controller.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 96d7bc213db87c8e4293a73a131c876a99c20e37
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 15 15:36:49 2016 -0500
+
+    changed game model and AI parameters
+
+ agent.mli    | 10 +++++-----
+ data.ml      | 15 ++++++++++++++-
+ main_test.ml | 13 +++++++++++++
+ view.mli     |  5 ++++-
+ 4 files changed, 36 insertions(+), 7 deletions(-)
+
+commit 7ae8279a1dbb4ff1956e9be33c77464ce67e487e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 14 22:56:09 2016 -0500
+
+    changed data move
+
+ data.ml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 056771741472f64d06ebf5629e5272a201125644
+Merge: de1fde9 e8b878b
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 14 17:34:24 2016 -0500
+
+    Merge remote-tracking branch 'origin/drew/controller'
+
+commit e8b878b49070568135f58eab5e7c519935f35e53
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 14 17:29:26 2016 -0500
+
+    changes for meeting
+
+ data.ml | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit de1fde919ec020e78b28dfccbcd4ff840041c69c
+Merge: d8be859 de85a19
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 14 16:59:43 2016 -0500
+
+    merge
+
+commit de85a19d4ae98680feaba04a8f79129ae5626285
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Fri Nov 11 22:03:37 2016 -0500
+
+    more controller work
+
+ controller.ml | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+commit d8be859ecf640ceaa92607479065131e9cda461d
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 10 18:59:05 2016 -0500
+
+    fixed get movement_option method
+
+ model.mli | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 9cf30c96685e9ce1c50f05e22878e5bdd9a63aa5
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 10 18:58:14 2016 -0500
+
+    more controller
+
+ controller.ml | 25 +++++++++++++++++++++++--
+ data.ml       |  2 +-
+ model.mli     |  6 +++---
+ 3 files changed, 27 insertions(+), 6 deletions(-)
+
+commit 2cd69d7c77484ba7a0618d8f13cbf5f28d386fbe
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 10 16:57:00 2016 -0500
+
+    started controler
+
+ controller.ml  | 12 +++++++++++-
+ controller.mli |  2 +-
+ main.ml        |  6 +++---
+ model.mli      |  2 +-
+ 4 files changed, 16 insertions(+), 6 deletions(-)
+
+commit d997155032e5de61709b048b70844fcf01267dfe
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 10 16:40:12 2016 -0500
+
+    made ml files
+
+ Makefile      |  2 +-
+ cli.ml        | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ controller.ml |  7 +++++++
+ dumbAI.ml     | 25 +++++++++++++++++++++++++
+ main.ml       |  7 +++++++
+ model.ml      | 16 ++++++++++++++++
+ 6 files changed, 100 insertions(+), 1 deletion(-)
+
+commit da4434e74493c7072b7577642acd214846e6cdc5
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Thu Nov 10 12:11:30 2016 -0500
+
+    moved interfaces to actual code
+
+ interfaces/agent.mli => agent.mli           | 0
+ interfaces/controller.mli => controller.mli | 0
+ interfaces/data.ml => data.ml               | 0
+ interfaces/model.mli => model.mli           | 0
+ interfaces/view.mli => view.mli             | 0
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 2dee984b9110b3ce4d00b9a6605197c6b129c3c9
+Merge: ed48a15 350051e
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 8 20:16:27 2016 -0500
+
+    Merge branch 'master' of github.coecis.cornell.edu:asd222/CS3110-MS2
+
+commit ed48a151fb563c62544896f01f44e3dd8ece395a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 8 20:14:23 2016 -0500
+
+    changed unit
+
+ interfaces/view.mli | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 531116c2f3e8da2c8b8154545ae80850d997a0e7
+Merge: b8ec0c5 e7f2941
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 8 20:03:31 2016 -0500
+
+    fixed merge conflicts
+
+commit b8ec0c5caa506d78fa8e4d4d5f9ea0743fe0dda0
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Tue Nov 8 20:00:34 2016 -0500
+
+    finished up MLIs
+
+ Makefile             | 12 ++++++++++++
+ interfaces/agent.mli |  5 +++++
+ interfaces/data.ml   | 15 ++++++++++++++-
+ interfaces/view.mli  | 36 +++++++++++++++++++++++++++++++-----
+ 4 files changed, 62 insertions(+), 6 deletions(-)
+
+commit 350051ef85a06af7fbd5ac57cfbfe75f337cf1e8
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 7 23:40:58 2016 -0500
+
+    fixed units in view
+
+ interfaces/view.mli | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit e7f294109222d63fe7227d095d9f290789b95970
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 7 22:23:34 2016 -0500
+
+    small fix
+
+ interfaces/view.mli | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit aee547a431d71bc4060a5aa8f96bda4012341168
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 7 22:21:55 2016 -0500
+
+    added prompt for filename and Controller.start
+
+ interfaces/controller.mli | 6 +++++-
+ interfaces/view.mli       | 3 +++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+commit 95b19477e3bce91a787e8b93b16926a0e7640a0a
+Author: Ubuntu <ubuntu@csvm>
+Date:   Mon Nov 7 22:16:29 2016 -0500
+
+    added envelope to game record
+
+ interfaces/data.ml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 9f3697e3dfd3a092174b02b52c5a33026b5975c6
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 22:02:44 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/data.ml | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+commit 122334bb87e3b204823492291b3978d95e5874f0
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:53:25 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/data.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 0ed05d2e5ec163e0ae3950142ea8f92cf26fd377
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:49:43 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/model.mli | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 3519febc1b679a796796c0be70dea9f9223617e9
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:49:17 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/data.mli | 38 --------------------------------------
+ 1 file changed, 38 deletions(-)
+
+commit a9d7e4ad72045f526d9ae60d2661a90ab04654d5
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:49:06 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/data.ml  | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ interfaces/data.mli | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
+
+commit 42593aca783dcd94b8c5b3bbfc58d7995c43903b
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:48:56 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/agent.mli      |  2 +-
+ interfaces/controller.mli |  3 ++-
+ interfaces/model.mli      | 39 +--------------------------------------
+ interfaces/view.mli       |  7 ++++---
+ 4 files changed, 8 insertions(+), 43 deletions(-)
+
+commit 8b55e316716ae9cef04856e9e8360483788dc34a
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Mon Nov 7 21:42:23 2016 -0500
+
+    changed few things from meetings
+
+ interfaces/agent.mli      |  9 +++------
+ interfaces/controller.mli |  1 +
+ interfaces/model.mli      | 10 ++++++++--
+ 3 files changed, 12 insertions(+), 8 deletions(-)
+
+commit 4770f55766991eb8236a53dda5376aa02cf9e710
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Nov 6 23:22:48 2016 -0500
+
+    finished all but View module
+
+ interfaces/agent.mli      | 20 +++++++++++++++++++-
+ interfaces/controller.mli |  2 ++
+ interfaces/input.mli      |  3 ---
+ interfaces/model.mli      | 18 +++++++++++++++---
+ interfaces/view.mli       | 15 +++++++++++++--
+ 5 files changed, 49 insertions(+), 9 deletions(-)
+
+commit 526c75cc98841aac3fd92a3c7d84bc076be3bfde
+Author: Drew Dunne <drew@drewsdunne.com>
+Date:   Sun Nov 6 20:21:03 2016 -0500
+
+    initial commit
+
+ .gitignore                | 22 ++++++++++++++++++++++
+ interfaces/agent.mli      |  5 +++++
+ interfaces/controller.mli |  3 +++
+ interfaces/input.mli      |  3 +++
+ interfaces/model.mli      | 35 +++++++++++++++++++++++++++++++++++
+ interfaces/view.mli       |  3 +++
+ 6 files changed, 71 insertions(+)
