@@ -215,7 +215,7 @@ let center_text_in_rect x y w h s =
               if (w' > w)
                 then let l_split = strict_split_string w h in
                   let l_split = List.filter (fun s -> s <> "") l_split in
-                  length_check (w, 13) (acc) (l_split@t)
+                  length_check (aw, ah) (acc) (l_split@t)
               else if (w' > aw)
                 then length_check (w', h') (List.rev (h::(List.rev acc))) t
               else length_check (aw, ah) (List.rev (h::(List.rev acc))) t in
@@ -233,7 +233,7 @@ let center_text_in_rect x y w h s =
       Graphics.moveto (x+buffer_w) (y+buffer_h+(count - 1 - n)*h');
       Graphics.draw_string s';
       loop (n+1) t in
-  loop 0 lst
+  loop 0 lst'
 
 (* returns the (x, y) of the next mouse click relative to the window,
  * doesn't terminate until the mouse is clicked in the window *)
