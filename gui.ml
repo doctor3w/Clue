@@ -90,7 +90,7 @@ let after_delay (f: unit -> 'a) (secs:float) : 'a =
   | false -> failwith ("Can never be false: " ^ Pervasives.__LOC__)
 
 (* true iff the current player is the player whose sheet is displayed *)
-let is_my_turn =
+let is_my_turn () =
   window.curr_player = window.sheet_disp
 
 (* partially applies the [rect] as four arguments to f *)
@@ -649,14 +649,14 @@ let prompt_move (movelst: move list) : string =
 
 (* Displays a description of what the agent rolled. *)
 let display_dice_roll (roll: int) : unit =
-  let _ = if (not is_my_turn) then gui_delay 1.0 else () in
+  let _ = if not (is_my_turn ()) then gui_delay 1.0 else () in
   let s = (" has rolled a " ^ (Pervasives.string_of_int roll) ^ ".") in
   set_info (window.curr_player ^ s);
   add_to_log [((window.curr_player ^ s), Graphics.black)]
 
 (* Displays a description of whether the agent elected to Roll or Passage. *)
 let display_move move : unit =
-  let _ = if (not is_my_turn) then gui_delay 1.0 else () in
+  let _ = if not (is_my_turn ()) then gui_delay 1.0 else () in
   let f loc = match loc.info with
   | Room_Rect (s,_) -> s
   | Space _ -> failwith ("can't take a passage to a space: "
@@ -700,7 +700,7 @@ let prompt_movement pathmap acc_room roll : loc =
 
 (* Displays the movement the agent took on its turn *)
 let display_movement (l, (s, b)) : unit =
-  let _ = if (not is_my_turn) then gui_delay 2.0 else () in
+  let _ = if not (is_my_turn ()) then gui_delay 2.0 else () in
   display_relocate window.curr_player l
 
 (* Prompts the user for a guess.
@@ -747,7 +747,7 @@ let prompt_guess loc (is_acc: bool) : string =
 
 (* Displays a guess (by the user or AI). *)
 let display_guess guess : unit =
-  let _ = if (not is_my_turn) then gui_delay 2.0 else () in
+  let _ = if not (is_my_turn ()) then gui_delay 2.0 else () in
   let guesser = window.curr_player in
   match guess with
   | (Suspect who, Weapon what, Room where) ->
@@ -852,7 +852,7 @@ let display_no_answer (who: string) : unit =
 
 (* Displays end game victory text, string is who won. *)
 let display_victory (who: string) : unit =
-  let _ = if (not is_my_turn) then gui_delay 4.0 else () in
+  let _ = if not (is_my_turn ()) then gui_delay 4.0 else () in
   set_info (who ^ " WINS!")
 
 (* Displays arbitrary text. *)
