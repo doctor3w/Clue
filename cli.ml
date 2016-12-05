@@ -81,9 +81,10 @@ let display_movement (l, (str, b)) =
 (* Displays the relocation of suspect [string] to the Room loc *)
 let display_relocate who loc =
 	let intro = "The player " in
-	let room_name = match loc.info with
-									| Room_Rect (s, _) -> s
-									| _ -> failwith ("must be a room: " ^ Pervasives.__LOC__) in
+	let room_name =
+		match loc.info with
+		| Room_Rect (s, _) -> s
+		| _ -> failwith ("must be a room: " ^ Pervasives.__LOC__) in
 	let str = who ^ " was relocated to the " ^ room_name ^ ".\n" in
 	print_chars [] (intro^str)
 
