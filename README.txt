@@ -30,13 +30,11 @@ Then with the `main.byte` file you can run it with this usage:
 ```
 USAGE: 
 
-./main.byte [OPTIONS] [FILE_NAME] [SEED]
+./main.byte [OPTIONS] [FILE_NAME]
 
 These can be in any order
 OPTIONS:
 	-gui : Uses a GUI instead of CLI
 FILE_NAME: 
 	optional filename to load on run
-SEED:
-	integer for loading seed on launch (makes repeating games easy)
 ```

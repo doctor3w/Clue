@@ -173,15 +173,21 @@ let get_guess pl public : guess =
   let unks_s = List.filter s_only unks in
   let unks_w = List.filter w_only unks in
   let s =
-    try List.hd my_s with _ ->
-    try List.hd env_s with _ ->
-    if List.length unks_s = 0 then failwith "No card to guess"
-    else List.nth unks_s (Random.int (List.length unks_s)) in
+    if knows_sus pl then
+      try List.hd my_s with _ ->
+      try List.hd env_s with _ ->
+      failwith "Known but not known"
+    else
+      if List.length unks_s = 0 then failwith "No card to guess"
+      else List.nth unks_s (Random.int (List.length unks_s)) in
   let w =
-    try List.hd my_w with _ ->
-    try List.hd env_w with _ ->
-    if List.length unks_w = 0 then failwith "No card to guess"
-    else List.nth unks_w (Random.int (List.length unks_w)) in
+    if knows_weap pl then
+      try List.hd my_w with _ ->
+      try List.hd env_w with _ ->
+      failwith "Known but not known"
+    else
+      if List.length unks_w = 0 then failwith "No card to guess"
+      else List.nth unks_w (Random.int (List.length unks_w)) in
   (s, w, r)
 
 (* [get_accusation] takes in a game sheet and the current location and returns
