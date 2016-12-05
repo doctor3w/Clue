@@ -731,14 +731,15 @@ let first_take_note player public: player =
       help t public)) in help hand public;
   player
 
-let rec update_player player l =
-      match !l with
-      | [] -> player
-      | h::t ->
-        let data = CardMap.find h player.sheet in
-        let data' = {data with card_info = Envelope} in
-        let sheet' = CardMap.add h data' player.sheet in
-            update_player {player with sheet = sheet'} (ref t)
+let update_player player l =
+  let f acc el =
+    let sh = acc.sheet in
+    let d = CardMap.find el sh in
+    let d' = {d with card_info = Envelope} in
+    let sh' = CardMap.add el d' sh in
+    {acc with sheet = sh'} in
+  List.fold_left f player !l
+
 
 let compile_known matrix public lst ref_l =
   let counter = ref None in
