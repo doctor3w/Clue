@@ -199,7 +199,7 @@ let strict_split_string w s =
     match lst with
     | [] -> acc
     | h::t -> let (w', _) = Graphics.text_size h in
-              if w' >= w
+              if w' > w
               then let lst' = split_on_all_chars w h in
                 loop (acc@lst') t
               else loop (List.rev (h::(List.rev acc))) t in
@@ -215,7 +215,7 @@ let center_text_in_rect x y w h s =
               if (w' > w)
                 then let l_split = strict_split_string w h in
                   let l_split = List.filter (fun s -> s <> "") l_split in
-                  length_check (aw, ah) (acc) (l_split@t)
+                  length_check (w, 13) (acc) (l_split@t)
               else if (w' > aw)
                 then length_check (w', h') (List.rev (h::(List.rev acc))) t
               else length_check (aw, ah) (List.rev (h::(List.rev acc))) t in
@@ -228,6 +228,8 @@ let center_text_in_rect x y w h s =
       let (w', h') = biggest_size in
       let h'' = h'*count in
       let (buffer_w, buffer_h) = ((w - w')/2, (h - h'')/2) in
+      let buffer_w = if buffer_w < 0 then 0 else buffer_w in
+      let buffer_h = if buffer_h < 0 then 0 else buffer_h in
       Graphics.moveto (x+buffer_w) (y+buffer_h+(count - 1 - n)*h');
       Graphics.draw_string s';
       loop (n+1) t in
@@ -726,11 +728,17 @@ let prompt_filename () : string =
 (* Prompts the user for whether he rolls dice or not. *)
 let prompt_move_gui (movelst: move list) : move =
   let transform = get_b_transform () in
+  let coords = ref [] in
+  let add_loc_coord loc =
+    match loc.info with
+    Room_Rect (_,(x,_,y,_)) | Space (x,y) -> coords := (x,y)::(!coords) in
   let f acc move =
     match move with
-    | Passage loc -> highlight_loc transform loc; loc::acc
+    | Passage loc -> add_loc_coord loc; loc::acc
     | Roll -> highlight_roll "ROLL" (); acc in
   let loclst = List.fold_left f [] movelst in
+  draw_board !coords ();
+  draw_players();
   let rectlst = [("board", window.b_window); ("roll", window.roll_window)] in
   let rec loop () =
     match get_next_click_in_rects rectlst () with
