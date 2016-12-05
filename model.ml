@@ -18,16 +18,17 @@ type room_temp = {
 open Board
 
 exception BadConfig
+exception Not_json
 
 module YJ = Yojson.Basic.Util
 
 (* loads a json object from file [file_name] *)
 let load_json file_name =
   let len = String.length file_name in
-  if len < 5 then failwith "not a json, ln 26" (* can't end in .json *)
-  else if((String.sub file_name (len-5) 5) = ".json") then
+  if len < 5 then failwith "not a json file" (* can't end in .json *)
+  else if ((String.sub file_name (len-5) 5) = ".json") then
     Yojson.Basic.from_file file_name
-  else failwith ("not a .json, ln 30, filename: " ^ file_name)
+  else failwith ("not a .json, filename: " ^ file_name)
 
 (* returns a shuffled copy of [lst] *)
 let shuffle_lst lst =
