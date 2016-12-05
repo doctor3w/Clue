@@ -836,7 +836,8 @@ let take_notes player public guess str_option: player =
     | _,_,_ -> ());
   (* if the player only has n cards in hands and he already has n known,
     then any maybe_in_hand must be not_in_hand *)
-    column_helper matrix p_index x_len player;
+    for y=0 to (y_len-1) 
+    do column_helper matrix y x_len player done;
   (* might need to do more to compile the data *)
   (* update not_in_hand if the player answering the guess is not adjacent
     to the player asking*)
