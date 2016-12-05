@@ -80,8 +80,6 @@ let pub = {
     };
     deck = (s_lst,w_lst,r_lst);
     player_order = ["red";"blue";"green";"yellow"];
-    current_guess = (Suspect "", Weapon "", Room "");
-    current_response = None;
   }
 
 

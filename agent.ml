@@ -85,6 +85,8 @@ let process_of_elimination sheet pub pl_typ =
     let r_unks = poe_finder rs [] sheet in
     poe_update s_unks sheet |> poe_update w_unks |> poe_update r_unks
 
+(* Displays the sheet if the agent is human and the type is GUI.
+ * Meant for updating the GUI. *)
 let show_sheet sheet agent =
   if agent = Human_t && !view_type = GUI then
     Gui.show_sheet sheet

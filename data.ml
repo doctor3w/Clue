@@ -73,8 +73,10 @@ type sheet = sheet_data CardMap.t
  * module should be used to call the prompts on *)
 type agent = Human_t | DumbAI_t | SmartAI_t | ResponsiveAI_t
 
+(* [coord] is a coordinate of row, column *)
 type coord = int*int
 
+(* an ordered module for coord to use in maps *)
 module Coord = struct
   type t = coord
   let compare (r1,c1) (r2,c2) =
@@ -85,16 +87,22 @@ module Coord = struct
     else 0
 end
 
+(* Two useful Map modules, one with strings as key and other with coords *)
 module CoordMap = Map.Make(Coord)
 module StringMap = Map.Make(String)
 
+(* A temporary record for use during import. Not used after import has
+ * been completed. *)
 type player_temp = {
   p_id:string; play_ord:int; start:int*int
 }
 
+(* [rect] is a rectangle declaration using x-y coordinates. *)
 type rect = int*int*int*int
 (* rect is x0,x1.y0,y1*)
 
+(* Similar to a player_temp, just used in import to hold the data before full
+ * data compilation into a [game] *)
 type room_temp = {
   r_id: string;
   rect: rect;
@@ -104,14 +112,25 @@ type room_temp = {
 
 (* x0, x1, y0, y1 *)
 
+(**
+ * [coord_info] respresents a location on the board, holding the name of the
+ * room and its rect or the coordinates of the space.
+ *)
 type coord_info = Space of (int*int) | Room_Rect of string * (int*int*int*int)
 
+(**
+ * [loc] respresents a location on the board, holding the coord_info and a
+ * list of all the locations accessible from that location.
+ **)
 type loc =
 {
   info: coord_info;
   edges: (int*int) list
 }
 
+(* [board] represents the entire game board once built. This holds two maps,
+ * one that maps [coord]s to [loc]s and the other is room names [string] to
+ * [coord]s of the room. *)
 type board =
 {
   dim: int*int;
@@ -119,6 +138,7 @@ type board =
   room_coords: coord StringMap.t
 }
 
+(* PathMap is a module that is used to find paths around a board type. *)
 module PathMap = struct
   type backpointer = (int*coord)
   type t = backpointer CoordMap.t
@@ -204,8 +224,6 @@ type public = {curr_player: string;
                acc_room: string;
                deck: deck;
                player_order: string list;
-               current_guess: guess;
-               current_response: string option;
                }
 
 (**
@@ -232,8 +250,6 @@ let game_init = {
       loc_map = CoordMap.empty;
       room_coords = StringMap.empty;
     };
-    current_guess = (Suspect "", Weapon "", Room ""); (* every time we have a new guess, we need to update game.current_guess *)
-    current_response = None;
     deck = ([],[],[]);
     player_order = []
   };
