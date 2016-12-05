@@ -182,6 +182,10 @@ let make_agent_lst j =
     | "DumbAI" -> DumbAI_t
     | "SmartAI" -> SmartAI_t
     | "ResponsiveAI" -> ResponsiveAI_t
+    | "RandomAI" -> let n = Random.int 3 in
+                    if      n = 0 then DumbAI_t
+                    else if n = 1 then SmartAI_t
+                    else               ResponsiveAI_t
     | s -> failwith ("unrecongnized agent type: " ^ s) in
   let f' acc el =
     let el' = YJ.to_assoc el in

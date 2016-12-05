@@ -434,28 +434,28 @@
     [
       {
         "suspect": "Walker White",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "David Gries",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "Ross Tate",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "Andrew Myers",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "Joe Halpern",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "Mike George",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }, {
         "suspect": "Michael Clarkson",
         "agent_type": "Human"
       }, {
         "suspect": "Anne Bracy",
-        "agent_type": "ResponsiveAI"
+        "agent_type": "RandomAI"
       }
     ]
 }
