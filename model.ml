@@ -86,6 +86,14 @@ let extract_coord j : int*int =
     (x, y)
   | _ -> failwith "invalid coord"
 
+let extract_color j : int*int*int =
+  match (Yojson.Basic.Util.to_assoc j) with
+  | [r; g; b] -> let r'= snd r |> Yojson.Basic.Util.to_int in
+                 let g'= snd g |> Yojson.Basic.Util.to_int in
+                 let b'= snd b |> Yojson.Basic.Util.to_int in
+                 (r', g', b')
+  | _ -> failwith ("color of wrong form: " ^ Pervasives.__LOC__)
+
 (* extracts the dimensions (row_count * col_count) from json [j] *)
 let extract_dim j : int*int =
   let asc = YJ.to_assoc j in
@@ -96,7 +104,7 @@ let extract_dim j : int*int =
 (* extracts a [player_temp] record from [json] *)
 let make_temp_player json : player_temp =
   let asc = Yojson.Basic.Util.to_assoc json in
-  let p_temp = {p_id = ""; play_ord = -1; start = (-1, -1)} in
+  let p_temp = {p_id =""; play_ord = -1; start = (-1,-1); color = (-1,-1,-1)} in
   let rec loop lst acc =
   match lst with
   | [] -> acc
@@ -109,6 +117,10 @@ let make_temp_player json : player_temp =
   | ("start_space", j)::t ->
     let coord = extract_coord j
     in let acc = {acc with start = coord}
+    in loop t acc
+  | ("color", j)::t ->
+    let color = extract_color j
+    in let acc = {acc with color = color}
     in loop t acc
   | (s,_)::t ->
     failwith ("can't recognize within player: " ^ s)
@@ -197,6 +209,7 @@ let add_player game full_deck player_temp agent_lst =
     agent = List.assoc player_temp.p_id agent_lst;
     curr_loc = loc;
     listen = Array.make_matrix dcount pcount Pure_unknown;
+    color = player_temp.color;
   } in {game with players = p::game.players}
 
 (* [import_board] takes in a filename of a game configuration file and

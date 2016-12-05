@@ -671,7 +671,8 @@ let display_turn (public:Data.public) : unit =
   window.po_lst <- cycle_to this_turn window.po_lst;
   po_start_turn ();
   set_info s;
-  add_to_log [(s, StringMap.find this_turn window.player_colors)]
+  add_to_log [(s, StringMap.find this_turn window.player_colors)];
+  if not (is_my_turn ()) then gui_delay 1.0 else gui_delay 0.5
 
 (* Prompts the user for a file so that it can be imported into the Model *)
 let prompt_filename () : string =
@@ -804,6 +805,7 @@ let prompt_guess loc (is_acc: bool) : string =
                 if is_acc then r := card else () in
   set_roll_text "GUESS";
   let (csus, cweap, croom) = loop () in
+  draw_roll ();
   match csus, cweap, croom with
   | Suspect sus, Weapon weap, Room room -> (sus ^ ", " ^ weap ^ ", " ^ room)
   | _ -> failwith ("guess in wrong order: " ^ Pervasives.__LOC__)
@@ -909,8 +911,7 @@ let display_answer (c:card option) (who: string) (detail: bool) : unit =
     | true, Some c -> who ^ " shows you " ^ card_detail c
     | false, Some c -> who ^ " showed a card from their hand." in
   set_info s; add_to_log [(s, Graphics.black)];
-  let _ = if not my_ans then gui_delay 2.0 else ()
-  in ()
+  if not my_ans then gui_delay 0.0 else ()
 
 (* Displays that the player [string] could not answer with a card.
  * This is different from no one being able to show a card. *)
@@ -939,11 +940,12 @@ let init game =
   window.weap_count <- List.length r;
   window.po_lst <- game.public.player_order;
   let p_count = List.length game.players in
-  let colors = pick_n_colors p_count in
+  (*let colors = pick_n_colors p_count in*)
   let count = ref 0 in
   let f me =
     let sus = me.suspect in
-    let color = List.nth colors !count in
+    let (r,g,b) = me.color in
+    let color = Graphics.rgb r g b in
     count := !count + 1;
     window.player_locs <- StringMap.add sus me.curr_loc window.player_locs;
     window.player_colors <- StringMap.add sus color window.player_colors;
@@ -982,7 +984,8 @@ let prompt_continue () : unit =
     | _ -> failwith ("not a defined rectangle: "
                      ^ Pervasives.__LOC__)  in
   highlight_roll "CONTINUE" ();
-  loop ()
+  loop ();
+  draw_roll ()
 
 let prompt_end_game () : unit =
   let cont_rect = window.roll_window in
