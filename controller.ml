@@ -10,9 +10,25 @@ exception No_players
 (* Thrown when a player is not found in a player list *)
 exception Player_not_found
 
+let rec get_player plrs sus = match plrs with
+  | [] -> raise Player_not_found
+  | pl::t when pl.suspect = sus -> pl
+  | _::t -> get_player t sus
+
 (* Gets the current player and the next player in the players list.
  * If the provided player string is not found it will raise an error. *)
-let get_cur_next plrs cur =
+let get_cur_next order cur plrs =
+  let get_pl s = get_player plrs s in
+  let rec helper order t =
+    match t with
+    | [] -> raise Player_not_found
+    | c::n::t' ->
+      if c = cur then (get_pl c, get_pl n)
+      else helper order (n::t')
+    | h::[] when h = cur -> (get_pl h, get_pl (List.hd order))
+    | _::[] -> raise Player_not_found
+  in if order = [] then raise No_players else helper order order
+(* let get_cur_next plrs cur =
   let rec helper ps t =
     match t with
     | [] -> raise Player_not_found
@@ -20,7 +36,7 @@ let get_cur_next plrs cur =
       if c.suspect = cur then (c, n) else helper ps (n::t')
     | h::[] when h.suspect = cur -> (h, List.hd ps)
     | _::[] -> raise Player_not_found
-  in if plrs = [] then raise No_players else helper plrs plrs
+  in if plrs = [] then raise No_players else helper plrs plrs *)
 
 let get_movement_dir l ops =
   try List.assoc l ops with Not_found -> ("nothing", false)
@@ -142,7 +158,9 @@ let print_pls pls =
  * at a time.
  * Requires: game has at least one player. *)
 let rec step game =
-  let (curr_p, next_p) = get_cur_next game.players game.public.curr_player in
+  let (curr_p, next_p) =
+    let p = game.public in
+    get_cur_next p.player_order p.curr_player game.players in
   if curr_p.is_out then
     if not (check_all_out game.players) then
       step {game with public={game.public with curr_player=next_p.suspect}}
