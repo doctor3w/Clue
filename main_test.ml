@@ -16,6 +16,73 @@ let coord_of_loc loc = match loc.info with
 let (_, pm1) = get_movement_options game1 12
 let (_, pm2) = get_movement_options game2 12
 
+let loc1 = {info = Space (0,0);
+            edges = []}
+
+let blue = Suspect "blue"
+let green = Suspect "green"
+let red = Suspect "red"
+let yellow = Suspect "yellow"
+let s_lst = [blue;green;red;yellow]
+
+let gun = Weapon "gun"
+let rope = Weapon "rope"
+let sword = Weapon "sword"
+let w_lst = [gun;rope;sword]
+
+let room1 = Room "1"
+let room2 = Room "2"
+let room3 = Room "3"
+let room4 = Room "4"
+let r_lst = [room1;room2;room3;room4]
+
+let redp = {suspect="red";
+               hand=[gun; room3];
+               curr_loc=loc1;
+               sheet=default_sheet (s_lst@w_lst@r_lst);
+               agent=ResponsiveAI_t;
+               is_out=false;
+               listen= Array.make_matrix 11 4 Pure_unknown}
+
+let bluep = {suspect="blue";
+               hand=[sword; room2];
+               curr_loc=loc1;
+               sheet=default_sheet (s_lst@w_lst@r_lst);
+               agent=ResponsiveAI_t;
+               is_out=false;
+               listen= Array.make_matrix 11 4 Pure_unknown}
+
+let greenp = {suspect="green";
+               hand=[red; yellow];
+               curr_loc=loc1;
+               sheet=default_sheet (s_lst@w_lst@r_lst);
+               agent=ResponsiveAI_t;
+               is_out=false;
+               listen= Array.make_matrix 11 4 Pure_unknown}
+
+let yellowp = {suspect="yellow";
+               hand=[green; room4];
+               curr_loc=loc1;
+               sheet=default_sheet (s_lst@w_lst@r_lst);
+               agent=ResponsiveAI_t;
+               is_out=false;
+               listen= Array.make_matrix 11 4 Pure_unknown}
+
+
+let pub = {
+    curr_player = "blue";
+    acc_room = "acc";
+    board = {
+      dim = (-1,-1);
+      loc_map = CoordMap.empty;
+      room_coords = StringMap.empty;
+    };
+    deck = (s_lst,w_lst,r_lst);
+    player_order = ["red";"blue";"green";"yellow"];
+    current_guess = (Suspect "", Weapon "", Room "");
+    current_response = None;
+  }
+
 let pathmap_tests =
 [
   "pm1_id" >:: (fun _ -> assert_equal 0 (PathMap.length_to c1 pm1));
@@ -32,7 +99,10 @@ let pathmap_tests =
     (PathMap.nth_step_towards (7, 7) 5 pm1));
 ]
 
-let tests = pathmap_tests
+let responsive_tests =
+[]
+
+let tests = pathmap_tests@responsive_tests
 
 let suite =
   "Clue test suite"
